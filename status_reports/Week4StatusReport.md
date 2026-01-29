@@ -7,10 +7,10 @@
   - [ ] Software Design: Define classes + responsibilities (3 days) - Isaac
   
 ## Progress and issues: 
-This week we worked on project planning and updated our Living Doc. 
-What worked: Thinking about risk assessment and test plan helped further our project ideas.
-What we learned: Learing about testing in lecture.
-Where we had trouble: Less communication this week, mostly just because there was less to do. Although we could have used this time to work ahead.
+This week we worked on project planning and updated our Living Doc.  
+What worked: Thinking about risk assessment and test plan helped further our project ideas.  
+What we learned: Learing about testing in lecture.  
+Where we had trouble: Less communication this week, mostly just because there was less to do. Although we could have used this time to work ahead.  
 
 ## Plans and goals:
 - [ ] Finish Project Milestone #3 https://github.com/Connor-Allen10/codemon/issues/3#issue-3841088266
