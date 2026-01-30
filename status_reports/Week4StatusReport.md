@@ -23,7 +23,9 @@ Where we had trouble: Less communication this week, mostly just because there wa
     - [ ] Assumptions - Lon
     - [ ] Alternative Decisions - Connor
   - [ ] Software Design - Isaac (3 days)
-  - [ ] Coding Guidelines (short)
+  - [ ] Coding Guidelines (short)  
+     
+- [ ] Start Mid-Term Presentation
 
 # 2. Contributions of individual team members
 * Connor: Worked on Living Doc - Added outline for Project Milestone 3, filled out risk assessment, created Week 4 Status Report.
