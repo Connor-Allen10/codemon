@@ -1,0 +1,596 @@
+
+---
+events:
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineSystem.cmake:204 (message)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      The system is: Linux - 5.14.0-611.16.1.el9_7.x86_64 - x86_64
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:126 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+      Compiler: /bin/c++ 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+      
+      The CXX compiler identification is GNU, found in:
+        /nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/3.26.5/CompilerIdCXX/a.out
+      
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:57 (try_compile)"
+      - "/usr/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:3 (project)"
+    checks:
+      - "Detecting CXX compiler ABI info"
+    directories:
+      source: "/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-5cInKR"
+      binary: "/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-5cInKR"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      VCPKG_INSTALLED_DIR: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed"
+      VCPKG_PREFER_SYSTEM_LIBS: "OFF"
+      VCPKG_TARGET_TRIPLET: "x64-linux"
+      Z_VCPKG_ROOT_DIR: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg"
+    buildResult:
+      variable: "CMAKE_CXX_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: /nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-5cInKR
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /bin/gmake -f Makefile cmTC_e13eb/fast && /bin/gmake  -f CMakeFiles/cmTC_e13eb.dir/build.make CMakeFiles/cmTC_e13eb.dir/build
+        gmake[1]: Entering directory '/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-5cInKR'
+        Building CXX object CMakeFiles/cmTC_e13eb.dir/CMakeCXXCompilerABI.cpp.o
+        /bin/c++   -v -o CMakeFiles/cmTC_e13eb.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp
+        Using built-in specs.
+        COLLECT_GCC=/bin/c++
+        OFFLOAD_TARGET_NAMES=nvptx-none
+        OFFLOAD_TARGET_DEFAULT=1
+        Target: x86_64-redhat-linux
+        Configured with: ../configure --enable-bootstrap --enable-host-pie --enable-host-bind-now --enable-languages=c,c++,fortran,lto --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=https://bugs.rockylinux.org/ --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-linker-build-id --with-gcc-major-version-only --enable-plugin --enable-initfini-array --without-isl --enable-multilib --with-linker-hash-style=gnu --enable-offload-targets=nvptx-none --without-cuda-driver --enable-gnu-indirect-function --enable-cet --with-tune=generic --with-arch_64=x86-64-v2 --with-arch_32=x86-64 --build=x86_64-redhat-linux --with-build-config=bootstrap-lto --enable-link-serialization=1
+        Thread model: posix
+        Supported LTO compression algorithms: zlib zstd
+        gcc version 11.5.0 20240719 (Red Hat 11.5.0-11) (GCC) 
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_e13eb.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'CMakeFiles/cmTC_e13eb.dir/'
+         /usr/libexec/gcc/x86_64-redhat-linux/11/cc1plus -quiet -v -D_GNU_SOURCE /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles/cmTC_e13eb.dir/ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64-v2 -version -o /tmp/ccsfp6WU.s
+        GNU C++17 (GCC) version 11.5.0 20240719 (Red Hat 11.5.0-11) (x86_64-redhat-linux)
+        	compiled by GNU C version 11.5.0 20240719 (Red Hat 11.5.0-11), GMP version 6.2.0, MPFR version 4.1.0-p9, MPC version 1.2.1, isl version none
+        GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+        ignoring nonexistent directory "/usr/lib/gcc/x86_64-redhat-linux/11/include-fixed"
+        ignoring nonexistent directory "/usr/lib/gcc/x86_64-redhat-linux/11/../../../../x86_64-redhat-linux/include"
+        #include "..." search starts here:
+        #include <...> search starts here:
+         /usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11
+         /usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/x86_64-redhat-linux
+         /usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/backward
+         /usr/lib/gcc/x86_64-redhat-linux/11/include
+         /usr/local/include
+         /usr/include
+        End of search list.
+        GNU C++17 (GCC) version 11.5.0 20240719 (Red Hat 11.5.0-11) (x86_64-redhat-linux)
+        	compiled by GNU C version 11.5.0 20240719 (Red Hat 11.5.0-11), GMP version 6.2.0, MPFR version 4.1.0-p9, MPC version 1.2.1, isl version none
+        GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+        Compiler executable checksum: 6853d00618d026aa88cc8c38be95aaf1
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_e13eb.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'CMakeFiles/cmTC_e13eb.dir/'
+         as -v --64 -o CMakeFiles/cmTC_e13eb.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccsfp6WU.s
+        GNU assembler version 2.35.2 (x86_64-redhat-linux) using BFD version version 2.35.2-67.el9_7.1
+        COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/
+        LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../:/lib/:/usr/lib/
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_e13eb.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'CMakeFiles/cmTC_e13eb.dir/CMakeCXXCompilerABI.cpp.'
+        Linking CXX executable cmTC_e13eb
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e13eb.dir/link.txt --verbose=1
+        /bin/c++  -v CMakeFiles/cmTC_e13eb.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_e13eb 
+        Using built-in specs.
+        COLLECT_GCC=/bin/c++
+        COLLECT_LTO_WRAPPER=/usr/libexec/gcc/x86_64-redhat-linux/11/lto-wrapper
+        OFFLOAD_TARGET_NAMES=nvptx-none
+        OFFLOAD_TARGET_DEFAULT=1
+        Target: x86_64-redhat-linux
+        Configured with: ../configure --enable-bootstrap --enable-host-pie --enable-host-bind-now --enable-languages=c,c++,fortran,lto --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=https://bugs.rockylinux.org/ --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-linker-build-id --with-gcc-major-version-only --enable-plugin --enable-initfini-array --without-isl --enable-multilib --with-linker-hash-style=gnu --enable-offload-targets=nvptx-none --without-cuda-driver --enable-gnu-indirect-function --enable-cet --with-tune=generic --with-arch_64=x86-64-v2 --with-arch_32=x86-64 --build=x86_64-redhat-linux --with-build-config=bootstrap-lto --enable-link-serialization=1
+        Thread model: posix
+        Supported LTO compression algorithms: zlib zstd
+        gcc version 11.5.0 20240719 (Red Hat 11.5.0-11) (GCC) 
+        COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/
+        LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../:/lib/:/usr/lib/
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_e13eb' '-shared-libgcc' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'cmTC_e13eb.'
+         /usr/libexec/gcc/x86_64-redhat-linux/11/collect2 -plugin /usr/libexec/gcc/x86_64-redhat-linux/11/liblto_plugin.so -plugin-opt=/usr/libexec/gcc/x86_64-redhat-linux/11/lto-wrapper -plugin-opt=-fresolution=/tmp/ccplJQGc.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --no-add-needed --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_e13eb /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/11/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/11 -L/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/11/../../.. CMakeFiles/cmTC_e13eb.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-redhat-linux/11/crtend.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_e13eb' '-shared-libgcc' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'cmTC_e13eb.'
+        gmake[1]: Leaving directory '/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-5cInKR'
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:127 (message)"
+      - "/usr/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      Parsed CXX implicit include dir info: rv=done
+        found start of include info
+        found start of implicit include info
+          add: [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11]
+          add: [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/x86_64-redhat-linux]
+          add: [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/backward]
+          add: [/usr/lib/gcc/x86_64-redhat-linux/11/include]
+          add: [/usr/local/include]
+          add: [/usr/include]
+        end of search list found
+        collapse include dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11] ==> [/usr/include/c++/11]
+        collapse include dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/x86_64-redhat-linux] ==> [/usr/include/c++/11/x86_64-redhat-linux]
+        collapse include dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/backward] ==> [/usr/include/c++/11/backward]
+        collapse include dir [/usr/lib/gcc/x86_64-redhat-linux/11/include] ==> [/usr/lib/gcc/x86_64-redhat-linux/11/include]
+        collapse include dir [/usr/local/include] ==> [/usr/local/include]
+        collapse include dir [/usr/include] ==> [/usr/include]
+        implicit include dirs: [/usr/include/c++/11;/usr/include/c++/11/x86_64-redhat-linux;/usr/include/c++/11/backward;/usr/lib/gcc/x86_64-redhat-linux/11/include;/usr/local/include;/usr/include]
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:152 (message)"
+      - "/usr/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      Parsed CXX implicit link information:
+        link line regex: [^( *|.*[/\\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        ignore line: [Change Dir: /nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-5cInKR]
+        ignore line: []
+        ignore line: [Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /bin/gmake -f Makefile cmTC_e13eb/fast && /bin/gmake  -f CMakeFiles/cmTC_e13eb.dir/build.make CMakeFiles/cmTC_e13eb.dir/build]
+        ignore line: [gmake[1]: Entering directory '/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-5cInKR']
+        ignore line: [Building CXX object CMakeFiles/cmTC_e13eb.dir/CMakeCXXCompilerABI.cpp.o]
+        ignore line: [/bin/c++   -v -o CMakeFiles/cmTC_e13eb.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [Using built-in specs.]
+        ignore line: [COLLECT_GCC=/bin/c++]
+        ignore line: [OFFLOAD_TARGET_NAMES=nvptx-none]
+        ignore line: [OFFLOAD_TARGET_DEFAULT=1]
+        ignore line: [Target: x86_64-redhat-linux]
+        ignore line: [Configured with: ../configure --enable-bootstrap --enable-host-pie --enable-host-bind-now --enable-languages=c c++ fortran lto --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=https://bugs.rockylinux.org/ --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-linker-build-id --with-gcc-major-version-only --enable-plugin --enable-initfini-array --without-isl --enable-multilib --with-linker-hash-style=gnu --enable-offload-targets=nvptx-none --without-cuda-driver --enable-gnu-indirect-function --enable-cet --with-tune=generic --with-arch_64=x86-64-v2 --with-arch_32=x86-64 --build=x86_64-redhat-linux --with-build-config=bootstrap-lto --enable-link-serialization=1]
+        ignore line: [Thread model: posix]
+        ignore line: [Supported LTO compression algorithms: zlib zstd]
+        ignore line: [gcc version 11.5.0 20240719 (Red Hat 11.5.0-11) (GCC) ]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_e13eb.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'CMakeFiles/cmTC_e13eb.dir/']
+        ignore line: [ /usr/libexec/gcc/x86_64-redhat-linux/11/cc1plus -quiet -v -D_GNU_SOURCE /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles/cmTC_e13eb.dir/ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64-v2 -version -o /tmp/ccsfp6WU.s]
+        ignore line: [GNU C++17 (GCC) version 11.5.0 20240719 (Red Hat 11.5.0-11) (x86_64-redhat-linux)]
+        ignore line: [	compiled by GNU C version 11.5.0 20240719 (Red Hat 11.5.0-11)  GMP version 6.2.0  MPFR version 4.1.0-p9  MPC version 1.2.1  isl version none]
+        ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+        ignore line: [ignoring nonexistent directory "/usr/lib/gcc/x86_64-redhat-linux/11/include-fixed"]
+        ignore line: [ignoring nonexistent directory "/usr/lib/gcc/x86_64-redhat-linux/11/../../../../x86_64-redhat-linux/include"]
+        ignore line: [#include "..." search starts here:]
+        ignore line: [#include <...> search starts here:]
+        ignore line: [ /usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11]
+        ignore line: [ /usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/x86_64-redhat-linux]
+        ignore line: [ /usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/backward]
+        ignore line: [ /usr/lib/gcc/x86_64-redhat-linux/11/include]
+        ignore line: [ /usr/local/include]
+        ignore line: [ /usr/include]
+        ignore line: [End of search list.]
+        ignore line: [GNU C++17 (GCC) version 11.5.0 20240719 (Red Hat 11.5.0-11) (x86_64-redhat-linux)]
+        ignore line: [	compiled by GNU C version 11.5.0 20240719 (Red Hat 11.5.0-11)  GMP version 6.2.0  MPFR version 4.1.0-p9  MPC version 1.2.1  isl version none]
+        ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+        ignore line: [Compiler executable checksum: 6853d00618d026aa88cc8c38be95aaf1]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_e13eb.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'CMakeFiles/cmTC_e13eb.dir/']
+        ignore line: [ as -v --64 -o CMakeFiles/cmTC_e13eb.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccsfp6WU.s]
+        ignore line: [GNU assembler version 2.35.2 (x86_64-redhat-linux) using BFD version version 2.35.2-67.el9_7.1]
+        ignore line: [COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/]
+        ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../:/lib/:/usr/lib/]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_e13eb.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'CMakeFiles/cmTC_e13eb.dir/CMakeCXXCompilerABI.cpp.']
+        ignore line: [Linking CXX executable cmTC_e13eb]
+        ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e13eb.dir/link.txt --verbose=1]
+        ignore line: [/bin/c++  -v CMakeFiles/cmTC_e13eb.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_e13eb ]
+        ignore line: [Using built-in specs.]
+        ignore line: [COLLECT_GCC=/bin/c++]
+        ignore line: [COLLECT_LTO_WRAPPER=/usr/libexec/gcc/x86_64-redhat-linux/11/lto-wrapper]
+        ignore line: [OFFLOAD_TARGET_NAMES=nvptx-none]
+        ignore line: [OFFLOAD_TARGET_DEFAULT=1]
+        ignore line: [Target: x86_64-redhat-linux]
+        ignore line: [Configured with: ../configure --enable-bootstrap --enable-host-pie --enable-host-bind-now --enable-languages=c c++ fortran lto --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=https://bugs.rockylinux.org/ --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-linker-build-id --with-gcc-major-version-only --enable-plugin --enable-initfini-array --without-isl --enable-multilib --with-linker-hash-style=gnu --enable-offload-targets=nvptx-none --without-cuda-driver --enable-gnu-indirect-function --enable-cet --with-tune=generic --with-arch_64=x86-64-v2 --with-arch_32=x86-64 --build=x86_64-redhat-linux --with-build-config=bootstrap-lto --enable-link-serialization=1]
+        ignore line: [Thread model: posix]
+        ignore line: [Supported LTO compression algorithms: zlib zstd]
+        ignore line: [gcc version 11.5.0 20240719 (Red Hat 11.5.0-11) (GCC) ]
+        ignore line: [COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/11/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/]
+        ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/11/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/11/../../../:/lib/:/usr/lib/]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_e13eb' '-shared-libgcc' '-mtune=generic' '-march=x86-64-v2' '-dumpdir' 'cmTC_e13eb.']
+        link line: [ /usr/libexec/gcc/x86_64-redhat-linux/11/collect2 -plugin /usr/libexec/gcc/x86_64-redhat-linux/11/liblto_plugin.so -plugin-opt=/usr/libexec/gcc/x86_64-redhat-linux/11/lto-wrapper -plugin-opt=-fresolution=/tmp/ccplJQGc.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --no-add-needed --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_e13eb /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/11/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/11 -L/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/11/../../.. CMakeFiles/cmTC_e13eb.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-redhat-linux/11/crtend.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o]
+          arg [/usr/libexec/gcc/x86_64-redhat-linux/11/collect2] ==> ignore
+          arg [-plugin] ==> ignore
+          arg [/usr/libexec/gcc/x86_64-redhat-linux/11/liblto_plugin.so] ==> ignore
+          arg [-plugin-opt=/usr/libexec/gcc/x86_64-redhat-linux/11/lto-wrapper] ==> ignore
+          arg [-plugin-opt=-fresolution=/tmp/ccplJQGc.res] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+          arg [-plugin-opt=-pass-through=-lc] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+          arg [--build-id] ==> ignore
+          arg [--no-add-needed] ==> ignore
+          arg [--eh-frame-hdr] ==> ignore
+          arg [--hash-style=gnu] ==> ignore
+          arg [-m] ==> ignore
+          arg [elf_x86_64] ==> ignore
+          arg [-dynamic-linker] ==> ignore
+          arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+          arg [-o] ==> ignore
+          arg [cmTC_e13eb] ==> ignore
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crt1.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crt1.o]
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o]
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/crtbegin.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/crtbegin.o]
+          arg [-L/usr/lib/gcc/x86_64-redhat-linux/11] ==> dir [/usr/lib/gcc/x86_64-redhat-linux/11]
+          arg [-L/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64] ==> dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64]
+          arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+          arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
+          arg [-L/usr/lib/gcc/x86_64-redhat-linux/11/../../..] ==> dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../..]
+          arg [CMakeFiles/cmTC_e13eb.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+          arg [-lstdc++] ==> lib [stdc++]
+          arg [-lm] ==> lib [m]
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [-lgcc] ==> lib [gcc]
+          arg [-lc] ==> lib [c]
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [-lgcc] ==> lib [gcc]
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/crtend.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/crtend.o]
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o]
+        collapse obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crt1.o] ==> [/usr/lib64/crt1.o]
+        collapse obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o] ==> [/usr/lib64/crti.o]
+        collapse obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o] ==> [/usr/lib64/crtn.o]
+        collapse library dir [/usr/lib/gcc/x86_64-redhat-linux/11] ==> [/usr/lib/gcc/x86_64-redhat-linux/11]
+        collapse library dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64] ==> [/usr/lib64]
+        collapse library dir [/lib/../lib64] ==> [/lib64]
+        collapse library dir [/usr/lib/../lib64] ==> [/usr/lib64]
+        collapse library dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../..] ==> [/usr/lib]
+        implicit libs: [stdc++;m;gcc_s;gcc;c;gcc_s;gcc]
+        implicit objs: [/usr/lib64/crt1.o;/usr/lib64/crti.o;/usr/lib/gcc/x86_64-redhat-linux/11/crtbegin.o;/usr/lib/gcc/x86_64-redhat-linux/11/crtend.o;/usr/lib64/crtn.o]
+        implicit dirs: [/usr/lib/gcc/x86_64-redhat-linux/11;/usr/lib64;/lib64;/usr/lib]
+        implicit fwks: []
+      
+      
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CheckSymbolExists.cmake:145 (try_compile)"
+      - "/usr/share/cmake/Modules/CheckSymbolExists.cmake:75 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "/usr/share/cmake/Modules/FindBZip2.cmake:93 (CHECK_SYMBOL_EXISTS)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/scripts/buildsystems/vcpkg.cmake:908 (_find_package)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/freetype/vcpkg-cmake-wrapper.cmake:43 (find_package)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/scripts/buildsystems/vcpkg.cmake:862 (include)"
+      - "/usr/share/cmake/Modules/CMakeFindDependencyMacro.cmake:76 (find_package)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml/SFMLGraphicsDependencies.cmake:12 (find_dependency)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml/SFMLConfig.cmake:151 (include)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/scripts/buildsystems/vcpkg.cmake:908 (_find_package)"
+      - "CMakeLists.txt:8 (find_package)"
+    checks:
+      - "Looking for BZ2_bzCompressInit"
+    directories:
+      source: "/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-HoRVaj"
+      binary: "/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-HoRVaj"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml"
+      VCPKG_INSTALLED_DIR: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed"
+      VCPKG_PREFER_SYSTEM_LIBS: "OFF"
+      VCPKG_TARGET_TRIPLET: "x64-linux"
+      Z_VCPKG_ROOT_DIR: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg"
+    buildResult:
+      variable: "BZIP2_NEED_PREFIX"
+      cached: true
+      stdout: |
+        Change Dir: /nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-HoRVaj
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /bin/gmake -f Makefile cmTC_05fcf/fast && /bin/gmake  -f CMakeFiles/cmTC_05fcf.dir/build.make CMakeFiles/cmTC_05fcf.dir/build
+        gmake[1]: Entering directory '/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-HoRVaj'
+        Building CXX object CMakeFiles/cmTC_05fcf.dir/CheckSymbolExists.cxx.o
+        /bin/c++  -I/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/include -std=gnu++17 -o CMakeFiles/cmTC_05fcf.dir/CheckSymbolExists.cxx.o -c /nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-HoRVaj/CheckSymbolExists.cxx
+        Linking CXX executable cmTC_05fcf
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_05fcf.dir/link.txt --verbose=1
+        /bin/c++ CMakeFiles/cmTC_05fcf.dir/CheckSymbolExists.cxx.o -o cmTC_05fcf  /nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/lib/libbz2.a 
+        gmake[1]: Leaving directory '/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-HoRVaj'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CheckLibraryExists.cmake:71 (try_compile)"
+      - "/usr/share/cmake/Modules/FindX11.cmake:498 (check_library_exists)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/scripts/buildsystems/vcpkg.cmake:908 (_find_package)"
+      - "/usr/share/cmake/Modules/CMakeFindDependencyMacro.cmake:76 (find_package)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml/SFMLWindowDependencies.cmake:31 (find_dependency)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml/SFMLConfig.cmake:151 (include)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/scripts/buildsystems/vcpkg.cmake:908 (_find_package)"
+      - "CMakeLists.txt:8 (find_package)"
+    checks:
+      - "Looking for XOpenDisplay in /usr/lib64/libX11.so;/usr/lib64/libXext.so"
+    directories:
+      source: "/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-BPVQc4"
+      binary: "/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-BPVQc4"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml;/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml"
+      VCPKG_INSTALLED_DIR: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed"
+      VCPKG_PREFER_SYSTEM_LIBS: "OFF"
+      VCPKG_TARGET_TRIPLET: "x64-linux"
+      Z_VCPKG_ROOT_DIR: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg"
+    buildResult:
+      variable: "X11_LIB_X11_SOLO"
+      cached: true
+      stdout: |
+        Change Dir: /nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-BPVQc4
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /bin/gmake -f Makefile cmTC_602b8/fast && /bin/gmake  -f CMakeFiles/cmTC_602b8.dir/build.make CMakeFiles/cmTC_602b8.dir/build
+        gmake[1]: Entering directory '/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-BPVQc4'
+        Building CXX object CMakeFiles/cmTC_602b8.dir/CheckFunctionExists.cxx.o
+        /bin/c++   -DCHECK_FUNCTION_EXISTS=XOpenDisplay -std=gnu++17 -o CMakeFiles/cmTC_602b8.dir/CheckFunctionExists.cxx.o -c /nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-BPVQc4/CheckFunctionExists.cxx
+        Linking CXX executable cmTC_602b8
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_602b8.dir/link.txt --verbose=1
+        /bin/c++  -DCHECK_FUNCTION_EXISTS=XOpenDisplay CMakeFiles/cmTC_602b8.dir/CheckFunctionExists.cxx.o -o cmTC_602b8  /usr/lib64/libX11.so /usr/lib64/libXext.so 
+        gmake[1]: Leaving directory '/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-BPVQc4'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CheckFunctionExists.cmake:91 (try_compile)"
+      - "/usr/share/cmake/Modules/FindX11.cmake:513 (check_function_exists)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/scripts/buildsystems/vcpkg.cmake:908 (_find_package)"
+      - "/usr/share/cmake/Modules/CMakeFindDependencyMacro.cmake:76 (find_package)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml/SFMLWindowDependencies.cmake:31 (find_dependency)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml/SFMLConfig.cmake:151 (include)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/scripts/buildsystems/vcpkg.cmake:908 (_find_package)"
+      - "CMakeLists.txt:8 (find_package)"
+    checks:
+      - "Looking for gethostbyname"
+    directories:
+      source: "/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-mI0Mok"
+      binary: "/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-mI0Mok"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml;/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml"
+      VCPKG_INSTALLED_DIR: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed"
+      VCPKG_PREFER_SYSTEM_LIBS: "OFF"
+      VCPKG_TARGET_TRIPLET: "x64-linux"
+      Z_VCPKG_ROOT_DIR: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg"
+    buildResult:
+      variable: "CMAKE_HAVE_GETHOSTBYNAME"
+      cached: true
+      stdout: |
+        Change Dir: /nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-mI0Mok
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /bin/gmake -f Makefile cmTC_f1beb/fast && /bin/gmake  -f CMakeFiles/cmTC_f1beb.dir/build.make CMakeFiles/cmTC_f1beb.dir/build
+        gmake[1]: Entering directory '/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-mI0Mok'
+        Building CXX object CMakeFiles/cmTC_f1beb.dir/CheckFunctionExists.cxx.o
+        /bin/c++   -DCHECK_FUNCTION_EXISTS=gethostbyname -std=gnu++17 -o CMakeFiles/cmTC_f1beb.dir/CheckFunctionExists.cxx.o -c /nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-mI0Mok/CheckFunctionExists.cxx
+        Linking CXX executable cmTC_f1beb
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f1beb.dir/link.txt --verbose=1
+        /bin/c++  -DCHECK_FUNCTION_EXISTS=gethostbyname CMakeFiles/cmTC_f1beb.dir/CheckFunctionExists.cxx.o -o cmTC_f1beb 
+        gmake[1]: Leaving directory '/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-mI0Mok'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CheckFunctionExists.cmake:91 (try_compile)"
+      - "/usr/share/cmake/Modules/FindX11.cmake:527 (check_function_exists)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/scripts/buildsystems/vcpkg.cmake:908 (_find_package)"
+      - "/usr/share/cmake/Modules/CMakeFindDependencyMacro.cmake:76 (find_package)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml/SFMLWindowDependencies.cmake:31 (find_dependency)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml/SFMLConfig.cmake:151 (include)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/scripts/buildsystems/vcpkg.cmake:908 (_find_package)"
+      - "CMakeLists.txt:8 (find_package)"
+    checks:
+      - "Looking for connect"
+    directories:
+      source: "/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-f6ArWv"
+      binary: "/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-f6ArWv"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml;/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml"
+      VCPKG_INSTALLED_DIR: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed"
+      VCPKG_PREFER_SYSTEM_LIBS: "OFF"
+      VCPKG_TARGET_TRIPLET: "x64-linux"
+      Z_VCPKG_ROOT_DIR: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg"
+    buildResult:
+      variable: "CMAKE_HAVE_CONNECT"
+      cached: true
+      stdout: |
+        Change Dir: /nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-f6ArWv
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /bin/gmake -f Makefile cmTC_f570d/fast && /bin/gmake  -f CMakeFiles/cmTC_f570d.dir/build.make CMakeFiles/cmTC_f570d.dir/build
+        gmake[1]: Entering directory '/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-f6ArWv'
+        Building CXX object CMakeFiles/cmTC_f570d.dir/CheckFunctionExists.cxx.o
+        /bin/c++   -DCHECK_FUNCTION_EXISTS=connect -std=gnu++17 -o CMakeFiles/cmTC_f570d.dir/CheckFunctionExists.cxx.o -c /nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-f6ArWv/CheckFunctionExists.cxx
+        Linking CXX executable cmTC_f570d
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f570d.dir/link.txt --verbose=1
+        /bin/c++  -DCHECK_FUNCTION_EXISTS=connect CMakeFiles/cmTC_f570d.dir/CheckFunctionExists.cxx.o -o cmTC_f570d 
+        gmake[1]: Leaving directory '/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-f6ArWv'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CheckFunctionExists.cmake:91 (try_compile)"
+      - "/usr/share/cmake/Modules/FindX11.cmake:536 (check_function_exists)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/scripts/buildsystems/vcpkg.cmake:908 (_find_package)"
+      - "/usr/share/cmake/Modules/CMakeFindDependencyMacro.cmake:76 (find_package)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml/SFMLWindowDependencies.cmake:31 (find_dependency)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml/SFMLConfig.cmake:151 (include)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/scripts/buildsystems/vcpkg.cmake:908 (_find_package)"
+      - "CMakeLists.txt:8 (find_package)"
+    checks:
+      - "Looking for remove"
+    directories:
+      source: "/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-vBsoUF"
+      binary: "/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-vBsoUF"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml;/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml"
+      VCPKG_INSTALLED_DIR: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed"
+      VCPKG_PREFER_SYSTEM_LIBS: "OFF"
+      VCPKG_TARGET_TRIPLET: "x64-linux"
+      Z_VCPKG_ROOT_DIR: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg"
+    buildResult:
+      variable: "CMAKE_HAVE_REMOVE"
+      cached: true
+      stdout: |
+        Change Dir: /nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-vBsoUF
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /bin/gmake -f Makefile cmTC_6e339/fast && /bin/gmake  -f CMakeFiles/cmTC_6e339.dir/build.make CMakeFiles/cmTC_6e339.dir/build
+        gmake[1]: Entering directory '/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-vBsoUF'
+        Building CXX object CMakeFiles/cmTC_6e339.dir/CheckFunctionExists.cxx.o
+        /bin/c++   -DCHECK_FUNCTION_EXISTS=remove -std=gnu++17 -o CMakeFiles/cmTC_6e339.dir/CheckFunctionExists.cxx.o -c /nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-vBsoUF/CheckFunctionExists.cxx
+        Linking CXX executable cmTC_6e339
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6e339.dir/link.txt --verbose=1
+        /bin/c++  -DCHECK_FUNCTION_EXISTS=remove CMakeFiles/cmTC_6e339.dir/CheckFunctionExists.cxx.o -o cmTC_6e339 
+        gmake[1]: Leaving directory '/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-vBsoUF'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CheckFunctionExists.cmake:91 (try_compile)"
+      - "/usr/share/cmake/Modules/FindX11.cmake:545 (check_function_exists)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/scripts/buildsystems/vcpkg.cmake:908 (_find_package)"
+      - "/usr/share/cmake/Modules/CMakeFindDependencyMacro.cmake:76 (find_package)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml/SFMLWindowDependencies.cmake:31 (find_dependency)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml/SFMLConfig.cmake:151 (include)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/scripts/buildsystems/vcpkg.cmake:908 (_find_package)"
+      - "CMakeLists.txt:8 (find_package)"
+    checks:
+      - "Looking for shmat"
+    directories:
+      source: "/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-oady0f"
+      binary: "/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-oady0f"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml;/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml"
+      VCPKG_INSTALLED_DIR: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed"
+      VCPKG_PREFER_SYSTEM_LIBS: "OFF"
+      VCPKG_TARGET_TRIPLET: "x64-linux"
+      Z_VCPKG_ROOT_DIR: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg"
+    buildResult:
+      variable: "CMAKE_HAVE_SHMAT"
+      cached: true
+      stdout: |
+        Change Dir: /nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-oady0f
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /bin/gmake -f Makefile cmTC_f89d8/fast && /bin/gmake  -f CMakeFiles/cmTC_f89d8.dir/build.make CMakeFiles/cmTC_f89d8.dir/build
+        gmake[1]: Entering directory '/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-oady0f'
+        Building CXX object CMakeFiles/cmTC_f89d8.dir/CheckFunctionExists.cxx.o
+        /bin/c++   -DCHECK_FUNCTION_EXISTS=shmat -std=gnu++17 -o CMakeFiles/cmTC_f89d8.dir/CheckFunctionExists.cxx.o -c /nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-oady0f/CheckFunctionExists.cxx
+        Linking CXX executable cmTC_f89d8
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f89d8.dir/link.txt --verbose=1
+        /bin/c++  -DCHECK_FUNCTION_EXISTS=shmat CMakeFiles/cmTC_f89d8.dir/CheckFunctionExists.cxx.o -o cmTC_f89d8 
+        gmake[1]: Leaving directory '/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-oady0f'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CheckLibraryExists.cmake:71 (try_compile)"
+      - "/usr/share/cmake/Modules/FindX11.cmake:555 (check_library_exists)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/scripts/buildsystems/vcpkg.cmake:908 (_find_package)"
+      - "/usr/share/cmake/Modules/CMakeFindDependencyMacro.cmake:76 (find_package)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml/SFMLWindowDependencies.cmake:31 (find_dependency)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml/SFMLConfig.cmake:151 (include)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/scripts/buildsystems/vcpkg.cmake:908 (_find_package)"
+      - "CMakeLists.txt:8 (find_package)"
+    checks:
+      - "Looking for IceConnectionNumber in ICE"
+    directories:
+      source: "/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-HVvOEK"
+      binary: "/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-HVvOEK"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml;/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml"
+      VCPKG_INSTALLED_DIR: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed"
+      VCPKG_PREFER_SYSTEM_LIBS: "OFF"
+      VCPKG_TARGET_TRIPLET: "x64-linux"
+      Z_VCPKG_ROOT_DIR: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg"
+    buildResult:
+      variable: "CMAKE_LIB_ICE_HAS_ICECONNECTIONNUMBER"
+      cached: true
+      stdout: |
+        Change Dir: /nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-HVvOEK
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /bin/gmake -f Makefile cmTC_f90f5/fast && /bin/gmake  -f CMakeFiles/cmTC_f90f5.dir/build.make CMakeFiles/cmTC_f90f5.dir/build
+        gmake[1]: Entering directory '/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-HVvOEK'
+        Building CXX object CMakeFiles/cmTC_f90f5.dir/CheckFunctionExists.cxx.o
+        /bin/c++   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber -std=gnu++17 -o CMakeFiles/cmTC_f90f5.dir/CheckFunctionExists.cxx.o -c /nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-HVvOEK/CheckFunctionExists.cxx
+        Linking CXX executable cmTC_f90f5
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f90f5.dir/link.txt --verbose=1
+        /bin/c++  -DCHECK_FUNCTION_EXISTS=IceConnectionNumber CMakeFiles/cmTC_f90f5.dir/CheckFunctionExists.cxx.o -o cmTC_f90f5  -lICE 
+        gmake[1]: Leaving directory '/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-HVvOEK'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/usr/share/cmake/Modules/CheckCXXSourceCompiles.cmake:76 (cmake_check_source_compiles)"
+      - "/usr/share/cmake/Modules/FindThreads.cmake:99 (CHECK_CXX_SOURCE_COMPILES)"
+      - "/usr/share/cmake/Modules/FindThreads.cmake:163 (_threads_check_libc)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/scripts/buildsystems/vcpkg.cmake:908 (_find_package)"
+      - "/usr/share/cmake/Modules/CMakeFindDependencyMacro.cmake:76 (find_package)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml/SFMLSystemDependencies.cmake:8 (find_dependency)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml/SFMLConfig.cmake:151 (include)"
+      - "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/scripts/buildsystems/vcpkg.cmake:908 (_find_package)"
+      - "CMakeLists.txt:8 (find_package)"
+    checks:
+      - "Performing Test CMAKE_HAVE_LIBC_PTHREAD"
+    directories:
+      source: "/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-tvWVqm"
+      binary: "/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-tvWVqm"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml;/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml;/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml;/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed/x64-linux/share/sfml"
+      VCPKG_INSTALLED_DIR: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg/installed"
+      VCPKG_PREFER_SYSTEM_LIBS: "OFF"
+      VCPKG_TARGET_TRIPLET: "x64-linux"
+      Z_VCPKG_ROOT_DIR: "/nfs/stak/users/hutchiis/.vscode/CS362/vcpkg"
+    buildResult:
+      variable: "CMAKE_HAVE_LIBC_PTHREAD"
+      cached: true
+      stdout: |
+        Change Dir: /nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-tvWVqm
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /bin/gmake -f Makefile cmTC_835a1/fast && /bin/gmake  -f CMakeFiles/cmTC_835a1.dir/build.make CMakeFiles/cmTC_835a1.dir/build
+        gmake[1]: Entering directory '/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-tvWVqm'
+        Building CXX object CMakeFiles/cmTC_835a1.dir/src.cxx.o
+        /bin/c++ -DCMAKE_HAVE_LIBC_PTHREAD  -std=gnu++17 -o CMakeFiles/cmTC_835a1.dir/src.cxx.o -c /nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-tvWVqm/src.cxx
+        Linking CXX executable cmTC_835a1
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_835a1.dir/link.txt --verbose=1
+        /bin/c++ CMakeFiles/cmTC_835a1.dir/src.cxx.o -o cmTC_835a1 
+        gmake[1]: Leaving directory '/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/CMakeScratch/TryCompile-tvWVqm'
+        
+      exitCode: 0
+...
