@@ -1,3 +1,0 @@
-/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/codemon.dir
-/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/edit_cache.dir
-/nfs/stak/users/hutchiis/.vscode/CS362/codemon/build/CMakeFiles/rebuild_cache.dir
