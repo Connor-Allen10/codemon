@@ -1,12 +1,7 @@
-#include <SFML/Graphics.hpp>
+#include "game/Game.h"
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode({800, 600}), "Codemon");
-    while (window.isOpen()) {
-        while (auto e = window.pollEvent()) {
-            if (e->is<sf::Event::Closed>()) window.close();
-        }
-        window.clear();
-        window.display();
-    }
+    Game game;
+    game.run();
+    return 0;
 }
