@@ -1,4 +1,4 @@
-#include "game/StateStack.hpp"
+#include "StateStack.hpp"
 
 void StateStack::push(std::unique_ptr<State> state) {
     mStack.push_back(std::move(state));

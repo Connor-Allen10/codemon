@@ -1,5 +1,5 @@
-#include "game/Game.hpp"
-#include "states/WorldState.hpp"
+#include "Game.hpp"
+#include "../states/WorldState.hpp"
 
 Game::Game()
 : mWindow(sf::VideoMode({960, 540}), "Codemon")

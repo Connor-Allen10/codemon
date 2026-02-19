@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include "game/State.hpp"
+#include "State.hpp"
 
 class StateStack {
 public:

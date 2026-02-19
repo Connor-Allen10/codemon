@@ -2,7 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 
-#include "game/StateStack.hpp"
+#include "StateStack.hpp"
 
 class Game {
 public:
