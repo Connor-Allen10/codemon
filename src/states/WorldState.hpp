@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "game/State.hpp"
+#include "../game/State.hpp"
 
 class WorldState : public State {
 public:

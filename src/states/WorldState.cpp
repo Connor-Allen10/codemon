@@ -1,4 +1,4 @@
-#include "states/WorldState.hpp"
+#include "WorldState.hpp"
 #include <cmath>
 
 static float length(sf::Vector2f v) {
@@ -30,27 +30,24 @@ bool WorldState::isNearObstacle() const {
     return length((p + sf::Vector2f(20.f, 20.f)) - (o + sf::Vector2f(40.f, 40.f))) < 120.f;
 }
 
+
 void WorldState::handleEvent(const sf::Event& e) {
-    // Toggle debug UI when near obstacle and press E
     if (e.is<sf::Event::KeyPressed>()) {
-        const auto& kp = e.get<sf::Event::KeyPressed>();
-        if (kp.code == sf::Keyboard::Key::E) {
+        const auto* kp = e.getIf<sf::Event::KeyPressed>();
+        if (!kp) return;
+        if (kp->code == sf::Keyboard::Key::E) {
             if (mObstacleLocked && isNearObstacle()) {
                 mDebugOpen = !mDebugOpen;
             }
         }
-
-        // "Apply fix" with Enter (MVP)
-        if (kp.code == sf::Keyboard::Key::Enter) {
+        if (kp->code == sf::Keyboard::Key::Enter) {
             if (mDebugOpen) {
                 mObstacleLocked = false;
                 mDebugOpen = false;
                 mObstacle.setFillColor(sf::Color::Green);
             }
         }
-
-        // Close debug UI with Escape
-        if (kp.code == sf::Keyboard::Key::Escape) {
+        if (kp->code == sf::Keyboard::Key::Escape) {
             mDebugOpen = false;
         }
     }
