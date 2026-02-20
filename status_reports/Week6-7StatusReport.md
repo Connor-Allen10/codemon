@@ -13,6 +13,7 @@ This week, the team focused on finalizing Milestone 4 requirements, specifically
 * **Developer Documentation:** Created `DEVELOPER_GUIDE.md` with build instructions (CMake), testing protocols, and directory mapping.
 * **Bug Tracker Setup:** Implemented a standardized GitHub Issue template for bug reporting and documented known limitations.
 * **Core Implementation:** Continued refinement of the Battle and World state transitions.
+* **Base SFML Implementation:** Created a prototype of graphical game movement.
 
 ## 2. Individual Contributions
 
