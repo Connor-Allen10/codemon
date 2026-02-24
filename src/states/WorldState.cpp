@@ -21,6 +21,11 @@ WorldState::WorldState(sf::RenderWindow& window)
     // Debug overlay (simple for now)
     mOverlay.setSize(sf::Vector2f(mWindow.getSize()));
     mOverlay.setFillColor(sf::Color(0, 0, 0, 160));
+
+    // Camera setup: start as default view and center on player
+    mWorldView = mWindow.getDefaultView();
+    sf::Vector2f playerCenter = mPlayer.getPosition() + 0.5f * mPlayer.getSize();
+    mWorldView.setCenter(playerCenter);
 }
 
 bool WorldState::isNearObstacle() const {
@@ -30,11 +35,11 @@ bool WorldState::isNearObstacle() const {
     return length((p + sf::Vector2f(20.f, 20.f)) - (o + sf::Vector2f(40.f, 40.f))) < 120.f;
 }
 
-
 void WorldState::handleEvent(const sf::Event& e) {
     if (e.is<sf::Event::KeyPressed>()) {
         const auto* kp = e.getIf<sf::Event::KeyPressed>();
         if (!kp) return;
+
         if (kp->code == sf::Keyboard::Key::E) {
             if (mObstacleLocked && isNearObstacle()) {
                 mDebugOpen = !mDebugOpen;
@@ -79,15 +84,22 @@ void WorldState::update(sf::Time dt) {
     } else {
         mPlayer.setPosition(newPos);
     }
+
+    // Camera follows player
+    sf::Vector2f playerCenter = mPlayer.getPosition() + 0.5f * mPlayer.getSize();
+    mWorldView.setCenter(playerCenter);
 }
 
 void WorldState::render(sf::RenderTarget& target) {
+    // Draw world with camera view
+    target.setView(mWorldView);
     target.draw(mObstacle);
     target.draw(mPlayer);
 
-    // Draw overlay if debug open
+    // Draw overlay/UI in screen space (not affected by camera)
     if (mDebugOpen) {
+        target.setView(target.getDefaultView());
         target.draw(mOverlay);
-        // (We’ll add text/UI next; keeping it simple so it compiles everywhere)
+        // (We’ll add text/UI next)
     }
 }

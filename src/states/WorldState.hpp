@@ -16,6 +16,9 @@ private:
 private:
     sf::RenderWindow& mWindow;
 
+    // Camera view that follows the player
+    sf::View mWorldView;
+
     sf::RectangleShape mPlayer;
     sf::RectangleShape mObstacle;
 
