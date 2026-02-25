@@ -16,6 +16,9 @@ private:
 private:
     sf::RenderWindow& mWindow;
 
+    // Camera view that follows the player
+    sf::View mWorldView;
+
     sf::Texture playerTexture;
     sf::Texture playerTexture2;
     sf::Texture playerReverse;
