@@ -16,8 +16,15 @@ private:
 private:
     sf::RenderWindow& mWindow;
 
-    sf::RectangleShape mPlayer;
-    sf::RectangleShape mObstacle;
+    sf::Texture playerTexture;
+    sf::Texture playerTexture2;
+    sf::Texture playerReverse;
+
+    sf::Texture obstacleTexture;
+    sf::Texture obstacleTexture2;
+
+    sf::Sprite mPlayer; 
+    sf::Sprite mObstacle;
 
     bool mObstacleLocked = true;
     bool mDebugOpen = false;

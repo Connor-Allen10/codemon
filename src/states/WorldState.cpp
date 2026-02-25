@@ -1,24 +1,60 @@
 #include "WorldState.hpp"
 #include <cmath>
+#include <iostream>
+#include <filesystem>
 
 static float length(sf::Vector2f v) {
     return std::sqrt(v.x * v.x + v.y * v.y);
 }
 
 WorldState::WorldState(sf::RenderWindow& window)
-: mWindow(window)
+: mWindow(window),
+  mPlayer(playerTexture),
+  mObstacle(obstacleTexture)
 {
-    // Player
-    mPlayer.setSize({40.f, 40.f});
-    mPlayer.setPosition({120.f, 200.f});
-    mPlayer.setFillColor(sf::Color::Cyan);
 
-    // Obstacle (door/bridge/etc.)
-    mObstacle.setSize({80.f, 80.f});
-    mObstacle.setPosition({500.f, 200.f});
-    mObstacle.setFillColor(sf::Color::Red);
+    std::cout << "Working directory: "
+        << std::filesystem::current_path()
+        << std::endl;
+    // =================
+    // Load all textures
+    // =================
 
-    // Debug overlay (simple for now)
+    if (!playerTexture.loadFromFile("../../assets/player.png")) {
+        std::cerr << "Failed to load player.png\n";
+    }
+    if (!playerTexture2.loadFromFile("../../assets/player_state2.png")) {
+        std::cerr << "Failed to load player_state2.png\n";
+    }
+    if (!playerReverse.loadFromFile("../../assets/player_reverse.png")) {
+        std::cerr << "Failed to load player_reverse.png\n";
+    }
+
+    if (!obstacleTexture.loadFromFile("../../assets/npc.png")) {
+        std::cerr << "Failed to load npc.png\n";
+    }
+    if (!obstacleTexture2.loadFromFile("../../assets/npc_state2.png")) {
+        std::cerr << "Failed to load npc_state2.png\n";
+    }
+    
+    window.clear(sf::Color::Blue);
+
+    mPlayer = sf::Sprite(playerTexture);
+    mObstacle = sf::Sprite(obstacleTexture);
+    
+    // Initialize Sprite texture and position
+    mPlayer.setTexture(playerTexture);
+    mPlayer.setPosition({100.f, 100.f});
+
+    std::cout << "Player texture size: "
+          << playerTexture.getSize().x << " x "
+          << playerTexture.getSize().y << std::endl;
+
+    mObstacle.setTexture(obstacleTexture);
+    mObstacle.setPosition({300.f, 100.f});
+
+
+    // Debug overlay
     mOverlay.setSize(sf::Vector2f(mWindow.getSize()));
     mOverlay.setFillColor(sf::Color(0, 0, 0, 160));
 }
@@ -44,7 +80,7 @@ void WorldState::handleEvent(const sf::Event& e) {
             if (mDebugOpen) {
                 mObstacleLocked = false;
                 mDebugOpen = false;
-                mObstacle.setFillColor(sf::Color::Green);
+                mObstacle.setTexture(obstacleTexture2);
             }
         }
         if (kp->code == sf::Keyboard::Key::Escape) {
@@ -63,20 +99,29 @@ void WorldState::update(sf::Time dt) {
         move.y -= speed;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
         move.y += speed;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) {
         move.x -= speed;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
+        mPlayer.setTexture(playerReverse);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) {
         move.x += speed;
+        mPlayer.setTexture(playerTexture);
+    }
+        
 
     sf::Vector2f newPos = mPlayer.getPosition() + move * dt.asSeconds();
 
-    // Very simple collision: if obstacle is locked, keep player out of it
+    // Collision logic
     if (mObstacleLocked) {
-        sf::FloatRect nextBounds(newPos, mPlayer.getSize());
-        if (!nextBounds.findIntersection(mObstacle.getGlobalBounds()).has_value()) {
+        sf::FloatRect nextBounds = mPlayer.getGlobalBounds();
+        nextBounds.position = newPos;
+
+        if (!nextBounds.findIntersection(mObstacle.getGlobalBounds()).has_value())
+        {
             mPlayer.setPosition(newPos);
         }
-    } else {
+    }
+    else {
         mPlayer.setPosition(newPos);
     }
 }
@@ -88,6 +133,6 @@ void WorldState::render(sf::RenderTarget& target) {
     // Draw overlay if debug open
     if (mDebugOpen) {
         target.draw(mOverlay);
-        // (We’ll add text/UI next; keeping it simple so it compiles everywhere)
+        // add text/UI
     }
 }
