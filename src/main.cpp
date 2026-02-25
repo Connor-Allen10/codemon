@@ -1,19 +1,68 @@
+#include <SFML/Graphics.hpp>
+#include <filesystem>
+#include <iostream>
 #include "game/Game.hpp"
 
-int main() {
-    Game game;
-    game.run();
-    return 0;
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+// --------------------------------------------------
+// Get directory where the executable is located
+// --------------------------------------------------
+std::filesystem::path getExecutableDir()
+{
+#ifdef _WIN32
+    char buffer[MAX_PATH];
+    GetModuleFileNameA(nullptr, buffer, MAX_PATH);
+    return std::filesystem::path(buffer).parent_path();
+#else
+    return std::filesystem::current_path();
+#endif
 }
 
+int main()
+{
+    try
+    {
+        // ------------------------------------------
+        // Fix working directory automatically
+        // exe = codemon/src/bin/codemon.exe
+        // assets = codemon/assets/
+        // so go up TWO folders
+        // ------------------------------------------
+        std::filesystem::path exeDir = getExecutableDir();
+
+        // Move working directory to project root
+        std::filesystem::current_path(exeDir.parent_path().parent_path());
+
+        std::cout << "Working directory set to: "
+                  << std::filesystem::current_path() << std::endl;
+
+        Game game;
+        game.run();
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Fatal error: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
 /*
 
 COMPILE COMMAND
 
-g++ main.cpp battle/Battle.cpp battle/Party.cpp states/BattleState.cpp states/DebugState.cpp states/MainMenuState.cpp states/WorldState.cpp world/TileMap.cpp game/Game.cpp game/StateStack.cpp `
-  -I.\include `
-  -L.\lib `
-  -lsfml-graphics -lsfml-window -lsfml-system `
-  -o .\bin\codemon.exe
+compile from project root
 
+g++ -std=c++17 `
+  src/main.cpp `
+  src/battle/Battle.cpp src/battle/Party.cpp `
+  src/states/BattleState.cpp src/states/DebugState.cpp src/states/MainMenuState.cpp src/states/WorldState.cpp `
+  src/world/TileMap.cpp `
+  src/game/Game.cpp src/game/StateStack.cpp `
+  -Isrc -Isrc/include `
+  -Lsrc/lib `
+  -lsfml-graphics -lsfml-window -lsfml-system `
+  -o src/bin/codemon.exe
 */
