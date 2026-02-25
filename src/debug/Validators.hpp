@@ -13,32 +13,39 @@
 namespace Validators {
 
     /**
+     * @brief Normalizes strings by removing whitespace and converting to lowercase.
+     * @param s The raw string to be cleaned.
+     * @return A "flat" version of the string for easy comparison.
+     */
+    inline std::string sanitize(std::string s) {
+        // Remove all whitespace (spaces, tabs, newlines)
+        s.erase(std::remove_if(s.begin(), s.end(), [](unsigned char c) {
+            return std::isspace(c);
+        }), s.end());
+        
+        // Convert to lowercase so 'IF' and 'if' match
+        std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) {
+            return static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+        });
+        return s;
+    }
+
+    /**
      * @brief Performs a normalized comparison between player input and a solution.
-     * * To prevent the game from being frustrating, this function "normalizes" 
-     * strings by removing all whitespace before comparing. This means 
-     * "if(x==0)" and "if ( x == 0 )" are both treated as correct.
+     * * By using sanitize(), "if ( X == 0 )" and "if(x==0)" are both treated as correct.
      * * @param input The raw string typed by the player in the UI.
      * @param solution The hardcoded "correct" version of the code.
      * @return true if the code is logically equivalent, false otherwise.
      */
     inline bool exactMatch(std::string input, std::string solution) {
-        // Lambda function to strip all whitespace characters (spaces, tabs, newlines)
-        auto normalize = [](std::string s) {
-            s.erase(std::remove_if(s.begin(), s.end(), [](unsigned char c) {
-                return std::isspace(c);
-            }), s.end());
-            return s;
-        };
-
-        return normalize(input) == normalize(solution);
+        return sanitize(input) == sanitize(solution);
     }
 
     /**
      * @brief Checks if a specific "fix" keyword exists within the player's code.
-     * * Useful for challenges where the player can write multiple things, but 
-     * must include a specific fix (like changing '=' to '==').
+     * Useful for challenges where the player must include a specific function or fix.
      */
     inline bool containsKeyword(const std::string& input, const std::string& keyword) {
-        return input.find(keyword) != std::string::npos;
+        return sanitize(input).find(sanitize(keyword)) != std::string::npos;
     }
 }
