@@ -60,7 +60,12 @@ WorldState::WorldState(sf::RenderWindow& window)
 
     // Camera setup: start as default view and center on player
     mWorldView = mWindow.getDefaultView();
-    sf::Vector2f playerCenter = mPlayer.getPosition() + 0.5f * mPlayer.getSize();
+    sf::FloatRect bounds = mPlayer.getGlobalBounds();
+    sf::Vector2f playerCenter = 
+    {
+        bounds.position.x + bounds.size.x * 0.5f,
+        bounds.position.y + bounds.size.y * 0.5f
+    };
     mWorldView.setCenter(playerCenter);
 }
 
@@ -131,8 +136,12 @@ void WorldState::update(sf::Time dt) {
     }
 
     // Camera follows player
-    sf::Vector2f playerCenter = mPlayer.getPosition() + 0.5f * mPlayer.getSize();
-    mWorldView.setCenter(playerCenter);
+    sf::FloatRect bounds = mPlayer.getGlobalBounds();
+    sf::Vector2f playerCenter = 
+    {
+        bounds.position.x + bounds.size.x * 0.5f,
+        bounds.position.y + bounds.size.y * 0.5f
+    };
 }
 
 void WorldState::render(sf::RenderTarget& target) {
