@@ -13,8 +13,8 @@
 std::filesystem::path getExecutableDir()
 {
 #ifdef _WIN32
-    char buffer[MAX_PATH];
-    GetModuleFileNameA(nullptr, buffer, MAX_PATH);
+    wchar_t buffer[MAX_PATH];
+    GetModuleFileNameW(nullptr, buffer, MAX_PATH);
     return std::filesystem::path(buffer).parent_path();
 #else
     return std::filesystem::current_path();
@@ -36,8 +36,8 @@ int main()
         // Move working directory to project root
         std::filesystem::current_path(exeDir.parent_path().parent_path());
 
-        std::cout << "Working directory set to: "
-                  << std::filesystem::current_path() << std::endl;
+        std::wcout << L"Working directory set to: "
+               << std::filesystem::current_path().wstring() << std::endl;
 
         Game game;
         game.run();
