@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "../game/State.hpp"
+#include "../world/TileMap.hpp"
 
 class WorldState : public State {
 public:
@@ -28,6 +29,9 @@ private:
 
     sf::Sprite mPlayer; 
     sf::Sprite mObstacle;
+
+    // Tile map (background)
+    TileMap mMap;
 
     bool mObstacleLocked = true;
     bool mDebugOpen = false;

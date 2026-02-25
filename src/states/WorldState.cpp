@@ -16,21 +16,33 @@ WorldState::WorldState(sf::RenderWindow& window)
     // Load all textures
     // =================
 
-    if (!playerTexture.loadFromFile("../../assets/player.png")) {
+    // NOTE: CMake copies the `assets/` folder into the build directory.
+    // When you run the game from the build folder (default for most IDEs),
+    // these paths should be relative to the build working directory.
+    if (!playerTexture.loadFromFile("assets/player.png")) {
         std::cerr << "Failed to load player.png\n";
     }
-    if (!playerTexture2.loadFromFile("../../assets/player_state2.png")) {
+    if (!playerTexture2.loadFromFile("assets/player_state2.png")) {
         std::cerr << "Failed to load player_state2.png\n";
     }
-    if (!playerReverse.loadFromFile("../../assets/player_reverse.png")) {
+    if (!playerReverse.loadFromFile("assets/player_reverse.png")) {
         std::cerr << "Failed to load player_reverse.png\n";
     }
 
-    if (!obstacleTexture.loadFromFile("../../assets/npc.png")) {
+    if (!obstacleTexture.loadFromFile("assets/npc.png")) {
         std::cerr << "Failed to load npc.png\n";
     }
-    if (!obstacleTexture2.loadFromFile("../../assets/npc_state2.png")) {
+    if (!obstacleTexture2.loadFromFile("assets/npc_state2.png")) {
         std::cerr << "Failed to load npc_state2.png\n";
+    }
+
+    // =============
+    // Load the map
+    // =============
+    // This draws a simple colored tile grid based on the CSV values in assets/data/map01.csv
+    // (0 = Path, 1 = Grass, 2 = Wall)
+    if (!mMap.loadFromCSV("assets/data/map01.csv", 48)) {
+        std::cerr << "Failed to load assets/data/map01.csv\n";
     }
 
     mPlayer = sf::Sprite(playerTexture);
@@ -132,12 +144,16 @@ void WorldState::update(sf::Time dt) {
         bounds.position.x + bounds.size.x * 0.5f,
         bounds.position.y + bounds.size.y * 0.5f
     };
-    // mWorldView.setCenter(playerCenter);
+    mWorldView.setCenter(playerCenter);
 }
 
 void WorldState::render(sf::RenderTarget& target) {
     // Draw world with camera view
     target.setView(mWorldView);
+
+    // Map first (background)
+    target.draw(mMap);
+
     target.draw(mObstacle);
     target.draw(mPlayer);
 
