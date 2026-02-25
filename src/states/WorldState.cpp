@@ -12,10 +12,6 @@ WorldState::WorldState(sf::RenderWindow& window)
   mPlayer(playerTexture),
   mObstacle(obstacleTexture)
 {
-
-    std::cout << "Working directory: "
-        << std::filesystem::current_path()
-        << std::endl;
     // =================
     // Load all textures
     // =================
@@ -36,8 +32,6 @@ WorldState::WorldState(sf::RenderWindow& window)
     if (!obstacleTexture2.loadFromFile("../../assets/npc_state2.png")) {
         std::cerr << "Failed to load npc_state2.png\n";
     }
-    
-    window.clear(sf::Color::Blue);
 
     mPlayer = sf::Sprite(playerTexture);
     mObstacle = sf::Sprite(obstacleTexture);
@@ -45,10 +39,6 @@ WorldState::WorldState(sf::RenderWindow& window)
     // Initialize Sprite texture and position
     mPlayer.setTexture(playerTexture);
     mPlayer.setPosition({100.f, 100.f});
-
-    std::cout << "Player texture size: "
-          << playerTexture.getSize().x << " x "
-          << playerTexture.getSize().y << std::endl;
 
     mObstacle.setTexture(obstacleTexture);
     mObstacle.setPosition({300.f, 100.f});
@@ -73,7 +63,7 @@ bool WorldState::isNearObstacle() const {
     sf::Vector2f p = mPlayer.getPosition();
     sf::Vector2f o = mObstacle.getPosition();
     // crude proximity check
-    return length((p + sf::Vector2f(20.f, 20.f)) - (o + sf::Vector2f(40.f, 40.f))) < 120.f;
+    return length((p + sf::Vector2f(50.f, 50.f)) - (o + sf::Vector2f(50.f, 50.f))) < 120.f;
 }
 
 void WorldState::handleEvent(const sf::Event& e) {
@@ -142,6 +132,7 @@ void WorldState::update(sf::Time dt) {
         bounds.position.x + bounds.size.x * 0.5f,
         bounds.position.y + bounds.size.y * 0.5f
     };
+    // mWorldView.setCenter(playerCenter);
 }
 
 void WorldState::render(sf::RenderTarget& target) {
