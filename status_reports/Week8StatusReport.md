@@ -20,8 +20,8 @@ This week, the team implemented a CI/CD pipeline and integrated GoogleTest. Whil
 * **Goals for Next Week:** Debug the Windows `run_tests_NOT_BUILT` error by refining the CTest discovery path.
 
 ### Connor Allen (Project Manager)
-* **Accomplishments:** Worked on SFML sprite implementation and texture management. *(Connor to add specifics).*
-* **Goals for Next Week:** Finalize battle state logic.
+* **Accomplishments:** Worked on SFML sprite implementation and texture management, tested beta distribution and execution, .
+* **Goals for Next Week:** Finalize battle state logic, add main menu state, add help menu.
 
 ### Isaac Hutchison (UI / UX Designer)
 * **Accomplishments:** Refined SFML graphical assets and integrated new sprites. *(Isaac to add specifics).*
