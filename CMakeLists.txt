@@ -60,4 +60,5 @@ target_link_libraries(run_tests PRIVATE GTest::gtest_main)
 
 # Allow CMake to discover and list tests in the VS Code Test Explorer
 include(GoogleTest)
-gtest_discover_tests(run_tests DISCOVERY_MODE PRE_TEST)
+# This prevents the "NOT_BUILT" error by deferring test discovery
+gtest_discover_tests(run_tests DISCOVERY_MODE POST_BUILD)
