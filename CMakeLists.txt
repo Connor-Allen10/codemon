@@ -36,3 +36,28 @@ target_link_libraries(codemon PRIVATE
 if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
     file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 endif()
+
+# =========================================================
+# 7. Milestone 5: Automated Testing (GoogleTest)
+# =========================================================
+
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/refs/heads/main.zip
+)
+# For Windows compatibility
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+
+# Create a separate executable for running tests
+add_executable(run_tests tests/test_stats.cpp)
+
+# Link GoogleTest to the test executable
+target_link_libraries(run_tests PRIVATE GTest::gtest_main)
+
+# Allow CMake to discover and list tests in the VS Code Test Explorer
+include(GoogleTest)
+gtest_discover_tests(run_tests)
