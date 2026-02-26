@@ -28,8 +28,8 @@ This week, the team implemented a CI/CD pipeline and integrated GoogleTest. Whil
 * **Goals for Next Week:** Finalize UI scaling for different resolutions.
 
 ## 3. Roadblocks & Risks
-* **Windows CI Environment:** The Windows runner is failing to locate the test executable despite a successful compilation. This is due to how Visual Studio separates `Release` binaries.
-* **Resolution:** Actively moving toward an explicit path-based testing step in the YAML configuration.
+* **Windows CI Build/Test Conflict:** The Windows runner was failing because the MSVC compiler attempted to execute tests before the build artifacts were fully localized in the `Release/` folder.
+* **Resolution:** Reconfigured the GitHub Actions workflow to use explicit target building (`--target codemon --target run_tests`). This bypasses the default MSVC "post-build" test trigger, allowing the Build and Test phases to run as truly independent steps.
 
 ## 4. Plans for Next Week
 * Stabilize Windows CI.
