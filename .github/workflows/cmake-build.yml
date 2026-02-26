@@ -40,8 +40,7 @@ jobs:
 
     - name: Run Tests
       shell: bash
-      working-directory: ./build
       run: |
-        # This command is the 'magic' for cross-platform
-        # -C Release tells Windows where to look, but Mac ignores it safely
+        cd build
+        # On Windows, we must specify the configuration to find the .exe
         ctest -C Release --output-on-failure

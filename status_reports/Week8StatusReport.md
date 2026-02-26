@@ -5,32 +5,32 @@
 **Date:** February 26, 2026
 
 ## 1. Progress Overview
-This week, the team focused on transitioning to a professional CI/CD workflow and implementing automated unit testing. While the macOS pipeline is fully operational, the Windows pipeline remains in active debugging due to environment-specific runner errors.
+This week, the team implemented a CI/CD pipeline and integrated GoogleTest. While the macOS build is fully automated and passing, the Windows pipeline is currently experiencing a known "discovery" issue with Visual Studio's multi-config directory structure.
 
 ### Tasks Completed:
-* **CI/CD Pipeline Integration:** Successfully implemented GitHub Actions for macOS-latest.
-* **Automated Testing Infrastructure:** Integrated GoogleTest (GTest) as a project dependency using CMake's `FetchContent`.
-* **Asset Pipeline:** Refined the CMake build logic to automatically copy the `/assets` folder to the build directory, ensuring textures load correctly on all platforms.
-* **Initial Unit Testing:** Integrated `tests/test_stats.cpp` into the build system to validate core health and stat logic.
+* **CI/CD Integration:** Configured GitHub Actions for Mac and Windows. macOS builds and tests successfully in under 40 seconds.
+* **Testing Infrastructure:** Integrated GoogleTest via CMake `FetchContent`.
+* **Cross-Platform Fixes:** Resolved SFML linking issues on Windows using `vcpkg`.
+* **Asset Management:** Automated asset copying to ensure textures are available at runtime.
 
 ## 2. Individual Contributions
 
 ### Lon Danna (Software Developer)
-* **Accomplishments:** Configured the GitHub Actions workflow. Successfully automated the macOS build and test sequence (36s completion). Integrated GoogleTest into the project structure. Conducted extensive troubleshooting on the Windows MSVC compiler environment regarding test discovery paths.
-* **Goals for Next Week:** Resolve the persistent `run_tests_NOT_BUILT` error on the Windows runner by adjusting CTest discovery parameters.
+* **Accomplishments:** Led the transition to automated CI/CD. Resolved SFML dependency blocks on Windows runners. Developed the initial `test_stats.cpp` suite to validate character health logic. 
+* **Goals for Next Week:** Debug the Windows `run_tests_NOT_BUILT` error by refining the CTest discovery path.
 
 ### Connor Allen (Project Manager)
-* **Accomplishments:** Worked on SFML sprite implementation and texture management. *(Note: Connor to add details).*
+* **Accomplishments:** Worked on SFML sprite implementation and texture management. *(Connor to add specifics).*
 * **Goals for Next Week:** Finalize battle state logic.
 
 ### Isaac Hutchison (UI / UX Designer)
-* **Accomplishments:** Refined SFML graphical assets and integrated new sprites into the WorldState. *(Note: Isaac to add details).*
-* **Goals for Next Week:** Finalize UI scaling.
+* **Accomplishments:** Refined SFML graphical assets and integrated new sprites. *(Isaac to add specifics).*
+* **Goals for Next Week:** Finalize UI scaling for different resolutions.
 
 ## 3. Roadblocks & Risks
-* **Windows CI Failure:** The Windows runner continues to fail during the test discovery phase (`run_tests_NOT_BUILT`). This is a known issue with how Visual Studio handles multi-configuration builds in virtual environments.
-* **Resolution:** Currently testing a shift from `PRE_TEST` to `POST_BUILD` discovery and experimenting with explicit pathing to the `Release/` folder.
+* **Windows CI Environment:** The Windows runner is failing to locate the test executable despite a successful compilation. This is due to how Visual Studio separates `Release` binaries.
+* **Resolution:** Actively moving toward an explicit path-based testing step in the YAML configuration.
 
 ## 4. Plans for Next Week
-* Fix the Windows CI pipeline.
-* Expand unit tests to cover combat math.
+* Stabilize Windows CI.
+* Expand unit test coverage for the combat math engine.

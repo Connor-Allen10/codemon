@@ -52,13 +52,9 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-# Create the test executable
 add_executable(run_tests tests/test_stats.cpp)
 target_link_libraries(run_tests PRIVATE GTest::gtest_main)
 
-# This tells Visual Studio/MSBuild NOT to run tests during the build phase
-set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)
-
-# Modern discovery: This is the most stable way for Windows + Mac
+# THE FIX: Tell CMake NOT to try and find the tests until we manually run CTest
 include(GoogleTest)
-gtest_discover_tests(run_tests)
+gtest_discover_tests(run_tests DISCOVERY_MODE PRE_TEST)
