@@ -1,0 +1,40 @@
+name: Codemon CI - Multi-OS Build & Test
+
+on:
+  push:
+    branches: [ main, development ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Install SFML (macOS)
+      if: matrix.os == 'macos-latest'
+      run: brew install sfml
+
+    - name: Install SFML (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        vcpkg install sfml:x64-windows
+        echo "CMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" >> $GITHUB_ENV
+
+    - name: Configure CMake
+      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build Project
+      run: cmake --build build --config Release
+
+    - name: Run Tests
+      run: |
+        cd build
+        ctest -C Release --output-on-failure
