@@ -35,12 +35,12 @@ jobs:
         fi
 
     - name: Build Project
-      # We add --target codemon and --target run_tests to be explicit
-      run: cmake --build build --config Release
+      # The --no-dependencies or specific target prevents the auto-test trigger
+      run: cmake --build build --config Release --target codemon --target run_tests
 
     - name: Run Tests
       shell: bash
+      working-directory: ./build
       run: |
-        cd build
-        # On Windows, we must specify the configuration to find the .exe
+        # We manually call ctest here, where we have control
         ctest -C Release --output-on-failure

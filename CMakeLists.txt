@@ -55,11 +55,6 @@ enable_testing()
 add_executable(run_tests tests/test_stats.cpp)
 target_link_libraries(run_tests PRIVATE GTest::gtest_main)
 
-# THE FIX: On Windows, we stop automatic discovery to avoid the NOT_BUILT error.
-# On Mac, we keep it normal.
-if(WIN32)
-    add_test(NAME AllTests COMMAND run_tests)
-else()
-    include(GoogleTest)
-    gtest_discover_tests(run_tests)
-endif()
+# We define the test, but we use a placeholder for the path 
+# so CMake doesn't try to find it during the build phase.
+add_test(NAME AllTests COMMAND run_tests)
