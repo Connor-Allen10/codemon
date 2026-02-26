@@ -24,7 +24,7 @@ This week, the team implemented a CI/CD pipeline and integrated GoogleTest. Whil
 * **Goals for Next Week:** Finalize battle state logic, add main menu state, add help menu.
 
 ### Isaac Hutchison (UI / UX Designer)
-* **Accomplishments:** Refined SFML graphical assets and integrated new sprites. *(Isaac to add specifics).*
+* **Accomplishments:** Refined SFML graphical assets and integrated new sprites. Integrated sprites with the map.
 * **Goals for Next Week:** Finalize UI scaling for different resolutions.
 
 ## 3. Roadblocks & Risks
