@@ -35,15 +35,13 @@ jobs:
         fi
 
     - name: Build Project
+      # We add --target codemon and --target run_tests to be explicit
       run: cmake --build build --config Release
 
     - name: Run Tests
       shell: bash
+      working-directory: ./build
       run: |
-        cd build
-        # On Windows, the exe is in Release/. This command checks both spots.
-        if [ -d "Release" ]; then
-          ./Release/run_tests.exe
-        else
-          ./run_tests
-        fi
+        # This command is the 'magic' for cross-platform
+        # -C Release tells Windows where to look, but Mac ignores it safely
+        ctest -C Release --output-on-failure

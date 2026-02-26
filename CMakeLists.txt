@@ -52,13 +52,13 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-# Create a separate executable for running tests
+# Create the test executable
 add_executable(run_tests tests/test_stats.cpp)
-
-# Link GoogleTest to the test executable
 target_link_libraries(run_tests PRIVATE GTest::gtest_main)
 
-# Allow CMake to discover and list tests in the VS Code Test Explorer
+# This tells Visual Studio/MSBuild NOT to run tests during the build phase
+set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)
+
+# Modern discovery: This is the most stable way for Windows + Mac
 include(GoogleTest)
-# This prevents the "NOT_BUILT" error by deferring test discovery
-gtest_discover_tests(run_tests DISCOVERY_MODE POST_BUILD)
+gtest_discover_tests(run_tests)
