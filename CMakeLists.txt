@@ -10,11 +10,6 @@ if(APPLE)
     list(APPEND CMAKE_PREFIX_PATH "/opt/homebrew")
 endif()
 
-# Help Windows find SFML if using vcpkg
-if(WIN32 AND NOT SFML_DIR)
-    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
-endif()
-
 # 1. Find SFML
 # This works on Mac (Homebrew) and Windows (if SFML is in their PATH or CMake prefix)
 find_package(SFML COMPONENTS Network Graphics Window Audio System CONFIG REQUIRED)
