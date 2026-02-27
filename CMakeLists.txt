@@ -48,9 +48,25 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-# Create the test executable
-add_executable(run_tests tests/test_stats.cpp)
-target_link_libraries(run_tests PRIVATE GTest::gtest_main)
+# Create the test executable (add more test files here)
+add_executable(run_tests
+    tests/test_stats.cpp
+    tests/test_tilemap.cpp
+    src/world/TileMap.cpp
+)
+
+# Let tests find headers like: #include "world/TileMap.hpp"
+target_include_directories(run_tests PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+# Link GoogleTest + SFML because TileMap uses SFML types
+target_link_libraries(run_tests PRIVATE
+    GTest::gtest_main
+    sfml-graphics
+    sfml-window
+    sfml-system
+)
 
 # Modern test discovery (Works perfectly on Mac and Linux)
 include(GoogleTest)
