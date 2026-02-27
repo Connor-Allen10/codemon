@@ -2,21 +2,36 @@
 #include <string>
 
 /**
- * @struct ValidationResult
- * @brief A data package returned by the Validation Engine to the Game States.
- * * When the BattleState or WorldState asks a Validator to check code, they 
- * receive this struct back. It tells the UI what to display and the game 
- * whether to unlock the next area or deal damage to an enemy.
+ * @file ValidationResult.hpp
+ * @brief Defines the result type produced by validator functions.
+ *
+ * Validators (either free functions or members of a challenge class) return
+ * this struct so that game states can uniformly react to a player's attempt.
+ * The `success` field drives game logic, `feedback` is written to the
+ * on‑screen terminal, and `efficiencyRating` can be used for scoring or
+ * damage multipliers in battle.
  */
-struct ValidationResult {
-    // True if the player successfully fixed the bug.
-    bool success;
 
-    // A message to be displayed in the Game's terminal/overlay.
-    // Example: "Syntax Error: Missing semicolon at line 1."
+struct ValidationResult {
+    /// whether the submitted fix was accepted by the validator
+    bool success = false;
+
+    /// human‑readable message displayed to the player
     std::string feedback;
 
-    // Optional: Could be used in BattleState to determine how much
-    // damage a "Code Fix" attack does based on how clean the code is.
-    float efficiencyRating = 1.0f; 
+    /// optional multiplier (defaults to 1.0); reserved for later use
+    float efficiencyRating = 1.0f;
+
+    /// defaulted for convenience when fields will be set later
+    ValidationResult() = default;
+
+    /**
+     * @brief Convenience constructor with all fields.
+     *
+     * @param s  success flag
+     * @param f  feedback text
+     * @param e  efficiency multiplier (default 1.0)
+     */
+    ValidationResult(bool s, std::string f, float e = 1.0f)
+        : success(s), feedback(std::move(f)), efficiencyRating(e) {}
 };
