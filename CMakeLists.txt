@@ -48,19 +48,24 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-# Create the test executable (add more test files here)
-add_executable(run_tests
-    tests/test_stats.cpp
-    tests/test_tilemap.cpp
+# Create the test executable by collecting all sources under tests/
+file(GLOB_RECURSE TEST_SOURCES "tests/*.cpp")
+add_executable(run_tests ${TEST_SOURCES})
+
+# Some GoogleTest cases rely on implementation files (e.g. TileMap) that are
+# not themselves part of the main codemon target.  List them explicitly so
+# that the test binary links correctly.
+target_sources(run_tests PRIVATE
     src/world/TileMap.cpp
 )
 
-# Let tests find headers like: #include "world/TileMap.hpp"
+# Let tests find project headers via the source tree root
 target_include_directories(run_tests PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-# Link GoogleTest + SFML because TileMap uses SFML types
+# Link GoogleTest + SFML because some tests use SFML types
+# (TileMap, etc.)
 target_link_libraries(run_tests PRIVATE
     GTest::gtest_main
     sfml-graphics
