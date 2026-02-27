@@ -5,14 +5,17 @@ project(codemon LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 1. Handle SFML Pathing for macOS (Homebrew)
+# Handle SFML Pathing for macOS (Homebrew) and Linux (system packages)
 if(APPLE)
     list(APPEND CMAKE_PREFIX_PATH "/opt/homebrew")
 endif()
+if(UNIX AND NOT APPLE)
+    # On Linux, try standard system paths
+    list(APPEND CMAKE_PREFIX_PATH "/usr" "/usr/local")
+endif()
 
 # 2. Find SFML
-# This will now work on Mac (via brew) and Ubuntu (via apt-get)
-find_package(SFML COMPONENTS Network Graphics Window Audio System REQUIRED)
+find_package(SFML 2.5 REQUIRED COMPONENTS Network Graphics Window Audio System)
 
 # 3. Find all source files
 file(GLOB_RECURSE SOURCES "src/*.cpp")
