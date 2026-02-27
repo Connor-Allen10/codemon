@@ -12,8 +12,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # We use Ubuntu because it is the industry standard for stable C++ CI
-        os: [macos-latest, ubuntu-latest]
+        # Running on macOS for now; Ubuntu SFML packaging needs investigation
+        os: [macos-latest]
 
     steps:
     - uses: actions/checkout@v4
