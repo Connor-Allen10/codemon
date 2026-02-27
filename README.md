@@ -9,6 +9,7 @@ Anyone looking for project details should refer to the following guides:
 
 * **[User Manual](./docs/USER_GUIDE.md)**: Instructions on how to install, run, and play the game.
 * **[Developer Guidelines](./docs/DEVELOPER_GUIDE.md)**: Technical details on the directory structure, build system (CMake), and testing.
+* **[Test Plan & CI Infrastructure](./docs/TEST_PLAN.md)**: Details on testing strategy, how to add tests, and our GitHub Actions CI setup.
 
 ---
 
