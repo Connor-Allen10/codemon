@@ -15,7 +15,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 # 2. Find SFML
-find_package(SFML 2.5 REQUIRED COMPONENTS Network Graphics Window Audio System)
+find_package(SFML 3.0 REQUIRED COMPONENTS Network Graphics Window Audio System)
 
 # 3. Find all source files
 file(GLOB_RECURSE SOURCES "src/*.cpp")
