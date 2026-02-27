@@ -26,7 +26,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
-        sudo apt-get install -y libsfml-dev libsfml-graphics-2.6 libsfml-window-2.6 libsfml-system-2.6 libsfml-audio-2.6 libsfml-network-2.6
+        sudo apt-get install -y libsfml-dev cmake
 
     - name: Configure CMake
       run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
