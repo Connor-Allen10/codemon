@@ -12,35 +12,28 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        # We use Ubuntu because it is the industry standard for stable C++ CI
+        os: [macos-latest, ubuntu-latest]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install SFML (macOS)
       if: matrix.os == 'macos-latest'
       run: brew install sfml
 
-    - name: Install SFML (Windows)
-      if: matrix.os == 'windows-latest'
-      run: vcpkg install sfml:x64-windows
+    - name: Install SFML (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libsfml-dev
 
     - name: Configure CMake
-      shell: bash
-      run: |
-        if [ "${{ matrix.os }}" == "windows-latest" ]; then
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
-        else
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-        fi
+      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 
     - name: Build Project
-      # The --no-dependencies or specific target prevents the auto-test trigger
-      run: cmake --build build --config Release --target codemon --target run_tests
+      run: cmake --build build --config Release
 
     - name: Run Tests
-      shell: bash
       working-directory: ./build
-      run: |
-        # We manually call ctest here, where we have control
-        ctest -C Release --output-on-failure
+      run: ctest -C Release --output-on-failure
