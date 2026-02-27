@@ -100,25 +100,47 @@ void WorldState::handleEvent(const sf::Event& e) {
         }
     }
 }
+sf::Vector2f WorldState::computeMovementInput(bool up, bool down, bool left, bool right) {
+    const float speed = 220.f;
+    sf::Vector2f move(0.f, 0.f);
+
+    if (up)    move.y -= speed;
+    if (down)  move.y += speed;
+    if (left) {
+        move.x -= speed;
+        mPlayer.setTexture(playerReverse);
+    } 
+    if (right) {
+        move.x += speed;
+        mPlayer.setTexture(playerTexture);
+    }
+    return move;
+}
+
+void WorldState::applyMovement(sf::Vector2f move, sf::Time dt) {
+    sf::Vector2f newPos = mPlayer.getPosition() + move * dt.asSeconds();
+
+    if (mObstacleLocked) {
+        sf::FloatRect nextBounds = mPlayer.getGlobalBounds();
+        nextBounds.position = newPos;
+
+        if (!nextBounds.findIntersection(mObstacle.getGlobalBounds()).has_value())
+            mPlayer.setPosition(newPos);
+    } else {
+        mPlayer.setPosition(newPos);
+    }
+}
 
 void WorldState::update(sf::Time dt) {
     if (mDebugOpen) return; // freeze movement while in debug UI
 
-    const float speed = 220.f;
-    sf::Vector2f move(0.f, 0.f);
+    bool up    = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up);
+    bool down  = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down);
+    bool left  = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left);
+    bool right = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right);
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
-        move.y -= speed;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
-        move.y += speed;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) {
-        move.x -= speed;
-        mPlayer.setTexture(playerReverse);
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) {
-        move.x += speed;
-        mPlayer.setTexture(playerTexture);
-    }
+    sf::Vector2f move = computeMovementInput(up, down, left, right);
+    applyMovement(move, dt);
         
 
     sf::Vector2f newPos = mPlayer.getPosition() + move * dt.asSeconds();
