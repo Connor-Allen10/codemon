@@ -23,14 +23,13 @@ file(GLOB_RECURSE SOURCES "src/*.cpp")
 # 4. Create the main game executable
 add_executable(codemon ${SOURCES})
 
-# 5. Include headers and link SFML
-target_include_directories(codemon PRIVATE include)
+# 5. Include headers and link SFML using modern target approach
 target_link_libraries(codemon PRIVATE
-    sfml-graphics
-    sfml-window
-    sfml-system
-    sfml-audio
-    sfml-network
+    SFML::Graphics
+    SFML::Window
+    SFML::System
+    SFML::Audio
+    SFML::Network
 )
 
 # 6. Copy assets to the build folder
@@ -68,13 +67,12 @@ target_include_directories(run_tests PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-# Link GoogleTest + SFML because some tests use SFML types
-# (TileMap, etc.)
+# Link GoogleTest + SFML using modern target approach
 target_link_libraries(run_tests PRIVATE
     GTest::gtest_main
-    sfml-graphics
-    sfml-window
-    sfml-system
+    SFML::Graphics
+    SFML::Window
+    SFML::System
 )
 
 # Modern test discovery (Works perfectly on Mac and Linux)
