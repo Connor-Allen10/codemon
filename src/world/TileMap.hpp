@@ -1,50 +1,52 @@
 #pragma once
+
 #include <SFML/Graphics.hpp>
-#include <cstdint>
 #include <string>
 #include <vector>
 
-enum class TileType : uint8_t {
-    Path  = 0,   // walkable, no encounters
-    Grass = 1,   // walkable, encounterable
-    Wall  = 2    // blocked
+enum class TileType : int {
+    Path  = 0, // walkable, NOT encounterable
+    Grass = 1, // walkable, encounterable
+    Wall  = 2  // NOT walkable
 };
 
 struct TileRules {
-    bool passable;
-    bool encounter;
+    bool passable = false;
+    bool encounter = false;
 };
 
 inline TileRules RulesFor(TileType t) {
     switch (t) {
-        case TileType::Path:  return {true,  false};
-        case TileType::Grass: return {true,  true };
-        case TileType::Wall:  return {false, false};
+        case TileType::Path:  return { true,  false };
+        case TileType::Grass: return { true,  true  };
+        case TileType::Wall:  return { false, false };
+        default:              return { false, false };
     }
-    return {true, false};
 }
 
 class TileMap : public sf::Drawable {
 public:
-    bool loadFromCSV(const std::string& csvPath, unsigned tileSize);
+    TileMap();
+    explicit TileMap(unsigned tileSizePx);
 
-    unsigned tileSize() const { return mTileSize; }
-    unsigned widthTiles() const { return mWidth; }
-    unsigned heightTiles() const { return mHeight; }
+    bool loadFromCSV(const std::string& csvPath, unsigned tileSizePx);
 
-    sf::Vector2u worldPixelSize() const { return {mWidth * mTileSize, mHeight * mTileSize}; }
+    unsigned getTileSize() const { return mTileSize; }
+    unsigned getWidth() const { return mWidth; }
+    unsigned getHeight() const { return mHeight; }
 
-    // Returns false if rect overlaps any blocked tile OR is out-of-bounds.
     bool isRectPassable(const sf::FloatRect& rect) const;
-
-    // Returns true if world position is on a grass tile (encounterable).
+    bool overlapsImpassable(const sf::FloatRect& rect) const;
     bool isEncounterAt(const sf::Vector2f& worldPos) const;
 
 private:
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-
     bool inBounds(int tx, int ty) const;
     TileType tileAt(int tx, int ty) const;
+
+    void rebuildMesh();
+    sf::Color colorFor(TileType t) const;
+
+    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 private:
     unsigned mTileSize = 48;
@@ -52,7 +54,5 @@ private:
     unsigned mHeight = 0;
 
     std::vector<TileType> mTiles;
-
-    // Colored geometry for fast drawing (two triangles per tile)
     sf::VertexArray mVerts;
 };
