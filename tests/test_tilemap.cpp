@@ -37,9 +37,9 @@ TEST(TileMapTest, LoadFromCSV_BasicAndRulesWork) {
     TileMap map;
     ASSERT_TRUE(map.loadFromCSV(path, /*tileSize=*/10));
 
-    EXPECT_EQ(map.widthTiles(), 3u);
-    EXPECT_EQ(map.heightTiles(), 2u);
-    EXPECT_EQ(map.tileSize(), 10u);
+    EXPECT_EQ(map.getWidth(), 3u);
+    EXPECT_EQ(map.getHeight(), 2u);
+    EXPECT_EQ(map.getTileSize(), 10u);
 
     // Encounter checks (test points inside each tile)
     // Tile (1,0) is Grass => encounter true
