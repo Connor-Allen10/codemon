@@ -5,4 +5,10 @@ codemontest
 # build artifacts
 *.exe
 /build/
+*.o
+*.obj
+src/bin/*.exe
+src/bin/*.dll
+src/bin/*.pdb
+
 

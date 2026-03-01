@@ -7,7 +7,7 @@ the Codémon project.
 ## 1. Obtaining the Source Code
 Clone the repository using Git:
 ```bash
-git clone [https://github.com/Connor-Allen10/codemon.git](https://github.com/Connor-Allen10/codemon.git)
+git clone https://github.com/Connor-Allen10/codemon.git
 ```
 
 ## 2. Directory Structure
@@ -23,7 +23,7 @@ We use CMake as our build system to manage dependencies like SFML.
 ### Prerequisites:
 * C++ Compiler: GCC, Clang, or MSVC (supporting C++17 or higher).
 * CMake: Version 3.10 or higher.
-* SFML: Version 2.5.1.
+* SFML: Version 3.0+.
 
 ### Build Steps:
 1. Open a terminal in the project root.
@@ -32,13 +32,15 @@ We use CMake as our build system to manage dependencies like SFML.
 4. Compile the software: `cmake --build .`
 
 ## 4. Testing the Software
-We use an automated unit testing suite to verify game logic.
+We use an automated unit testing suite with GoogleTest to verify game logic.
 
-To run tests, execute the test binary generated in the /build folder: `./CodemonTests`
+To run tests locally, execute:
+```bash
+cd build
+ctest --output-on-failure
+```
 
-### Adding New Tests:
-* Test files are located in the /src or a dedicated /tests folder.
-* Naming Convention: New test files should follow the pattern `test_[ClassName].cpp`.
+For detailed information on testing infrastructure and continuous integration, see [TEST_PLAN.md](TEST_PLAN.md).
 
 ## 5. Building a Release
 To package a release for end-users:

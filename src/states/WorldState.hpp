@@ -45,4 +45,7 @@ private:
 
     // simple overlay when debug UI is open
     sf::RectangleShape mOverlay;
+
+    sf::Vector2f computeMovementInput(bool up, bool down, bool left, bool right);
+    void applyMovement(sf::Vector2f move, sf::Time dt);
 };
