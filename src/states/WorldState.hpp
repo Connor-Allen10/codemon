@@ -29,11 +29,15 @@ private:
     sf::Texture mPlayerTex;
     sf::Texture mTrainerTex;
 
+    bool mPlayerTexLoaded = false;
     bool mTrainerTexLoaded = false;
 
     // Sprites
     sf::Sprite mPlayer;
     sf::Sprite mTrainer;
+
+    // Fallback visible player if texture fails
+    sf::RectangleShape mPlayerFallback;
 
     // Fallback visible trainer if texture fails
     sf::RectangleShape mTrainerFallback;

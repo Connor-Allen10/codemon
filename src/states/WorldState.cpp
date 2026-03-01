@@ -5,6 +5,20 @@
 
 namespace {
 constexpr unsigned kTileSize = 48;
+
+void scaleSpriteToTile(sf::Sprite& sprite, float tileSize) {
+    const auto b = sprite.getLocalBounds();
+#if SFML_VERSION_MAJOR >= 3
+    const float w = b.size.x;
+    const float h = b.size.y;
+#else
+    const float w = b.width;
+    const float h = b.height;
+#endif
+    if (w > 0.f && h > 0.f) {
+        sprite.setScale({tileSize / w, tileSize / h});
+    }
+}
 }
 
 WorldState::WorldState(sf::RenderWindow& window)
@@ -19,10 +33,10 @@ WorldState::WorldState(sf::RenderWindow& window)
         std::cout << "Failed to load assets/data/map01.csv\n";
     }
 
-    const bool playerLoaded =
+    mPlayerTexLoaded =
         mPlayerTex.loadFromFile("assets/player.png") ||
         mPlayerTex.loadFromFile("../assets/player.png");
-    if (!playerLoaded) {
+    if (!mPlayerTexLoaded) {
         std::cout << "Failed to load player.png\n";
     }
 
@@ -33,17 +47,23 @@ WorldState::WorldState(sf::RenderWindow& window)
         std::cout << "Failed to load npc.png\n";
     }
 
-    if (playerLoaded) {
+    if (mPlayerTexLoaded) {
         mPlayer.setTexture(mPlayerTex, true);
+        scaleSpriteToTile(mPlayer, static_cast<float>(kTileSize));
     }
 
     if (mTrainerTexLoaded) {
         mTrainer.setTexture(mTrainerTex, true);
+        scaleSpriteToTile(mTrainer, static_cast<float>(kTileSize));
     }
 
     const float tileF = static_cast<float>(kTileSize);
     mPlayer.setPosition({100.f, 100.f});
     mTrainer.setPosition({300.f, 200.f});
+
+    mPlayerFallback.setSize({tileF, tileF});
+    mPlayerFallback.setFillColor(sf::Color::Blue);
+    mPlayerFallback.setPosition(mPlayer.getPosition());
 
     mTrainerFallback.setSize({tileF, tileF});
     mTrainerFallback.setFillColor(sf::Color::Red);
@@ -54,7 +74,13 @@ WorldState::WorldState(sf::RenderWindow& window)
         {0.f, 0.f},
         {static_cast<float>(ws.x), static_cast<float>(ws.y)}
     ));
-    mWorldView.setCenter(mPlayer.getPosition());
+#if SFML_VERSION_MAJOR >= 3
+    const auto pb = mPlayer.getGlobalBounds();
+    mWorldView.setCenter({pb.position.x + pb.size.x * 0.5f, pb.position.y + pb.size.y * 0.5f});
+#else
+    const auto pb = mPlayer.getGlobalBounds();
+    mWorldView.setCenter({pb.left + pb.width * 0.5f, pb.top + pb.height * 0.5f});
+#endif
 
     mOverlay.setPosition({0.f, 0.f});
     mOverlay.setSize({static_cast<float>(ws.x), static_cast<float>(ws.y)});
@@ -87,6 +113,7 @@ void WorldState::movePlayerWithCollision(sf::Vector2f delta) {
 
         if (!mMap.overlapsImpassable(testBounds)) {
             mPlayer.setPosition(nextPos);
+            mPlayerFallback.setPosition(nextPos);
         }
     }
 
@@ -105,6 +132,7 @@ void WorldState::movePlayerWithCollision(sf::Vector2f delta) {
 
         if (!mMap.overlapsImpassable(testBounds)) {
             mPlayer.setPosition(nextPos);
+            mPlayerFallback.setPosition(nextPos);
         }
     }
 }
@@ -129,7 +157,13 @@ sf::Vector2f WorldState::computeMovementInput(bool up, bool down, bool left, boo
 
 void WorldState::applyMovement(sf::Vector2f move, sf::Time dt) {
     movePlayerWithCollision(move * (mSpeed * dt.asSeconds()));
-    mWorldView.setCenter(mPlayer.getPosition());
+#if SFML_VERSION_MAJOR >= 3
+    const auto pb = mPlayer.getGlobalBounds();
+    mWorldView.setCenter({pb.position.x + pb.size.x * 0.5f, pb.position.y + pb.size.y * 0.5f});
+#else
+    const auto pb = mPlayer.getGlobalBounds();
+    mWorldView.setCenter({pb.left + pb.width * 0.5f, pb.top + pb.height * 0.5f});
+#endif
 
     // Simple view clamping to map bounds
     const auto mapWidth = static_cast<float>(mMap.getWidth() * mMap.getTileSize());
@@ -139,15 +173,29 @@ void WorldState::applyMovement(sf::Vector2f move, sf::Time dt) {
 
     auto center = mWorldView.getCenter();
 
-    if (center.x - viewHalfWidth < 0.f)
-        center.x = viewHalfWidth;
-    if (center.x + viewHalfWidth > mapWidth)
-        center.x = mapWidth - viewHalfWidth;
+    // If map failed to load, don't clamp to invalid dimensions.
+    if (mapWidth <= 0.f || mapHeight <= 0.f) {
+        return;
+    }
 
-    if (center.y - viewHalfHeight < 0.f)
-        center.y = viewHalfHeight;
-    if (center.y + viewHalfHeight > mapHeight)
-        center.y = mapHeight - viewHalfHeight;
+    // If map is smaller than the window, center view on map.
+    if (mapWidth <= mWorldView.getSize().x) {
+        center.x = mapWidth * 0.5f;
+    } else {
+        if (center.x - viewHalfWidth < 0.f)
+            center.x = viewHalfWidth;
+        if (center.x + viewHalfWidth > mapWidth)
+            center.x = mapWidth - viewHalfWidth;
+    }
+
+    if (mapHeight <= mWorldView.getSize().y) {
+        center.y = mapHeight * 0.5f;
+    } else {
+        if (center.y - viewHalfHeight < 0.f)
+            center.y = viewHalfHeight;
+        if (center.y + viewHalfHeight > mapHeight)
+            center.y = mapHeight - viewHalfHeight;
+    }
 
     mWorldView.setCenter(center);
 }
@@ -204,7 +252,11 @@ void WorldState::update(sf::Time dt) {
 void WorldState::render(sf::RenderTarget& target) {
     target.setView(mWorldView);
     target.draw(mMap);
-    target.draw(mPlayer);
+    if (mPlayerTexLoaded) {
+        target.draw(mPlayer);
+    } else {
+        target.draw(mPlayerFallback);
+    }
 
     if (mTrainerTexLoaded) {
         target.draw(mTrainer);
