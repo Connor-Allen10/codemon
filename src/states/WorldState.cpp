@@ -1,197 +1,188 @@
-#include "states/WorldState.hpp"
+#include "WorldState.hpp"
 
-#include <algorithm>
 #include <cmath>
 #include <iostream>
 
-WorldState::WorldState(sf::RenderWindow& window)
-: mWindow(window) {
+namespace {
+constexpr unsigned kTileSize = 48;
+}
 
-    // Load map (try both common working-directory cases)
-    bool loaded =
+WorldState::WorldState(sf::RenderWindow& window)
+: mWindow(window)
+, mPlayer(mDummyTex)
+, mTrainer(mDummyTex) {
+    const bool mapLoaded =
         mMap.loadFromCSV("assets/data/map01.csv", kTileSize) ||
         mMap.loadFromCSV("../assets/data/map01.csv", kTileSize);
 
-    if (!loaded) {
-        std::cout << "TileMap failed to load map01.csv; using whatever TileMap fallback exists.\n";
-        // If your TileMap has a fallback method, call it here.
-        // mMap.loadDefault();
+    if (!mapLoaded) {
+        std::cout << "Failed to load assets/data/map01.csv\n";
     }
 
-    setupView();
-    tryLoadSprites();
-
-    // Start positions (safe defaults)
-    if (mPlayer) mPlayer->setPosition({2.f * kTileSize, 2.f * kTileSize});
-    mPlayerFallback.setPosition({2.f * kTileSize, 2.f * kTileSize});
-
-    if (mNpc) mNpc->setPosition({6.f * kTileSize, 4.f * kTileSize});
-    mNpcFallback.setPosition({6.f * kTileSize, 4.f * kTileSize});
-
-    updateViewCenterOnPlayer();
-    clampViewToWorld();
-}
-
-void WorldState::setupView() {
-    // Match the window size
-    const auto ws = mWindow.getSize();
-    mWorldView = sf::View(sf::FloatRect(
-        sf::Vector2f{0.f, 0.f},
-        sf::Vector2f{static_cast<float>(ws.x), static_cast<float>(ws.y)}
-    ));
-}
-
-void WorldState::tryLoadSprites() {
-    // Player texture
-    bool playerOK =
+    const bool playerLoaded =
         mPlayerTex.loadFromFile("assets/player.png") ||
         mPlayerTex.loadFromFile("../assets/player.png");
-
-    // NPC texture (your file is npc.png)
-    bool npcOK =
-        mNpcTex.loadFromFile("assets/npc.png") ||
-        mNpcTex.loadFromFile("../assets/npc.png");
-
-    // Fallback rectangles (always valid)
-    mPlayerFallback.setSize({static_cast<float>(kTileSize), static_cast<float>(kTileSize)});
-    mPlayerFallback.setFillColor(sf::Color::Blue);
-
-    mNpcFallback.setSize({static_cast<float>(kTileSize), static_cast<float>(kTileSize)});
-    mNpcFallback.setFillColor(sf::Color::Red);
-
-    if (playerOK) {
-        mPlayer.emplace(mPlayerTex);
-        mPlayer->setOrigin(sf::Vector2f{0.f, 0.f});
-        scaleSpriteToOneTile(*mPlayer); // ✅ 1 tile player
-    } else {
-        std::cout << "WARNING: failed to load player.png; using fallback rectangle.\n";
+    if (!playerLoaded) {
+        std::cout << "Failed to load player.png\n";
     }
 
-    if (npcOK) {
-        mNpc.emplace(mNpcTex);
-        mNpc->setOrigin(sf::Vector2f{0.f, 0.f});
-        scaleSpriteToOneTile(*mNpc); // ✅ 1 tile NPC (your requested change)
-    } else {
-        std::cout << "WARNING: failed to load npc.png; using fallback rectangle.\n";
+    mTrainerTexLoaded =
+        mTrainerTex.loadFromFile("assets/npc.png") ||
+        mTrainerTex.loadFromFile("../assets/npc.png");
+    if (!mTrainerTexLoaded) {
+        std::cout << "Failed to load npc.png\n";
     }
-}
 
-void WorldState::scaleSpriteToOneTile(sf::Sprite& s) const {
-    const auto b = s.getLocalBounds();            // SFML 3: b.position, b.size
-    const float w = b.size.x;
-    const float h = b.size.y;
-
-    if (w <= 0.f || h <= 0.f) return;
-
-    const float tile = static_cast<float>(kTileSize);
-    s.setScale(sf::Vector2f{tile / w, tile / h});
-}
-
-sf::FloatRect WorldState::playerBoundsAt(const sf::Vector2f& pos) const {
-    if (mPlayer) {
-        auto b = mPlayer->getGlobalBounds();
-        return sf::FloatRect(pos, b.size);
+    if (playerLoaded) {
+        mPlayer.setTexture(mPlayerTex, true);
     }
-    // fallback
-    auto b = mPlayerFallback.getGlobalBounds();
-    return sf::FloatRect(pos, b.size);
+
+    if (mTrainerTexLoaded) {
+        mTrainer.setTexture(mTrainerTex, true);
+    }
+
+    const float tileF = static_cast<float>(kTileSize);
+    mPlayer.setPosition({100.f, 100.f});
+    mTrainer.setPosition({300.f, 200.f});
+
+    mTrainerFallback.setSize({tileF, tileF});
+    mTrainerFallback.setFillColor(sf::Color::Red);
+    mTrainerFallback.setPosition(mTrainer.getPosition());
+
+    const auto ws = mWindow.getSize();
+    mWorldView = sf::View(sf::FloatRect(
+        {0.f, 0.f},
+        {static_cast<float>(ws.x), static_cast<float>(ws.y)}
+    ));
+    mWorldView.setCenter(mPlayer.getPosition());
+
+    mOverlay.setPosition({0.f, 0.f});
+    mOverlay.setSize({static_cast<float>(ws.x), static_cast<float>(ws.y)});
+    mOverlay.setFillColor(sf::Color(0, 0, 0, 120));
 }
 
-void WorldState::movePlayerWithCollision(const sf::Vector2f& delta) {
-    // Axis-separated movement is usually cleaner for tile collision
-    // X
+bool WorldState::isNearTrainer() const {
+    const auto playerPos = mPlayer.getPosition();
+    const auto trainerPos = mTrainer.getPosition();
+    const auto dx = playerPos.x - trainerPos.x;
+    const auto dy = playerPos.y - trainerPos.y;
+    const auto distSq = dx * dx + dy * dy;
+    const float threshold = 96.f;
+    return distSq < threshold * threshold;
+}
+
+void WorldState::movePlayerWithCollision(sf::Vector2f delta) {
+    // X-axis movement
     {
-        sf::Vector2f curPos = mPlayer ? mPlayer->getPosition() : mPlayerFallback.getPosition();
-        sf::Vector2f nextPos = {curPos.x + delta.x, curPos.y};
+        const auto curPos = mPlayer.getPosition();
+        const auto nextPos = sf::Vector2f{curPos.x + delta.x, curPos.y};
+        auto testBounds = mPlayer.getGlobalBounds();
+        testBounds.position = nextPos;
 
-        sf::FloatRect nextBounds = playerBoundsAt(nextPos);
-
-        // IMPORTANT: use the function your TileMap currently supports.
-        // Based on your working version earlier: overlapsImpassable(bounds) == true means blocked.
-        if (!mMap.overlapsImpassable(nextBounds)) {
-            if (mPlayer) mPlayer->setPosition(nextPos);
-            mPlayerFallback.setPosition(nextPos);
+        if (!mMap.overlapsImpassable(testBounds)) {
+            mPlayer.setPosition(nextPos);
         }
     }
 
-    // Y
+    // Y-axis movement
     {
-        sf::Vector2f curPos = mPlayer ? mPlayer->getPosition() : mPlayerFallback.getPosition();
-        sf::Vector2f nextPos = {curPos.x, curPos.y + delta.y};
+        const auto curPos = mPlayer.getPosition();
+        const auto nextPos = sf::Vector2f{curPos.x, curPos.y + delta.y};
+        auto testBounds = mPlayer.getGlobalBounds();
+        testBounds.position = nextPos;
 
-        sf::FloatRect nextBounds = playerBoundsAt(nextPos);
-
-        if (!mMap.overlapsImpassable(nextBounds)) {
-            if (mPlayer) mPlayer->setPosition(nextPos);
-            mPlayerFallback.setPosition(nextPos);
+        if (!mMap.overlapsImpassable(testBounds)) {
+            mPlayer.setPosition(nextPos);
         }
     }
 }
 
-void WorldState::updateViewCenterOnPlayer() {
-    const sf::Vector2f p = mPlayer ? mPlayer->getPosition() : mPlayerFallback.getPosition();
-    const sf::Vector2f center = {p.x + kTileSize * 0.5f, p.y + kTileSize * 0.5f};
+sf::Vector2f WorldState::computeMovementInput(bool up, bool down, bool left, bool right) {
+    auto movement = sf::Vector2f{0.f, 0.f};
+
+    if (up) {
+        movement.y = -1.f;
+    } else if (down) {
+        movement.y = 1.f;
+    }
+
+    if (left) {
+        movement.x = -1.f;
+    } else if (right) {
+        movement.x = 1.f;
+    }
+
+    return movement;
+}
+
+void WorldState::applyMovement(sf::Vector2f move, sf::Time dt) {
+    movePlayerWithCollision(move * (mSpeed * dt.asSeconds()));
+    mWorldView.setCenter(mPlayer.getPosition());
+
+    // Simple view clamping to map bounds
+    const auto mapWidth = static_cast<float>(mMap.getWidth() * mMap.getTileSize());
+    const auto mapHeight = static_cast<float>(mMap.getHeight() * mMap.getTileSize());
+    const auto viewHalfWidth = mWorldView.getSize().x / 2.f;
+    const auto viewHalfHeight = mWorldView.getSize().y / 2.f;
+
+    auto center = mWorldView.getCenter();
+
+    if (center.x - viewHalfWidth < 0.f)
+        center.x = viewHalfWidth;
+    if (center.x + viewHalfWidth > mapWidth)
+        center.x = mapWidth - viewHalfWidth;
+
+    if (center.y - viewHalfHeight < 0.f)
+        center.y = viewHalfHeight;
+    if (center.y + viewHalfHeight > mapHeight)
+        center.y = mapHeight - viewHalfHeight;
+
     mWorldView.setCenter(center);
 }
 
-void WorldState::clampViewToWorld() {
-    // If your TileMap exposes pixel/world size helpers, clamp to those.
-    // If not, this keeps the view centered on player without hard clamping.
-    // (Leaving this function here so you can clamp once you add map dimension getters.)
-}
-
 void WorldState::handleEvent(const sf::Event& e) {
-    // SFML 3 event API
     if (const auto* keyPressed = e.getIf<sf::Event::KeyPressed>()) {
-        const auto code = keyPressed->code;
-
-        // If you want interaction keys here later (E to interact), add them here.
-        if (code == sf::Keyboard::Key::Escape) {
-            // placeholder: could open pause menu later
+        if (keyPressed->code == sf::Keyboard::Key::F1) {
+            mDebugOpen = !mDebugOpen;
         }
     }
 }
 
 void WorldState::update(sf::Time dt) {
-    sf::Vector2f dir{0.f, 0.f};
+    const bool up = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W) ||
+                    sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up);
+    const bool down = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S) ||
+                      sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down);
+    const bool left = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A) ||
+                      sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left);
+    const bool right = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) ||
+                       sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right);
 
-    // SFML 3 keyboard API uses sf::Keyboard::Key::<KeyName>
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W) ||
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
-        dir.y -= 1.f;
+    auto move = computeMovementInput(up, down, left, right);
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S) ||
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
-        dir.y += 1.f;
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A) ||
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
-        dir.x -= 1.f;
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) ||
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
-        dir.x += 1.f;
-
-    // normalize so diagonal isn't faster
-    const float mag = std::sqrt(dir.x * dir.x + dir.y * dir.y);
-    if (mag > 0.f) dir /= mag;
-
-    const sf::Vector2f delta = dir * (mMoveSpeed * dt.asSeconds());
-    movePlayerWithCollision(delta);
-
-    updateViewCenterOnPlayer();
-    clampViewToWorld();
+    if (move.x != 0.f || move.y != 0.f) {
+        // Normalize diagonal movement
+        const auto mag = std::sqrt(move.x * move.x + move.y * move.y);
+        if (mag > 0.f) {
+            move /= mag;
+        }
+        applyMovement(move, dt);
+    }
 }
 
 void WorldState::render(sf::RenderTarget& target) {
     target.setView(mWorldView);
-
-    // TileMap is drawable in your current setup (you were drawing it successfully)
     target.draw(mMap);
+    target.draw(mPlayer);
 
-    if (mNpc) target.draw(*mNpc);
-    else      target.draw(mNpcFallback);
+    if (mTrainerTexLoaded) {
+        target.draw(mTrainer);
+    } else {
+        target.draw(mTrainerFallback);
+    }
 
-    if (mPlayer) target.draw(*mPlayer);
-    else         target.draw(mPlayerFallback);
+    if (mDebugOpen) {
+        target.setView(target.getDefaultView());
+        target.draw(mOverlay);
+    }
 }
