@@ -23,6 +23,10 @@ file(GLOB_RECURSE SOURCES "src/*.cpp")
 # 4. Create the main game executable
 add_executable(codemon ${SOURCES})
 
+target_include_directories(codemon PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
 # 5. Include headers and link SFML using modern target approach
 target_link_libraries(codemon PRIVATE
     SFML::Graphics
