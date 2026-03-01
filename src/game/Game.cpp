@@ -32,6 +32,15 @@ void Game::run() {
 }
 
 void Game::processEvents() {
+#if SFML_VERSION_MAJOR >= 3
+    while (auto e = mWindow.pollEvent()) {
+        if (e->is<sf::Event::Closed>()) {
+            mWindow.close();
+            return;
+        }
+        mStates.handleEvent(*e);
+    }
+#else
     sf::Event e;
     while (mWindow.pollEvent(e)) {
         if (e.type == sf::Event::Closed) {
@@ -40,6 +49,7 @@ void Game::processEvents() {
         }
         mStates.handleEvent(e);
     }
+#endif
 }
 
 void Game::update(sf::Time dt) {

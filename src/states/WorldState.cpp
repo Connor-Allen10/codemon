@@ -77,8 +77,13 @@ void WorldState::movePlayerWithCollision(sf::Vector2f delta) {
         const auto curPos = mPlayer.getPosition();
         const auto nextPos = sf::Vector2f{curPos.x + delta.x, curPos.y};
         auto testBounds = mPlayer.getGlobalBounds();
-        // SFML 2.5/3.0 compatibility: recreate rect with new position
-        testBounds = sf::FloatRect(nextPos, testBounds.getSize());
+    #if SFML_VERSION_MAJOR >= 3
+        const auto size = testBounds.size;
+        testBounds = sf::FloatRect(nextPos, size);
+    #else
+        const auto size = sf::Vector2f(testBounds.width, testBounds.height);
+        testBounds = sf::FloatRect(nextPos.x, nextPos.y, size.x, size.y);
+    #endif
 
         if (!mMap.overlapsImpassable(testBounds)) {
             mPlayer.setPosition(nextPos);
@@ -90,8 +95,13 @@ void WorldState::movePlayerWithCollision(sf::Vector2f delta) {
         const auto curPos = mPlayer.getPosition();
         const auto nextPos = sf::Vector2f{curPos.x, curPos.y + delta.y};
         auto testBounds = mPlayer.getGlobalBounds();
-        // SFML 2.5/3.0 compatibility: recreate rect with new position
-        testBounds = sf::FloatRect(nextPos, testBounds.getSize());
+    #if SFML_VERSION_MAJOR >= 3
+        const auto size = testBounds.size;
+        testBounds = sf::FloatRect(nextPos, size);
+    #else
+        const auto size = sf::Vector2f(testBounds.width, testBounds.height);
+        testBounds = sf::FloatRect(nextPos.x, nextPos.y, size.x, size.y);
+    #endif
 
         if (!mMap.overlapsImpassable(testBounds)) {
             mPlayer.setPosition(nextPos);
@@ -143,14 +153,32 @@ void WorldState::applyMovement(sf::Vector2f move, sf::Time dt) {
 }
 
 void WorldState::handleEvent(const sf::Event& e) {
+#if SFML_VERSION_MAJOR >= 3
+    if (const auto* keyPressed = e.getIf<sf::Event::KeyPressed>()) {
+        if (keyPressed->code == sf::Keyboard::Key::F1) {
+            mDebugOpen = !mDebugOpen;
+        }
+    }
+#else
     if (e.type == sf::Event::KeyPressed) {
         if (e.key.code == sf::Keyboard::F1) {
             mDebugOpen = !mDebugOpen;
         }
     }
+#endif
 }
 
 void WorldState::update(sf::Time dt) {
+#if SFML_VERSION_MAJOR >= 3
+    const bool up = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W) ||
+                    sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up);
+    const bool down = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S) ||
+                      sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down);
+    const bool left = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A) ||
+                      sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left);
+    const bool right = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) ||
+                       sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right);
+#else
     const bool up = sf::Keyboard::isKeyPressed(sf::Keyboard::W) ||
                     sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
     const bool down = sf::Keyboard::isKeyPressed(sf::Keyboard::S) ||
@@ -159,6 +187,7 @@ void WorldState::update(sf::Time dt) {
                       sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
     const bool right = sf::Keyboard::isKeyPressed(sf::Keyboard::D) ||
                        sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
+#endif
 
     auto move = computeMovementInput(up, down, left, right);
 
