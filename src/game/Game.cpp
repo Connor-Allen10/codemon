@@ -1,6 +1,8 @@
 #include "Game.hpp"
 #include "../states/WorldState.hpp"
 
+const sf::Time Game::TimePerFrame = sf::seconds(1.f / 60.f);
+
 Game::Game()
 : mWindow(sf::VideoMode({960, 540}), "Codemon")
 , mStates()
@@ -30,12 +32,13 @@ void Game::run() {
 }
 
 void Game::processEvents() {
-    while (auto e = mWindow.pollEvent()) {
-        if (e->is<sf::Event::Closed>()) {
+    sf::Event e;
+    while (mWindow.pollEvent(e)) {
+        if (e.type == sf::Event::Closed) {
             mWindow.close();
             return;
         }
-        mStates.handleEvent(*e);
+        mStates.handleEvent(e);
     }
 }
 

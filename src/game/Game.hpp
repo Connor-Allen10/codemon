@@ -17,5 +17,5 @@ private:
 private:
     sf::RenderWindow mWindow;
     StateStack mStates;
-    static constexpr sf::Time TimePerFrame = sf::seconds(1.f / 60.f);
+    static const sf::Time TimePerFrame;
 };
