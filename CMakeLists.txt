@@ -5,7 +5,7 @@ project(codemon LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Handle SFML Pathing for macOS (Homebrew) and Linux (system packages)
+# Handle SFML Pathing for macOS (Homebrew), Linux (system packages), and Windows (vcpkg)
 if(APPLE)
     list(APPEND CMAKE_PREFIX_PATH "/opt/homebrew")
 endif()
@@ -13,9 +13,24 @@ if(UNIX AND NOT APPLE)
     # On Linux, try standard system paths
     list(APPEND CMAKE_PREFIX_PATH "/usr" "/usr/local")
 endif()
+if(WIN32)
+    # Windows with vcpkg integration
+    # CMAKE_TOOLCHAIN_FILE should be set via command line or vcpkg
+endif()
 
-# 2. Find SFML
-find_package(SFML 3.0 REQUIRED COMPONENTS Network Graphics Window Audio System)
+# 2. Find SFML (flexible version: accept 2.6+ or 3.0+)
+# Try SFML 3.0 first, fall back to 2.6 if not found
+find_package(SFML 3.0 QUIET COMPONENTS Network Graphics Window Audio System)
+if(NOT SFML_FOUND)
+    message(STATUS "SFML 3.0 not found, trying SFML 2.6...")
+    find_package(SFML 2.6 REQUIRED COMPONENTS network graphics window audio system)
+    # SFML 2.x uses lowercase component names
+    set(SFML_LIBS sfml-graphics sfml-window sfml-system sfml-audio sfml-network)
+else()
+    message(STATUS "Found SFML 3.0")
+    # SFML 3.x uses modern target names
+    set(SFML_LIBS SFML::Graphics SFML::Window SFML::System SFML::Audio SFML::Network)
+endif()
 
 # 3. Find all source files
 file(GLOB_RECURSE SOURCES "src/*.cpp")
@@ -29,11 +44,7 @@ target_include_directories(codemon PRIVATE
 
 # 5. Include headers and link SFML using modern target approach
 target_link_libraries(codemon PRIVATE
-    SFML::Graphics
-    SFML::Window
-    SFML::System
-    SFML::Audio
-    SFML::Network
+    ${SFML_LIBS}
 )
 
 # 6. Copy assets to the build folder
@@ -74,9 +85,7 @@ target_include_directories(run_tests PRIVATE
 # Link GoogleTest + SFML using modern target approach
 target_link_libraries(run_tests PRIVATE
     GTest::gtest_main
-    SFML::Graphics
-    SFML::Window
-    SFML::System
+    ${SFML_LIBS}
 )
 
 # Modern test discovery (Works perfectly on Mac and Linux)

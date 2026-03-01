@@ -12,8 +12,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # Running on macOS for now; Ubuntu SFML packaging needs investigation
-        os: [macos-latest]
+        # Added windows and ubuntu
+        os: [macos-latest, windows-latest, ubuntu-latest]
 
     steps:
     - uses: actions/checkout@v4
@@ -28,7 +28,23 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y libsfml-dev cmake
 
-    - name: Configure CMake
+    - name: Setup vcpkg (Windows)
+      if: matrix.os == 'windows-latest'
+      uses: lukka/run-vcpkg@v11
+      with:
+        vcpkgGitCommitId: 'c8696863d371ab7f46e213d8f5ca923c4aef2a00'
+
+    - name: Install SFML (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        vcpkg install sfml:x64-windows
+
+    - name: Configure CMake (Windows)
+      if: matrix.os == 'windows-latest'
+      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+
+    - name: Configure CMake (macOS/Linux)
+      if: matrix.os != 'windows-latest'
       run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 
     - name: Build Project
