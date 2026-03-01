@@ -77,7 +77,8 @@ void WorldState::movePlayerWithCollision(sf::Vector2f delta) {
         const auto curPos = mPlayer.getPosition();
         const auto nextPos = sf::Vector2f{curPos.x + delta.x, curPos.y};
         auto testBounds = mPlayer.getGlobalBounds();
-        testBounds.position = nextPos;
+        // SFML 2.5/3.0 compatibility: recreate rect with new position
+        testBounds = sf::FloatRect(nextPos, testBounds.getSize());
 
         if (!mMap.overlapsImpassable(testBounds)) {
             mPlayer.setPosition(nextPos);
@@ -89,7 +90,8 @@ void WorldState::movePlayerWithCollision(sf::Vector2f delta) {
         const auto curPos = mPlayer.getPosition();
         const auto nextPos = sf::Vector2f{curPos.x, curPos.y + delta.y};
         auto testBounds = mPlayer.getGlobalBounds();
-        testBounds.position = nextPos;
+        // SFML 2.5/3.0 compatibility: recreate rect with new position
+        testBounds = sf::FloatRect(nextPos, testBounds.getSize());
 
         if (!mMap.overlapsImpassable(testBounds)) {
             mPlayer.setPosition(nextPos);
@@ -141,22 +143,22 @@ void WorldState::applyMovement(sf::Vector2f move, sf::Time dt) {
 }
 
 void WorldState::handleEvent(const sf::Event& e) {
-    if (const auto* keyPressed = e.getIf<sf::Event::KeyPressed>()) {
-        if (keyPressed->code == sf::Keyboard::Key::F1) {
+    if (e.type == sf::Event::KeyPressed) {
+        if (e.key.code == sf::Keyboard::F1) {
             mDebugOpen = !mDebugOpen;
         }
     }
 }
 
 void WorldState::update(sf::Time dt) {
-    const bool up = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W) ||
-                    sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up);
-    const bool down = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S) ||
-                      sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down);
-    const bool left = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A) ||
-                      sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left);
-    const bool right = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) ||
-                       sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right);
+    const bool up = sf::Keyboard::isKeyPressed(sf::Keyboard::W) ||
+                    sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
+    const bool down = sf::Keyboard::isKeyPressed(sf::Keyboard::S) ||
+                      sf::Keyboard::isKeyPressed(sf::Keyboard::Down);
+    const bool left = sf::Keyboard::isKeyPressed(sf::Keyboard::A) ||
+                      sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
+    const bool right = sf::Keyboard::isKeyPressed(sf::Keyboard::D) ||
+                       sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
 
     auto move = computeMovementInput(up, down, left, right);
 
