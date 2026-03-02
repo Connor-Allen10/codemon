@@ -1,5 +1,6 @@
 #include "BattleState.hpp"
 
+#include <cmath>
 #include <filesystem>
 #include <iostream>
 
@@ -73,7 +74,11 @@ void BattleState::render(sf::RenderTarget& target) {
     
     // Optionally draw simple text if font loaded (simplified for now)
     if (mFontLoaded) {
+#if SFML_VERSION_MAJOR >= 3
         sf::Text text(mFont, "BATTLE! Press ESC to exit", 36);
+#else
+        sf::Text text("BATTLE! Press ESC to exit", mFont, 36);
+#endif
         text.setFillColor(sf::Color::White);
         
 #if SFML_VERSION_MAJOR >= 3
