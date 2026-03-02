@@ -1,3 +1,8 @@
+/**
+ * @file StateStack.cpp
+ * @brief Implementation of the StateStack state manager.
+ */
+
 #include "StateStack.hpp"
 
 void StateStack::push(std::unique_ptr<State> state) {
@@ -37,13 +42,16 @@ void StateStack::processPendingActions() {
     State* currentState = mStack.back().get();
     StateAction action = currentState->getPendingAction();
 
+    // Process push request: add new state to top of stack
     if (action == StateAction::Push) {
         auto newState = currentState->takePendingState();
         currentState->clearPendingAction();
         if (newState) {
             push(std::move(newState));
         }
-    } else if (action == StateAction::Pop) {
+    } 
+    // Process pop request: remove current state from stack
+    else if (action == StateAction::Pop) {
         currentState->clearPendingAction();
         pop();
     }

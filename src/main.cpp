@@ -1,3 +1,12 @@
+/**
+ * @file main.cpp
+ * @brief Entry point for the Codemon game.
+ * 
+ * Handles executable directory detection and working directory setup
+ * to ensure assets can be loaded regardless of where the executable
+ * is run from. Then creates and runs the Game instance.
+ */
+
 #include <SFML/Graphics.hpp>
 #include <filesystem>
 #include <iostream>
@@ -12,9 +21,13 @@
 #include <limits.h>
 #endif
 
-// --------------------------------------------------
-// Get directory where the executable is located
-// --------------------------------------------------
+/**
+ * @brief Get the directory where the executable is located.
+ * @return Path to the directory containing the executable
+ * 
+ * Platform-specific implementation for Windows, macOS, and Linux.
+ * Falls back to current_path() if platform-specific method fails.
+ */
 std::filesystem::path getExecutableDir()
 {
 #ifdef _WIN32
@@ -42,6 +55,17 @@ std::filesystem::path getExecutableDir()
 #endif
 }
 
+/**
+ * @brief Main entry point for the Codemon game.
+ * @return 0 on success, non-zero on error
+ * 
+ * Startup sequence:
+ * 1. Detect executable directory
+ * 2. Set working directory to project root (one level up from build/)
+ * 3. Verify assets/ folder exists
+ * 4. Create and run Game instance
+ * 5. Catch and report any exceptions
+ */
 int main()
 {
     try

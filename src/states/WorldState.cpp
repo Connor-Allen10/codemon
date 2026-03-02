@@ -1,3 +1,8 @@
+/**
+ * @file WorldState.cpp
+ * @brief Implementation of the WorldState class.
+ */
+
 #include "WorldState.hpp"
 #include "BattleState.hpp"
 
@@ -7,8 +12,16 @@
 #include <iostream>
 
 namespace {
-constexpr unsigned kTileSize = 48;
+const unsigned kTileSize = 48;  ///< Tile size in pixels
 
+/**
+ * @brief Scale a sprite to fit a tile size.
+ * @param sprite The sprite to scale
+ * @param tileSize Target size in pixels
+ * 
+ * Scales sprite to fit exactly within tileSize×tileSize,
+ * preserving aspect ratio.
+ */
 void scaleSpriteToTile(sf::Sprite& sprite, float tileSize) {
     const auto b = sprite.getLocalBounds();
 #if SFML_VERSION_MAJOR >= 3

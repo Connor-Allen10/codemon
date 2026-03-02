@@ -1,3 +1,8 @@
+/**
+ * @file BattleState.cpp
+ * @brief Implementation of the BattleState class.
+ */
+
 #include "BattleState.hpp"
 
 #include <cmath>
@@ -13,13 +18,13 @@ BattleState::BattleState(sf::RenderWindow& window)
         {static_cast<float>(ws.x), static_cast<float>(ws.y)}
     ));
 
-    // Setup battle background
+    // Setup battle background (dark purple)
     mBackground.setPosition({0.f, 0.f});
     mBackground.setSize({static_cast<float>(ws.x), static_cast<float>(ws.y)});
-    mBackground.setFillColor(sf::Color(64, 0, 128)); // Dark purple
+    mBackground.setFillColor(sf::Color(64, 0, 128));
 
+    // Try to load font (SFML 3.0 uses openFromFile, 2.x uses loadFromFile)
 #if SFML_VERSION_MAJOR >= 3
-    // SFML 3.0 uses openFromFile instead of loadFromFile
     mFontLoaded = mFont.openFromFile("assets/fonts/default.ttf") ||
                   mFont.openFromFile("../assets/fonts/default.ttf") ||
                   mFont.openFromFile("/System/Library/Fonts/Helvetica.ttc");
@@ -72,8 +77,9 @@ void BattleState::render(sf::RenderTarget& target) {
     target.setView(mBattleView);
     target.draw(mBackground);
     
-    // Optionally draw simple text if font loaded (simplified for now)
+    // Draw text with pulse animation (if font loaded)
     if (mFontLoaded) {
+        // SFML 3.0 vs 2.x have different Text constructor parameter order
 #if SFML_VERSION_MAJOR >= 3
         sf::Text text(mFont, "BATTLE! Press ESC to exit", 36);
 #else
@@ -81,6 +87,7 @@ void BattleState::render(sf::RenderTarget& target) {
 #endif
         text.setFillColor(sf::Color::White);
         
+        // Center text on screen
 #if SFML_VERSION_MAJOR >= 3
         const auto bounds = text.getLocalBounds();
         text.setOrigin({bounds.size.x * 0.5f, bounds.size.y * 0.5f});
@@ -91,7 +98,7 @@ void BattleState::render(sf::RenderTarget& target) {
         text.setPosition({static_cast<float>(mWindow.getSize().x) * 0.5f, 
                           static_cast<float>(mWindow.getSize().y) * 0.5f});
         
-        // Simple pulse animation
+        // Apply pulse effect to alpha channel (fade in/out)
         const float pulse = 0.5f + 0.5f * std::sin(mTimer * 3.f);
         const auto alpha = static_cast<std::uint8_t>(128 + 127 * pulse);
         text.setFillColor(sf::Color(255, 255, 255, alpha));
