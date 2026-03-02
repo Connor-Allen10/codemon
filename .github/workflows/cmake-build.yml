@@ -17,9 +17,27 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Cache Homebrew packages (macOS)
+      if: matrix.os == 'macos-latest'
+      uses: actions/cache@v3
+      with:
+        path: ~/Library/Caches/Homebrew
+        key: ${{ runner.os }}-brew-sfml-${{ hashFiles('.github/workflows/cmake-build.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-brew-sfml-
+
     - name: Install SFML (macOS)
       if: matrix.os == 'macos-latest'
       run: brew install sfml
+
+    - name: Cache apt packages (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/cache@v3
+      with:
+        path: /var/cache/apt/archives
+        key: ${{ runner.os }}-apt-sfml-${{ hashFiles('.github/workflows/cmake-build.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-apt-sfml-
 
     - name: Install SFML (Linux)
       if: matrix.os == 'ubuntu-latest'
@@ -35,4 +53,20 @@ jobs:
 
     - name: Run Tests
       working-directory: ./build
-      run: ctest -C Release --output-on-failure
+      run: |
+        echo "::group::Running CTest"
+        ctest -C Release --output-on-failure --verbose
+        echo "::endgroup::"
+
+    - name: Test Summary
+      if: always()
+      working-directory: ./build
+      run: |
+        echo "### Test Results for ${{ matrix.os }} :test_tube:" >> $GITHUB_STEP_SUMMARY
+        if ctest -C Release -N | grep -q "Total Tests: 0"; then
+          echo "⚠️ No tests found" >> $GITHUB_STEP_SUMMARY
+        else
+          TEST_COUNT=$(ctest -C Release -N | grep "Total Tests:" | awk '{print $3}')
+          echo "✅ All $TEST_COUNT tests passed" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "" >> $GITHUB_STEP_SUMMARY
