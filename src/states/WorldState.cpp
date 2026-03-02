@@ -151,11 +151,25 @@ bool WorldState::isNearTrainer() const {
 }
 
 void WorldState::movePlayerWithCollision(sf::Vector2f delta) {
+    auto currentCollisionBounds = [&]() {
+        auto bounds = mPlayer.getGlobalBounds();
+#if SFML_VERSION_MAJOR >= 3
+        if (!mPlayerTexLoaded || bounds.size.x <= 0.f || bounds.size.y <= 0.f) {
+            return mPlayerFallback.getGlobalBounds();
+        }
+#else
+        if (!mPlayerTexLoaded || bounds.width <= 0.f || bounds.height <= 0.f) {
+            return mPlayerFallback.getGlobalBounds();
+        }
+#endif
+        return bounds;
+    };
+
     // X-axis movement
     {
         const auto curPos = mPlayer.getPosition();
         const auto nextPos = sf::Vector2f{curPos.x + delta.x, curPos.y};
-        auto testBounds = mPlayer.getGlobalBounds();
+        auto testBounds = currentCollisionBounds();
     #if SFML_VERSION_MAJOR >= 3
         const auto size = testBounds.size;
         testBounds = sf::FloatRect(nextPos, size);
@@ -174,7 +188,7 @@ void WorldState::movePlayerWithCollision(sf::Vector2f delta) {
     {
         const auto curPos = mPlayer.getPosition();
         const auto nextPos = sf::Vector2f{curPos.x, curPos.y + delta.y};
-        auto testBounds = mPlayer.getGlobalBounds();
+        auto testBounds = currentCollisionBounds();
     #if SFML_VERSION_MAJOR >= 3
         const auto size = testBounds.size;
         testBounds = sf::FloatRect(nextPos, size);
