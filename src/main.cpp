@@ -59,10 +59,13 @@ int main()
         std::filesystem::path candidate = exeDir.parent_path();
         if (std::filesystem::exists(candidate / "assets")) {
             std::filesystem::current_path(candidate);
+            std::cout << "Assets found - working directory set to: "
+                      << std::filesystem::current_path().string() << std::endl;
+        } else {
+            std::cerr << "WARNING: assets/ folder not found in expected location.\n"
+                      << "Executable directory: " << exeDir.string() << "\n"
+                      << "Current directory: " << std::filesystem::current_path().string() << std::endl;
         }
-
-        std::wcout << L"Working directory set to: "
-               << std::filesystem::current_path().wstring() << std::endl;
 
         Game game;
         game.run();

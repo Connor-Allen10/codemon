@@ -1,6 +1,7 @@
 #include "WorldState.hpp"
 
 #include <cmath>
+#include <filesystem>
 #include <iostream>
 
 namespace {
@@ -30,21 +31,30 @@ WorldState::WorldState(sf::RenderWindow& window)
         mMap.loadFromCSV("../assets/data/map01.csv", kTileSize);
 
     if (!mapLoaded) {
-        std::cout << "Failed to load assets/data/map01.csv\n";
+        std::cerr << "ERROR: Failed to load map file. Tried paths:\n"
+                  << "  - " << std::filesystem::absolute("assets/data/map01.csv").string() << "\n"
+                  << "  - " << std::filesystem::absolute("../assets/data/map01.csv").string() << "\n"
+                  << "Current working directory: " << std::filesystem::current_path().string() << "\n";
     }
 
     mPlayerTexLoaded =
         mPlayerTex.loadFromFile("assets/player.png") ||
         mPlayerTex.loadFromFile("../assets/player.png");
     if (!mPlayerTexLoaded) {
-        std::cout << "Failed to load player.png\n";
+        std::cerr << "WARNING: Failed to load player texture. Tried paths:\n"
+                  << "  - " << std::filesystem::absolute("assets/player.png").string() << "\n"
+                  << "  - " << std::filesystem::absolute("../assets/player.png").string() << "\n"
+                  << "Using fallback blue rectangle.\n";
     }
 
     mTrainerTexLoaded =
         mTrainerTex.loadFromFile("assets/npc.png") ||
         mTrainerTex.loadFromFile("../assets/npc.png");
     if (!mTrainerTexLoaded) {
-        std::cout << "Failed to load npc.png\n";
+        std::cerr << "WARNING: Failed to load trainer texture. Tried paths:\n"
+                  << "  - " << std::filesystem::absolute("assets/npc.png").string() << "\n"
+                  << "  - " << std::filesystem::absolute("../assets/npc.png").string() << "\n"
+                  << "Using fallback red rectangle.\n";
     }
 
     if (mPlayerTexLoaded) {
