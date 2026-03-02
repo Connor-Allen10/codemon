@@ -14,7 +14,14 @@ public:
     void update(sf::Time dt);
     void render();
 
-    void setRenderTarget(sf::RenderTarget* target); // optional, if you want later
+    void setRenderTarget(sf::RenderTarget* target);
+
+    // Check if stack is empty
+    bool isEmpty() const { return mStack.empty(); }
+    size_t size() const { return mStack.size(); }
+
+private:
+    void processPendingActions();
 
 private:
     std::vector<std::unique_ptr<State>> mStack;

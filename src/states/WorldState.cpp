@@ -1,6 +1,8 @@
 #include "WorldState.hpp"
+#include "BattleState.hpp"
 
 #include <cmath>
+#include <cstdlib>
 #include <filesystem>
 #include <iostream>
 
@@ -286,6 +288,27 @@ void WorldState::update(sf::Time dt) {
     } else {
         // Keep camera clamping stable even when idle (e.g., after resize).
         updateCamera();
+    }
+
+    // Update encounter cooldown and check for random encounters
+    if (mEncounterCooldown > 0.f) {
+        mEncounterCooldown -= dt.asSeconds();
+    } else {
+        checkEncounter();
+        mEncounterCooldown = kEncounterCheckInterval;
+    }
+}
+
+void WorldState::checkEncounter() {
+    // Check if player is on encounter-able tile
+    const auto playerCenter = getPlayerCenter();
+    if (mMap.isEncounterAt(playerCenter)) {
+        // Random chance to trigger battle
+        const float roll = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
+        if (roll < kEncounterChance) {
+            std::cout << "[WorldState] Wild encounter! Transitioning to battle...\n";
+            requestPush(std::make_unique<BattleState>(mWindow));
+        }
     }
 }
 

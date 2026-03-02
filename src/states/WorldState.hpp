@@ -18,6 +18,7 @@ private:
     sf::Vector2f getPlayerCenter() const;
     void syncFallbackPositions();
     void updateCamera();
+    void checkEncounter();
 
 private:
     sf::RenderWindow& mWindow;
@@ -49,6 +50,11 @@ private:
     float mSpeed = 220.f;
     bool mDebugOpen = false;
     bool mTrainerLocked = true;
+
+    // Battle encounter tracking
+    float mEncounterCooldown = 0.f;
+    static constexpr float kEncounterCheckInterval = 0.5f; // Check every 0.5s
+    static constexpr float kEncounterChance = 0.15f; // 15% chance on grass
 
     // simple overlay when debug UI is open
     sf::RectangleShape mOverlay;

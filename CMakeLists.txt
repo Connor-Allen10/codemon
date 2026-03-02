@@ -76,6 +76,7 @@ target_sources(run_tests PRIVATE
     src/world/TileMap.cpp
     src/debug/DebugChallenge.cpp
     src/states/WorldState.cpp
+    src/states/BattleState.cpp
     src/game/StateStack.cpp
     src/game/Game.cpp
 )
