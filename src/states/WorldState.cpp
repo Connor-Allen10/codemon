@@ -22,6 +22,56 @@ void scaleSpriteToTile(sf::Sprite& sprite, float tileSize) {
 }
 }
 
+sf::Vector2f WorldState::getPlayerCenter() const {
+#if SFML_VERSION_MAJOR >= 3
+    const auto pb = mPlayer.getGlobalBounds();
+    return {pb.position.x + pb.size.x * 0.5f, pb.position.y + pb.size.y * 0.5f};
+#else
+    const auto pb = mPlayer.getGlobalBounds();
+    return {pb.left + pb.width * 0.5f, pb.top + pb.height * 0.5f};
+#endif
+}
+
+void WorldState::syncFallbackPositions() {
+    mPlayerFallback.setPosition(mPlayer.getPosition());
+    mTrainerFallback.setPosition(mTrainer.getPosition());
+}
+
+void WorldState::updateCamera() {
+    mWorldView.setCenter(getPlayerCenter());
+
+    const auto mapWidth = static_cast<float>(mMap.getWidth() * mMap.getTileSize());
+    const auto mapHeight = static_cast<float>(mMap.getHeight() * mMap.getTileSize());
+    const auto viewHalfWidth = mWorldView.getSize().x * 0.5f;
+    const auto viewHalfHeight = mWorldView.getSize().y * 0.5f;
+
+    auto center = mWorldView.getCenter();
+
+    if (mapWidth <= 0.f || mapHeight <= 0.f) {
+        return;
+    }
+
+    if (mapWidth <= mWorldView.getSize().x) {
+        center.x = mapWidth * 0.5f;
+    } else {
+        if (center.x - viewHalfWidth < 0.f)
+            center.x = viewHalfWidth;
+        if (center.x + viewHalfWidth > mapWidth)
+            center.x = mapWidth - viewHalfWidth;
+    }
+
+    if (mapHeight <= mWorldView.getSize().y) {
+        center.y = mapHeight * 0.5f;
+    } else {
+        if (center.y - viewHalfHeight < 0.f)
+            center.y = viewHalfHeight;
+        if (center.y + viewHalfHeight > mapHeight)
+            center.y = mapHeight - viewHalfHeight;
+    }
+
+    mWorldView.setCenter(center);
+}
+
 WorldState::WorldState(sf::RenderWindow& window)
 : mWindow(window)
 , mPlayer(mDummyTex)
@@ -73,24 +123,17 @@ WorldState::WorldState(sf::RenderWindow& window)
 
     mPlayerFallback.setSize({tileF, tileF});
     mPlayerFallback.setFillColor(sf::Color::Blue);
-    mPlayerFallback.setPosition(mPlayer.getPosition());
 
     mTrainerFallback.setSize({tileF, tileF});
     mTrainerFallback.setFillColor(sf::Color::Red);
-    mTrainerFallback.setPosition(mTrainer.getPosition());
+    syncFallbackPositions();
 
     const auto ws = mWindow.getSize();
     mWorldView = sf::View(sf::FloatRect(
         {0.f, 0.f},
         {static_cast<float>(ws.x), static_cast<float>(ws.y)}
     ));
-#if SFML_VERSION_MAJOR >= 3
-    const auto pb = mPlayer.getGlobalBounds();
-    mWorldView.setCenter({pb.position.x + pb.size.x * 0.5f, pb.position.y + pb.size.y * 0.5f});
-#else
-    const auto pb = mPlayer.getGlobalBounds();
-    mWorldView.setCenter({pb.left + pb.width * 0.5f, pb.top + pb.height * 0.5f});
-#endif
+    updateCamera();
 
     mOverlay.setPosition({0.f, 0.f});
     mOverlay.setSize({static_cast<float>(ws.x), static_cast<float>(ws.y)});
@@ -123,7 +166,7 @@ void WorldState::movePlayerWithCollision(sf::Vector2f delta) {
 
         if (!mMap.overlapsImpassable(testBounds)) {
             mPlayer.setPosition(nextPos);
-            mPlayerFallback.setPosition(nextPos);
+            syncFallbackPositions();
         }
     }
 
@@ -142,7 +185,7 @@ void WorldState::movePlayerWithCollision(sf::Vector2f delta) {
 
         if (!mMap.overlapsImpassable(testBounds)) {
             mPlayer.setPosition(nextPos);
-            mPlayerFallback.setPosition(nextPos);
+            syncFallbackPositions();
         }
     }
 }
@@ -167,47 +210,7 @@ sf::Vector2f WorldState::computeMovementInput(bool up, bool down, bool left, boo
 
 void WorldState::applyMovement(sf::Vector2f move, sf::Time dt) {
     movePlayerWithCollision(move * (mSpeed * dt.asSeconds()));
-#if SFML_VERSION_MAJOR >= 3
-    const auto pb = mPlayer.getGlobalBounds();
-    mWorldView.setCenter({pb.position.x + pb.size.x * 0.5f, pb.position.y + pb.size.y * 0.5f});
-#else
-    const auto pb = mPlayer.getGlobalBounds();
-    mWorldView.setCenter({pb.left + pb.width * 0.5f, pb.top + pb.height * 0.5f});
-#endif
-
-    // Simple view clamping to map bounds
-    const auto mapWidth = static_cast<float>(mMap.getWidth() * mMap.getTileSize());
-    const auto mapHeight = static_cast<float>(mMap.getHeight() * mMap.getTileSize());
-    const auto viewHalfWidth = mWorldView.getSize().x / 2.f;
-    const auto viewHalfHeight = mWorldView.getSize().y / 2.f;
-
-    auto center = mWorldView.getCenter();
-
-    // If map failed to load, don't clamp to invalid dimensions.
-    if (mapWidth <= 0.f || mapHeight <= 0.f) {
-        return;
-    }
-
-    // If map is smaller than the window, center view on map.
-    if (mapWidth <= mWorldView.getSize().x) {
-        center.x = mapWidth * 0.5f;
-    } else {
-        if (center.x - viewHalfWidth < 0.f)
-            center.x = viewHalfWidth;
-        if (center.x + viewHalfWidth > mapWidth)
-            center.x = mapWidth - viewHalfWidth;
-    }
-
-    if (mapHeight <= mWorldView.getSize().y) {
-        center.y = mapHeight * 0.5f;
-    } else {
-        if (center.y - viewHalfHeight < 0.f)
-            center.y = viewHalfHeight;
-        if (center.y + viewHalfHeight > mapHeight)
-            center.y = mapHeight - viewHalfHeight;
-    }
-
-    mWorldView.setCenter(center);
+    updateCamera();
 }
 
 void WorldState::handleEvent(const sf::Event& e) {
@@ -217,11 +220,21 @@ void WorldState::handleEvent(const sf::Event& e) {
             mDebugOpen = !mDebugOpen;
         }
     }
+    if (const auto* resized = e.getIf<sf::Event::Resized>()) {
+        mWorldView.setSize({static_cast<float>(resized->size.x), static_cast<float>(resized->size.y)});
+        mOverlay.setSize({static_cast<float>(resized->size.x), static_cast<float>(resized->size.y)});
+        updateCamera();
+    }
 #else
     if (e.type == sf::Event::KeyPressed) {
         if (e.key.code == sf::Keyboard::F1) {
             mDebugOpen = !mDebugOpen;
         }
+    }
+    if (e.type == sf::Event::Resized) {
+        mWorldView.setSize({static_cast<float>(e.size.width), static_cast<float>(e.size.height)});
+        mOverlay.setSize({static_cast<float>(e.size.width), static_cast<float>(e.size.height)});
+        updateCamera();
     }
 #endif
 }
@@ -256,22 +269,26 @@ void WorldState::update(sf::Time dt) {
             move /= mag;
         }
         applyMovement(move, dt);
+    } else {
+        // Keep camera clamping stable even when idle (e.g., after resize).
+        updateCamera();
     }
 }
 
 void WorldState::render(sf::RenderTarget& target) {
     target.setView(mWorldView);
+    // Deterministic world draw order: map -> NPCs -> player -> UI overlay.
     target.draw(mMap);
-    if (mPlayerTexLoaded) {
-        target.draw(mPlayer);
-    } else {
-        target.draw(mPlayerFallback);
-    }
-
     if (mTrainerTexLoaded) {
         target.draw(mTrainer);
     } else {
         target.draw(mTrainerFallback);
+    }
+
+    if (mPlayerTexLoaded) {
+        target.draw(mPlayer);
+    } else {
+        target.draw(mPlayerFallback);
     }
 
     if (mDebugOpen) {

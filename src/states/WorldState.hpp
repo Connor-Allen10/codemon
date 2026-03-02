@@ -15,6 +15,9 @@ public:
 private:
     bool isNearTrainer() const;
     void movePlayerWithCollision(sf::Vector2f delta);
+    sf::Vector2f getPlayerCenter() const;
+    void syncFallbackPositions();
+    void updateCamera();
 
 private:
     sf::RenderWindow& mWindow;
