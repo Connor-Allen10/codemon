@@ -27,11 +27,15 @@ BattleState::BattleState(sf::RenderWindow& window)
 #if SFML_VERSION_MAJOR >= 3
     mFontLoaded = mFont.openFromFile("assets/fonts/default.ttf") ||
                   mFont.openFromFile("../assets/fonts/default.ttf") ||
-                  mFont.openFromFile("/System/Library/Fonts/Helvetica.ttc");
+                  mFont.openFromFile("/System/Library/Fonts/Helvetica.ttc") ||
+                  mFont.openFromFile("C:/Windows/Fonts/arial.ttf") ||
+                  mFont.openFromFile("C:/Windows/Fonts/calibri.ttf");
 #else
     mFontLoaded = mFont.loadFromFile("assets/fonts/default.ttf") ||
                   mFont.loadFromFile("../assets/fonts/default.ttf") ||
-                  mFont.loadFromFile("/System/Library/Fonts/Helvetica.ttc");
+                  mFont.loadFromFile("/System/Library/Fonts/Helvetica.ttc") ||
+                  mFont.loadFromFile("C:/Windows/Fonts/arial.ttf") ||
+                  mFont.loadFromFile("C:/Windows/Fonts/calibri.ttf");
 #endif
 
     if (!mFontLoaded) {
