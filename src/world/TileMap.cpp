@@ -134,11 +134,31 @@ void TileMap::rebuildMesh() {
 }
 
 bool TileMap::isRectPassable(const sf::FloatRect& rect) const {
-    // SFML 3: rect.position + rect.size
+#if SFML_VERSION_MAJOR >= 3
+    if (rect.size.x <= 0.f || rect.size.y <= 0.f) {
+        return false;
+    }
+#else
+    if (rect.width <= 0.f || rect.height <= 0.f) {
+        return false;
+    }
+#endif
+
+    if (mTileSize == 0) {
+        return false;
+    }
+
+#if SFML_VERSION_MAJOR >= 3
     const float leftF   = rect.position.x;
     const float topF    = rect.position.y;
     const float rightF  = rect.position.x + rect.size.x - 1.f;
     const float bottomF = rect.position.y + rect.size.y - 1.f;
+#else
+    const float leftF   = rect.left;
+    const float topF    = rect.top;
+    const float rightF  = rect.left + rect.width - 1.f;
+    const float bottomF = rect.top + rect.height - 1.f;
+#endif
 
     const int left   = static_cast<int>(std::floor(leftF   / mTileSize));
     const int top    = static_cast<int>(std::floor(topF    / mTileSize));
@@ -159,6 +179,9 @@ bool TileMap::overlapsImpassable(const sf::FloatRect& rect) const {
 }
 
 bool TileMap::isEncounterAt(const sf::Vector2f& worldPos) const {
+    if (mTileSize == 0) {
+        return false;
+    }
     const int tx = static_cast<int>(std::floor(worldPos.x / mTileSize));
     const int ty = static_cast<int>(std::floor(worldPos.y / mTileSize));
     const TileType t = tileAt(tx, ty);

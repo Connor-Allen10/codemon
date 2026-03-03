@@ -1,3 +1,12 @@
+/**
+ * @file main.cpp
+ * @brief Entry point for the Codemon game.
+ * 
+ * Handles executable directory detection and working directory setup
+ * to ensure assets can be loaded regardless of where the executable
+ * is run from. Then creates and runs the Game instance.
+ */
+
 #include <SFML/Graphics.hpp>
 #include <filesystem>
 #include <iostream>
@@ -5,22 +14,58 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#elif defined(__APPLE__)
+#include <mach-o/dyld.h>
+#elif defined(__linux__)
+#include <unistd.h>
+#include <limits.h>
 #endif
 
-// --------------------------------------------------
-// Get directory where the executable is located
-// --------------------------------------------------
+/**
+ * @brief Get the directory where the executable is located.
+ * @return Path to the directory containing the executable
+ * 
+ * Platform-specific implementation for Windows, macOS, and Linux.
+ * Falls back to current_path() if platform-specific method fails.
+ */
 std::filesystem::path getExecutableDir()
 {
 #ifdef _WIN32
     wchar_t buffer[MAX_PATH];
     GetModuleFileNameW(nullptr, buffer, MAX_PATH);
     return std::filesystem::path(buffer).parent_path();
+#elif defined(__APPLE__)
+    uint32_t size = 0;
+    _NSGetExecutablePath(nullptr, &size);
+    std::string path(size, '\0');
+    if (_NSGetExecutablePath(path.data(), &size) == 0) {
+        return std::filesystem::path(path).parent_path();
+    }
+    return std::filesystem::current_path();
+#elif defined(__linux__)
+    char buffer[PATH_MAX];
+    const ssize_t count = readlink("/proc/self/exe", buffer, sizeof(buffer) - 1);
+    if (count > 0) {
+        buffer[count] = '\0';
+        return std::filesystem::path(buffer).parent_path();
+    }
+    return std::filesystem::current_path();
 #else
     return std::filesystem::current_path();
 #endif
 }
 
+/**
+ * @brief Main entry point for the Codemon game.
+ * @return 0 on success, non-zero on error
+ * 
+ * Startup sequence:
+ * 1. Detect executable directory
+ * 2. Set working directory to project root (one level up from build/)
+ * 3. Verify assets/ folder exists
+ * 4. Create and run Game instance
+ * 5. Catch and report any exceptions
+ */
 int main()
 {
     try
@@ -33,11 +78,18 @@ int main()
         // ------------------------------------------
         std::filesystem::path exeDir = getExecutableDir();
 
-        // Move working directory to project root
-        std::filesystem::current_path(exeDir.parent_path().parent_path());
-
-        std::wcout << L"Working directory set to: "
-               << std::filesystem::current_path().wstring() << std::endl;
+        // Move working directory to project root when running from build/
+        // executable path (e.g., <repo>/build/codemon).
+        std::filesystem::path candidate = exeDir.parent_path();
+        if (std::filesystem::exists(candidate / "assets")) {
+            std::filesystem::current_path(candidate);
+            std::cout << "Assets found - working directory set to: "
+                      << std::filesystem::current_path().string() << std::endl;
+        } else {
+            std::cerr << "WARNING: assets/ folder not found in expected location.\n"
+                      << "Executable directory: " << exeDir.string() << "\n"
+                      << "Current directory: " << std::filesystem::current_path().string() << std::endl;
+        }
 
         Game game;
         game.run();
@@ -66,3 +118,5 @@ g++ -std=c++17 `
   -lsfml-graphics -lsfml-window -lsfml-system `
   -o src/bin/codemon.exe
 */
+
+/*test comment*/

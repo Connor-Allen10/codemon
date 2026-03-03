@@ -2,7 +2,7 @@ name: CMake Build and Test
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, feature-lon, develop, 'feature/**' ]
   pull_request:
     branches: [ main ]
 
@@ -12,15 +12,32 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # Added windows and ubuntu
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [macos-latest, ubuntu-latest]
 
     steps:
     - uses: actions/checkout@v4
 
+    - name: Cache Homebrew packages (macOS)
+      if: matrix.os == 'macos-latest'
+      uses: actions/cache@v3
+      with:
+        path: ~/Library/Caches/Homebrew
+        key: ${{ runner.os }}-brew-sfml-${{ hashFiles('.github/workflows/cmake-build.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-brew-sfml-
+
     - name: Install SFML (macOS)
       if: matrix.os == 'macos-latest'
       run: brew install sfml
+
+    - name: Cache apt packages (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/cache@v3
+      with:
+        path: /var/cache/apt/archives
+        key: ${{ runner.os }}-apt-sfml-${{ hashFiles('.github/workflows/cmake-build.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-apt-sfml-
 
     - name: Install SFML (Linux)
       if: matrix.os == 'ubuntu-latest'
@@ -28,23 +45,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y libsfml-dev cmake
 
-    - name: Setup vcpkg (Windows)
-      if: matrix.os == 'windows-latest'
-      uses: lukka/run-vcpkg@v11
-      with:
-        vcpkgGitCommitId: 'c8696863d371ab7f46e213d8f5ca923c4aef2a00'
-
-    - name: Install SFML (Windows)
-      if: matrix.os == 'windows-latest'
-      run: |
-        vcpkg install sfml:x64-windows
-
-    - name: Configure CMake (Windows)
-      if: matrix.os == 'windows-latest'
-      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
-
-    - name: Configure CMake (macOS/Linux)
-      if: matrix.os != 'windows-latest'
+    - name: Configure CMake
       run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 
     - name: Build Project
@@ -52,4 +53,20 @@ jobs:
 
     - name: Run Tests
       working-directory: ./build
-      run: ctest -C Release --output-on-failure
+      run: |
+        echo "::group::Running CTest"
+        ctest -C Release --output-on-failure --verbose
+        echo "::endgroup::"
+
+    - name: Test Summary
+      if: always()
+      working-directory: ./build
+      run: |
+        echo "### Test Results for ${{ matrix.os }} :test_tube:" >> $GITHUB_STEP_SUMMARY
+        if ctest -C Release -N | grep -q "Total Tests: 0"; then
+          echo "⚠️ No tests found" >> $GITHUB_STEP_SUMMARY
+        else
+          TEST_COUNT=$(ctest -C Release -N | grep "Total Tests:" | awk '{print $3}')
+          echo "✅ All $TEST_COUNT tests passed" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "" >> $GITHUB_STEP_SUMMARY

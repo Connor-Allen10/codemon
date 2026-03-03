@@ -69,12 +69,16 @@ enable_testing()
 file(GLOB_RECURSE TEST_SOURCES "tests/*.cpp")
 add_executable(run_tests ${TEST_SOURCES})
 
-# Some GoogleTest cases rely on implementation files (e.g. TileMap, DebugChallenge)
+# Some GoogleTest cases rely on implementation files (e.g. TileMap, DebugChallenge, WorldState)
 # that are not themselves part of the main codemon target.  List them explicitly
 # so that the test binary links correctly.
 target_sources(run_tests PRIVATE
     src/world/TileMap.cpp
     src/debug/DebugChallenge.cpp
+    src/states/WorldState.cpp
+    src/states/BattleState.cpp
+    src/game/StateStack.cpp
+    src/game/Game.cpp
 )
 
 # Let tests find project headers via the source tree root

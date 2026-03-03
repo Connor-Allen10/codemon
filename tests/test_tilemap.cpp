@@ -37,9 +37,9 @@ TEST(TileMapTest, LoadFromCSV_BasicAndRulesWork) {
     TileMap map;
     ASSERT_TRUE(map.loadFromCSV(path, /*tileSize=*/10));
 
-    EXPECT_EQ(map.widthTiles(), 3u);
-    EXPECT_EQ(map.heightTiles(), 2u);
-    EXPECT_EQ(map.tileSize(), 10u);
+    EXPECT_EQ(map.getWidth(), 3u);
+    EXPECT_EQ(map.getHeight(), 2u);
+    EXPECT_EQ(map.getTileSize(), 10u);
 
     // Encounter checks (test points inside each tile)
     // Tile (1,0) is Grass => encounter true
@@ -83,4 +83,19 @@ TEST(TileMapTest, IsRectPassable_FalseWhenOutOfBounds) {
 
     // Rect partially outside left/top => should be not passable
     EXPECT_FALSE(map.isRectPassable(sf::FloatRect({-1.f, -1.f}, {2.f, 2.f})));
+}
+
+// --- REGRESSION TEST ---
+// Degenerate collision rectangles should not be considered passable.
+TEST(TileMapTest, IsRectPassable_FalseForDegenerateRect) {
+    const std::string csv =
+        "0,0\n"
+        "0,0\n";
+    const std::string path = writeTempCSV(csv);
+
+    TileMap map;
+    ASSERT_TRUE(map.loadFromCSV(path, /*tileSize=*/10));
+
+    EXPECT_FALSE(map.isRectPassable(sf::FloatRect({5.f, 5.f}, {0.f, 2.f})));
+    EXPECT_FALSE(map.isRectPassable(sf::FloatRect({5.f, 5.f}, {2.f, 0.f})));
 }
