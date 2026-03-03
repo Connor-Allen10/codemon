@@ -69,6 +69,7 @@ For detailed information, see:
 
 * **[User Manual](./docs/USER_GUIDE.md)**: How to install, run, and play the game.
 * **[Developer Guidelines](./docs/DEVELOPER_GUIDE.md)**: Architecture, directory structure, and build system details.
+* **[Living Document](./docs/LIVING_DOCUMENT.md)**: Complete design overview, use cases, architecture, and technical decisions.
 * **[Test Plan & CI Infrastructure](./docs/TEST_PLAN.md)**: Testing strategy and GitHub Actions CI setup.
 
 ---
