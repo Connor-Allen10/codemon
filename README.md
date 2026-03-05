@@ -6,7 +6,21 @@ Codémon is a Pokémon-style RPG built in C++ using SFML. In this world, the cor
 
 ## ⚡ Quick Start
 
+### Prerequisites
+- **CMake 3.10 or higher** (check version: `cmake --version`)
+- **C++ compiler** with C++17 support (GCC 7+, Clang 5+, MSVC 2017+)
+- **SFML library:**
+  - macOS: `brew install sfml` (SFML 3.0)
+  - Windows: `vcpkg install sfml:x64-windows` (SFML 2.6)
+  - Linux: `sudo apt install libsfml-dev` (Ubuntu/Debian)
+
 ### Build Instructions
+
+**Platform-Specific Notes:**
+- **macOS:** Uses SFML 3.0. Build should work out of the box with installed SFML.
+- **Windows:** Install SFML via `vcpkg install sfml:x64-windows` and use `-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake`
+- **Linux:** Ubuntu/Debian users should install `libsfml-dev` package.
+
 ```bash
 # Clone the repository
 git clone https://github.com/Connor-Allen10/codemon.git
@@ -22,11 +36,6 @@ cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
 ```
 
-**Platform-Specific Notes:**
-- **macOS:** Uses SFML 3.0. Build should work out of the box with installed SFML.
-- **Windows:** Install SFML via `vcpkg install sfml:x64-windows` and use `-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake`
-- **Linux:** Ubuntu/Debian users should install `libsfml-dev` package.
-
 ### Test Instructions
 ```bash
 # From project root
@@ -41,6 +50,11 @@ ctest --output-on-failure
 ./codemon           # macOS/Linux
 ./Release/codemon.exe  # Windows (Release mode)
 ```
+
+**Controls:**
+- **Movement:** WASD or Arrow Keys
+- **Debug Overlay:** F1 (toggle)
+- **Exit Battle:** ESC
 
 ---
 
