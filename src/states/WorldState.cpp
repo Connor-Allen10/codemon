@@ -308,6 +308,7 @@ void WorldState::update(sf::Time dt) {
         mEncounterCooldown -= dt.asSeconds();
     } else {
         checkEncounter();
+        // Always reset to base interval; checkEncounter will extend it if battle triggers
         mEncounterCooldown = kEncounterCheckInterval;
     }
 }
@@ -321,6 +322,9 @@ void WorldState::checkEncounter() {
         if (roll < kEncounterChance) {
             std::cout << "[WorldState] Wild encounter! Transitioning to battle...\n";
             requestPush(std::make_unique<BattleState>(mWindow));
+            // Set a long cooldown after battle trigger to prevent immediate re-encounter
+            // when returning from battle while still on grass tile
+            mEncounterCooldown = 3.0f;  // 3 second cooldown after battle
         }
     }
 }
