@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <filesystem>
+#include <vector>
 #include <iostream>
 
 BattleState::BattleState(sf::RenderWindow& window)
@@ -23,20 +24,32 @@ BattleState::BattleState(sf::RenderWindow& window)
     mBackground.setSize({static_cast<float>(ws.x), static_cast<float>(ws.y)});
     mBackground.setFillColor(sf::Color(64, 0, 128));
 
-    // Try to load font (SFML 3.0 uses openFromFile, 2.x uses loadFromFile)
+    // Try to load font without spamming failed open attempts.
+    const std::vector<std::string> fontCandidates = {
+        "assets/fonts/default.ttf",
+        "../assets/fonts/default.ttf",
+        "/System/Library/Fonts/Supplemental/Arial.ttf",
+        "/System/Library/Fonts/Supplemental/Helvetica.ttc",
+        "/Library/Fonts/Arial.ttf",
+        "C:/Windows/Fonts/arial.ttf",
+        "C:/Windows/Fonts/calibri.ttf"
+    };
+
+    for (const auto& path : fontCandidates) {
+        std::error_code ec;
+        if (!std::filesystem::exists(path, ec) || ec) {
+            continue;
+        }
+
 #if SFML_VERSION_MAJOR >= 3
-    mFontLoaded = mFont.openFromFile("assets/fonts/default.ttf") ||
-                  mFont.openFromFile("../assets/fonts/default.ttf") ||
-                  mFont.openFromFile("/System/Library/Fonts/Helvetica.ttc") ||
-                  mFont.openFromFile("C:/Windows/Fonts/arial.ttf") ||
-                  mFont.openFromFile("C:/Windows/Fonts/calibri.ttf");
+        if (mFont.openFromFile(path)) {
 #else
-    mFontLoaded = mFont.loadFromFile("assets/fonts/default.ttf") ||
-                  mFont.loadFromFile("../assets/fonts/default.ttf") ||
-                  mFont.loadFromFile("/System/Library/Fonts/Helvetica.ttc") ||
-                  mFont.loadFromFile("C:/Windows/Fonts/arial.ttf") ||
-                  mFont.loadFromFile("C:/Windows/Fonts/calibri.ttf");
+        if (mFont.loadFromFile(path)) {
 #endif
+            mFontLoaded = true;
+            break;
+        }
+    }
 
     if (!mFontLoaded) {
         std::cerr << "WARNING: Failed to load battle font. Text will not display.\n";

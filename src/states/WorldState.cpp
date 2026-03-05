@@ -308,23 +308,26 @@ void WorldState::update(sf::Time dt) {
         mEncounterCooldown -= dt.asSeconds();
     } else {
         checkEncounter();
-        // Always reset to base interval; checkEncounter will extend it if battle triggers
-        mEncounterCooldown = kEncounterCheckInterval;
+        // Only reset to normal interval if checkEncounter did not set a longer cooldown.
+        if (mEncounterCooldown <= 0.f) {
+            mEncounterCooldown = kEncounterCheckInterval;
+        }
     }
 }
 
 void WorldState::checkEncounter() {
-    // Check if player is on encounter-able tile
     const auto playerCenter = getPlayerCenter();
     if (mMap.isEncounterAt(playerCenter)) {
-        // Random chance to trigger battle
+        // Random chance to trigger battle.
         const float roll = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
         if (roll < kEncounterChance) {
+#ifndef NDEBUG
             std::cout << "[WorldState] Wild encounter! Transitioning to battle...\n";
+#endif
             requestPush(std::make_unique<BattleState>(mWindow));
-            // Set a long cooldown after battle trigger to prevent immediate re-encounter
-            // when returning from battle while still on grass tile
-            mEncounterCooldown = 3.0f;  // 3 second cooldown after battle
+
+            // Set long cooldown to prevent immediate re-trigger after exiting battle.
+            mEncounterCooldown = 5.0f;
         }
     }
 }
