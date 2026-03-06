@@ -30,7 +30,7 @@ This week, the team completed beta testing with peer reviewers, processed feedba
 * **Goals for Next Week:** Lead team discussion on final release plan, assign remaining tasks, prepare final presentation materials.
 
 ### Isaac Hutchison (UI / UX Designer)
-* **Accomplishments:** Gathered UX feedback from beta testers, identified documentation gaps.
+* **Accomplishments:** Gathered UX feedback from beta testers, identified documentation gaps. Started implementing final sprites into the game (still not finished, very buggy) 
 * **Goals for Next Week:** Assist with Windows testing for Issue #14, review final UI polish items.
 
 ## 3. Beta Testing Feedback Summary
