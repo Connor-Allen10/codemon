@@ -26,8 +26,8 @@ BattleState::BattleState(sf::RenderWindow& window)
 
     // Try to load font without spamming failed open attempts.
     const std::vector<std::string> fontCandidates = {
-        "assets/fonts/default.ttf",
-        "../assets/fonts/default.ttf",
+        "assets/fonts/arial.ttf",
+        "../assets/fonts/arial.ttf",
         "/System/Library/Fonts/Supplemental/Arial.ttf",
         "/System/Library/Fonts/Supplemental/Helvetica.ttc",
         "/Library/Fonts/Arial.ttf",
