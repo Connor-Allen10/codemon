@@ -50,3 +50,78 @@ A list of current known issues can be found in our issue tracker
 [here](https://github.com/Connor-Allen10/codemon/issues). 
 * Current limitation: The game is optimized for 1920x1080 resolution;
 * UI elements may shift on smaller screens.
+
+## 7. FAQ & Troubleshooting
+
+### Build Issues
+
+**Q: CMake says "Could not find SFML"**  
+A: Install SFML for your platform:
+- macOS: `brew install sfml`
+- Windows: `vcpkg install sfml:x64-windows`
+- Linux: `sudo apt install libsfml-dev`
+
+**Q: Build fails on Windows with "Cannot find vcpkg"**  
+A: Add the CMake toolchain flag:
+```bash
+cmake -B build -DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake
+```
+
+**Q: "cmake: command not found"**  
+A: Install CMake 3.10+ from [cmake.org](https://cmake.org/download/) or via your package manager.
+
+### Runtime Issues
+
+**Q: Battle text doesn't appear on Windows**  
+A: This is a known font loading issue (#14). The battle still works—press ESC to exit. Fix in progress.
+
+**Q: Game crashes immediately on startup**  
+A: Verify you're running from the correct directory with `assets/` folder present:
+```bash
+cd build
+./codemon  # macOS/Linux
+```
+
+**Q: Player movement feels laggy or stutters**  
+A: Build in Release mode for better performance:
+```bash
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+```
+
+**Q: Tests fail with "Cannot open map file"**  
+A: Ensure you're running tests from the build directory:
+```bash
+cd build
+ctest --output-on-failure
+```
+
+### Gameplay Issues
+
+**Q: I'm stuck in an endless battle loop**  
+A: This was fixed in commit `1810356`. Pull the latest changes:
+```bash
+git pull origin main
+```
+
+**Q: How do I trigger battles?**  
+A: Walk on grass tiles (green areas). Battles trigger randomly with 15% chance every 0.5 seconds.
+
+**Q: What are the controls?**  
+A: 
+- Movement: WASD or Arrow Keys
+- Debug overlay: F1
+- Exit battle: ESC
+
+**Q: Can I play in fullscreen?**  
+A: Currently windowed mode only. Fullscreen support is planned for a future release.
+
+### Still Having Issues?
+
+If your problem isn't listed here:
+1. Check [GitHub Issues](https://github.com/Connor-Allen10/codemon/issues) for similar reports
+2. Review the [Developer Guide](./DEVELOPER_GUIDE.md) for technical details
+3. Open a new issue with:
+   - Your OS and version
+   - Build logs or error messages
+   - Steps to reproduce the problem
