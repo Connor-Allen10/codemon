@@ -26,11 +26,11 @@ This week, the team completed beta testing with peer reviewers, processed feedba
 * **Goals for Next Week:** Investigate and resolve Issue #14 (battle text missing on Windows), prepare final release build.
 
 ### Connor Allen (Project Manager)
-* **Accomplishments:** Coordinated beta testing with peer team, reviewed feedback, and prioritized issues for final release phase.
+* **Accomplishments:** Coordinated beta testing with peer team, reviewed feedback, and prioritized issues for final release phase. Debugged and updated file structure for distribution and beta testing. Solved issue with Battle text not appearing on Windows computers.
 * **Goals for Next Week:** Lead team discussion on final release plan, assign remaining tasks, prepare final presentation materials.
 
 ### Isaac Hutchison (UI / UX Designer)
-* **Accomplishments:** Gathered UX feedback from beta testers, identified documentation gaps.
+* **Accomplishments:** Gathered UX feedback from beta testers, identified documentation gaps. Started implementing final sprites into the game (still not finished, very buggy) 
 * **Goals for Next Week:** Assist with Windows testing for Issue #14, review final UI polish items.
 
 ## 3. Beta Testing Feedback Summary
