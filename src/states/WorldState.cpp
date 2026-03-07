@@ -10,8 +10,13 @@
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
+#if __has_include(<TGUI/TGUI.hpp>) && __has_include(<TGUI/Backend/SFML-Graphics.hpp>)
+#define CODEMON_HAS_TGUI 1
 #include <TGUI/TGUI.hpp>
 #include <TGUI/Backend/SFML-Graphics.hpp>
+#else
+#define CODEMON_HAS_TGUI 0
+#endif
 
 namespace {
 const unsigned kTileSize = 48;  ///< Tile size in pixels
@@ -253,7 +258,7 @@ void WorldState::applyMovement(sf::Vector2f move, sf::Time dt) {
 void WorldState::handleEvent(const sf::Event& e) {
 #if SFML_VERSION_MAJOR >= 3
     if (const auto* keyPressed = e.getIf<sf::Event::KeyPressed>()) {
-        if (keyPressed->code == sf::Keyboard::Key::E) {
+        if (keyPressed->code == sf::Keyboard::Key::F1) {
             mDebugOpen = !mDebugOpen;
         }
     }
@@ -358,7 +363,7 @@ void WorldState::render(sf::RenderTarget& target) {
 
     if (mDebugOpen) {
         target.setView(target.getDefaultView());
-        //target.draw(mOverlay); (OLD OVERLAY PLACEHOLDER)
+    #if CODEMON_HAS_TGUI
         sf::RenderWindow window(sf::VideoMode({800, 600}), "TGUI Test");
         tgui::Gui gui{window};
 
@@ -386,5 +391,8 @@ void WorldState::render(sf::RenderTarget& target) {
             gui.draw();
             window.display();
         }
+    #else
+        target.draw(mOverlay);
+    #endif
     }
 }
