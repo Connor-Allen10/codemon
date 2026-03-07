@@ -13,6 +13,6 @@ src/bin/*.pdb
 
 # Ignore built TGUI executables and generated docs
 external/TGUI/gui-builder/gui-builder
-external/TGUI/doc/html/
+external/TGUI/doc/html/**
 
 
