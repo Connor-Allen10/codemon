@@ -4,6 +4,7 @@ project(codemon LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Handle SFML Pathing for macOS (Homebrew), Linux (system packages), and Windows (vcpkg)
 if(APPLE)
@@ -32,6 +33,10 @@ else()
     set(SFML_LIBS SFML::Graphics SFML::Window SFML::System SFML::Audio SFML::Network)
 endif()
 
+#Set TGUI Location
+set(TGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/TGUI/lib/cmake/TGUI")
+find_package(TGUI REQUIRED)
+
 # 3. Find all source files
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
@@ -45,6 +50,7 @@ target_include_directories(codemon PRIVATE
 # 5. Include headers and link SFML using modern target approach
 target_link_libraries(codemon PRIVATE
     ${SFML_LIBS}
+    TGUI::TGUI
 )
 
 # 6. Copy assets to the build folder
@@ -90,6 +96,7 @@ target_include_directories(run_tests PRIVATE
 target_link_libraries(run_tests PRIVATE
     GTest::gtest_main
     ${SFML_LIBS}
+    TGUI::TGUI
 )
 
 # Modern test discovery (Works perfectly on Mac and Linux)
