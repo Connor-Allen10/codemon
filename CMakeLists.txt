@@ -32,6 +32,16 @@ else()
     set(SFML_LIBS SFML::Graphics SFML::Window SFML::System SFML::Audio SFML::Network)
 endif()
 
+# Set TGUI location
+# On macOS, build from source to avoid incompatible prebuilt archives.
+if(APPLE)
+    set(TGUI_BACKEND SFML_GRAPHICS CACHE STRING "TGUI backend")
+    add_subdirectory(external/TGUI)
+else()
+    set(TGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/TGUI/lib/cmake/TGUI")
+    find_package(TGUI REQUIRED)
+endif()
+
 # 3. Find all source files
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
@@ -48,8 +58,8 @@ target_link_libraries(codemon PRIVATE
 )
 
 # 6. Copy assets to the build folder
-if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets")
-    file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src/assets")
+    file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/assets" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 endif()
 
 # =========================================================

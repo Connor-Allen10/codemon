@@ -93,32 +93,38 @@ WorldState::WorldState(sf::RenderWindow& window)
 , mTrainer(mDummyTex) {
     const bool mapLoaded =
         mMap.loadFromCSV("assets/data/map01.csv", kTileSize) ||
-        mMap.loadFromCSV("../assets/data/map01.csv", kTileSize);
+        mMap.loadFromCSV("../assets/data/map01.csv", kTileSize) ||
+        mMap.loadFromCSV("src/assets/data/map01.csv", kTileSize);
 
     if (!mapLoaded) {
         std::cerr << "ERROR: Failed to load map file. Tried paths:\n"
                   << "  - " << std::filesystem::absolute("assets/data/map01.csv").string() << "\n"
                   << "  - " << std::filesystem::absolute("../assets/data/map01.csv").string() << "\n"
+                  << "  - " << std::filesystem::absolute("src/assets/data/map01.csv").string() << "\n"
                   << "Current working directory: " << std::filesystem::current_path().string() << "\n";
     }
 
     mPlayerTexLoaded =
         mPlayerTex.loadFromFile("assets/player.png") ||
-        mPlayerTex.loadFromFile("../assets/player.png");
+        mPlayerTex.loadFromFile("../assets/player.png") ||
+        mPlayerTex.loadFromFile("src/assets/player.png");
     if (!mPlayerTexLoaded) {
         std::cerr << "WARNING: Failed to load player texture. Tried paths:\n"
                   << "  - " << std::filesystem::absolute("assets/player.png").string() << "\n"
                   << "  - " << std::filesystem::absolute("../assets/player.png").string() << "\n"
+                  << "  - " << std::filesystem::absolute("src/assets/player.png").string() << "\n"
                   << "Using fallback blue rectangle.\n";
     }
 
     mTrainerTexLoaded =
         mTrainerTex.loadFromFile("assets/npc.png") ||
-        mTrainerTex.loadFromFile("../assets/npc.png");
+        mTrainerTex.loadFromFile("../assets/npc.png") ||
+        mTrainerTex.loadFromFile("src/assets/npc.png");
     if (!mTrainerTexLoaded) {
         std::cerr << "WARNING: Failed to load trainer texture. Tried paths:\n"
                   << "  - " << std::filesystem::absolute("assets/npc.png").string() << "\n"
                   << "  - " << std::filesystem::absolute("../assets/npc.png").string() << "\n"
+                  << "  - " << std::filesystem::absolute("src/assets/npc.png").string() << "\n"
                   << "Using fallback red rectangle.\n";
     }
 
