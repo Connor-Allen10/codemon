@@ -10,6 +10,8 @@
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
+#include <TGUI/TGUI.hpp>
+#include <TGUI/Backend/SFML-Graphics.hpp>
 
 namespace {
 const unsigned kTileSize = 48;  ///< Tile size in pixels
@@ -245,7 +247,7 @@ void WorldState::applyMovement(sf::Vector2f move, sf::Time dt) {
 void WorldState::handleEvent(const sf::Event& e) {
 #if SFML_VERSION_MAJOR >= 3
     if (const auto* keyPressed = e.getIf<sf::Event::KeyPressed>()) {
-        if (keyPressed->code == sf::Keyboard::Key::F1) {
+        if (keyPressed->code == sf::Keyboard::Key::E) {
             mDebugOpen = !mDebugOpen;
         }
     }
@@ -350,6 +352,33 @@ void WorldState::render(sf::RenderTarget& target) {
 
     if (mDebugOpen) {
         target.setView(target.getDefaultView());
-        target.draw(mOverlay);
+        //target.draw(mOverlay); (OLD OVERLAY PLACEHOLDER)
+        sf::RenderWindow window(sf::VideoMode({800, 600}), "TGUI Test");
+        tgui::Gui gui{window};
+
+        auto textArea = tgui::TextArea::create();
+        textArea->setSize({"80%", "70%"});
+        textArea->setPosition({"10%", "15%"});
+        textArea->setText("int main() {\n    return 0;\n}");
+
+        gui.add(textArea);
+
+        while (window.isOpen())
+        {
+            while (const std::optional event = window.pollEvent())
+            {
+                gui.handleEvent(*event);
+
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter)) {
+                    mDebugOpen = !mDebugOpen;
+                    window.close();
+                }
+                    
+            }
+
+            window.clear();
+            gui.draw();
+            window.display();
+        }
     }
 }
