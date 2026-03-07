@@ -103,7 +103,7 @@ int main()
 }
 /*
 
-COMPILE COMMAND (WITH TGUI)
+COMPILE COMMAND
 
 compile from project root
 
@@ -114,10 +114,7 @@ g++ -std=c++17 `
   src/world/TileMap.cpp `
   src/game/Game.cpp src/game/StateStack.cpp `
   -Isrc -Isrc/include `
-  -Iexternal/TGUI/include `
   -Lsrc/lib `
-  -Lexternal/TGUI/lib `
-  -ltgui `
   -lsfml-graphics -lsfml-window -lsfml-system `
   -o src/bin/codemon.exe
 */
