@@ -32,14 +32,37 @@ else()
     set(SFML_LIBS SFML::Graphics SFML::Window SFML::System SFML::Audio SFML::Network)
 endif()
 
-# Set TGUI location
-# On macOS, build from source to avoid incompatible prebuilt archives.
+# Optional TGUI setup
+# - macOS: build from source to avoid incompatible prebuilt archives
+# - Other platforms: use vendored config if present, otherwise system package
+set(HAS_TGUI OFF)
 if(APPLE)
-    set(TGUI_BACKEND SFML_GRAPHICS CACHE STRING "TGUI backend")
-    add_subdirectory(external/TGUI)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/TGUI/CMakeLists.txt")
+        set(TGUI_BACKEND SFML_GRAPHICS CACHE STRING "TGUI backend")
+        add_subdirectory(external/TGUI)
+        set(HAS_TGUI ON)
+    else()
+        find_package(TGUI QUIET CONFIG)
+        if(TGUI_FOUND)
+            set(HAS_TGUI ON)
+        endif()
+    endif()
 else()
     set(TGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/TGUI/lib/cmake/TGUI")
-    find_package(TGUI REQUIRED)
+    find_package(TGUI QUIET CONFIG)
+    if(TGUI_FOUND)
+        set(HAS_TGUI ON)
+    else()
+        unset(TGUI_DIR)
+        find_package(TGUI QUIET CONFIG)
+        if(TGUI_FOUND)
+            set(HAS_TGUI ON)
+        endif()
+    endif()
+endif()
+
+if(NOT HAS_TGUI)
+    message(STATUS "TGUI not found; continuing without TGUI linkage")
 endif()
 
 # 3. Find all source files
@@ -56,6 +79,10 @@ target_include_directories(codemon PRIVATE
 target_link_libraries(codemon PRIVATE
     ${SFML_LIBS}
 )
+
+if(HAS_TGUI)
+    target_link_libraries(codemon PRIVATE TGUI::TGUI)
+endif()
 
 # 6. Copy assets to the build folder
 if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src/assets")
