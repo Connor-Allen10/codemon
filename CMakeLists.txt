@@ -34,8 +34,13 @@ else()
 endif()
 
 #Set TGUI Location
-set(TGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/TGUI/lib/cmake/TGUI")
-find_package(TGUI REQUIRED)
+find_package(TGUI QUIET)
+
+if(NOT TGUI_FOUND)
+    message(STATUS "System TGUI not found, using bundled TGUI")
+    set(TGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/TGUI/lib/cmake/TGUI")
+    find_package(TGUI REQUIRED)
+endif()
 
 # 3. Find all source files
 file(GLOB_RECURSE SOURCES "src/*.cpp")
