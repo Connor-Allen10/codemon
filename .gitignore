@@ -10,5 +10,4 @@ codemontest
 src/bin/*.exe
 src/bin/*.dll
 src/bin/*.pdb
-external/
 
