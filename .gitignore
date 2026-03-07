@@ -11,7 +11,8 @@ src/bin/*.exe
 src/bin/*.dll
 src/bin/*.pdb
 
-# Ignore built TGUI executables
+# Ignore built TGUI executables and generated docs
 external/TGUI/gui-builder/gui-builder
+external/TGUI/doc/html/
 
 
