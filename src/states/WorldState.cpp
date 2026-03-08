@@ -354,7 +354,7 @@ void WorldState::handleEvent(const sf::Event& e) {
         mOverlay.setSize({static_cast<float>(e.size.width), static_cast<float>(e.size.height)});
 #else
         mWorldView.setSize(static_cast<float>(e.size.width), static_cast<float>(e.size.height));
-        mOverlay.setSize(static_cast<float>(e.size.width), static_cast<float>(e.size.height));
+    mOverlay.setSize(sf::Vector2f(static_cast<float>(e.size.width), static_cast<float>(e.size.height)));
 #endif
         updateCamera();
     }
