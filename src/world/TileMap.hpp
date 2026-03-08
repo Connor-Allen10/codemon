@@ -55,4 +55,7 @@ private:
 
     std::vector<TileType> mTiles;
     sf::VertexArray mVerts;
+
+    sf::Texture mGrassTexture;
+    sf::Texture mPathTexture;
 };

@@ -5,12 +5,39 @@
 #include <cctype>
 #include <cmath>
 #include <algorithm>
+#include <iostream>
+
+namespace {
+bool loadTextureFromAny(sf::Texture& tex, std::initializer_list<const char*> paths) {
+    for (const char* path : paths) {
+        if (tex.loadFromFile(path)) {
+            tex.setSmooth(false);
+            return true;
+        }
+    }
+    return false;
+}
+}
 
 TileMap::TileMap() : TileMap(48) {}
 
 TileMap::TileMap(unsigned tileSizePx)
 : mTileSize(tileSizePx) {
     mVerts.setPrimitiveType(sf::PrimitiveType::Triangles);
+
+    if (!loadTextureFromAny(mGrassTexture, {
+        "src/assets/grass_tile.png", "assets/grass_tile.png",
+        "../src/assets/grass_tile.png", "../assets/grass_tile.png"
+    })) {
+        std::cerr << "WARNING: Failed to load grass tile texture. Using mesh colors fallback.\n";
+    }
+
+    if (!loadTextureFromAny(mPathTexture, {
+        "src/assets/path_tile.png", "assets/path_tile.png",
+        "../src/assets/path_tile.png", "../assets/path_tile.png"
+    })) {
+        std::cerr << "WARNING: Failed to load path tile texture. Using mesh colors fallback.\n";
+    }
 }
 
 bool TileMap::inBounds(int tx, int ty) const {
@@ -190,4 +217,69 @@ bool TileMap::isEncounterAt(const sf::Vector2f& worldPos) const {
 
 void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     target.draw(mVerts, states);
+
+    const float ts = static_cast<float>(mTileSize);
+
+    for (unsigned y = 0; y < mHeight; ++y) {
+        for (unsigned x = 0; x < mWidth; ++x) {
+            const TileType t = tileAt(static_cast<int>(x), static_cast<int>(y));
+
+            if (t == TileType::Grass) {
+                const auto size = mGrassTexture.getSize();
+                if (size.x == 0 || size.y == 0) {
+                    continue;
+                }
+
+                sf::Sprite grass(mGrassTexture);
+#if SFML_VERSION_MAJOR >= 3
+                grass.setScale({
+                    ts / static_cast<float>(size.x),
+                    ts / static_cast<float>(size.y)
+                });
+                grass.setPosition({
+                    static_cast<float>(x) * ts,
+                    static_cast<float>(y) * ts
+                });
+#else
+                grass.setScale(
+                    ts / static_cast<float>(size.x),
+                    ts / static_cast<float>(size.y)
+                );
+                grass.setPosition(
+                    static_cast<float>(x) * ts,
+                    static_cast<float>(y) * ts
+                );
+#endif
+                target.draw(grass, states);
+            }
+            else if (t == TileType::Path) {
+                const auto size = mPathTexture.getSize();
+                if (size.x == 0 || size.y == 0) {
+                    continue;
+                }
+
+                sf::Sprite path(mPathTexture);
+#if SFML_VERSION_MAJOR >= 3
+                path.setScale({
+                    ts / static_cast<float>(size.x),
+                    ts / static_cast<float>(size.y)
+                });
+                path.setPosition({
+                    static_cast<float>(x) * ts,
+                    static_cast<float>(y) * ts
+                });
+#else
+                path.setScale(
+                    ts / static_cast<float>(size.x),
+                    ts / static_cast<float>(size.y)
+                );
+                path.setPosition(
+                    static_cast<float>(x) * ts,
+                    static_cast<float>(y) * ts
+                );
+#endif
+                target.draw(path, states);
+            }
+        }
+    }
 }
