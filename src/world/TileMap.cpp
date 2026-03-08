@@ -11,6 +11,14 @@ TileMap::TileMap() : TileMap(48) {}
 TileMap::TileMap(unsigned tileSizePx)
 : mTileSize(tileSizePx) {
     mVerts.setPrimitiveType(sf::PrimitiveType::Triangles);
+
+    if (!mGrassTexture.loadFromFile("assets/grass_tile.png")) {
+        printf("Failed to load grass_tile.png\n");
+    }
+
+    if (!mPathTexture.loadFromFile("assets/path_tile.png")) {
+        printf("Failed to load path_tile.png\n");
+    }
 }
 
 bool TileMap::inBounds(int tx, int ty) const {
@@ -188,6 +196,60 @@ bool TileMap::isEncounterAt(const sf::Vector2f& worldPos) const {
     return RulesFor(t).encounter;
 }
 
-void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const
+{
     target.draw(mVerts, states);
+
+    const float ts = static_cast<float>(mTileSize);
+
+    for (unsigned y = 0; y < mHeight; ++y)
+    {
+        for (unsigned x = 0; x < mWidth; ++x)
+        {
+            const TileType t = tileAt(x, y);
+
+            if (t == TileType::Grass)
+            {
+                sf::Sprite grass(mGrassTexture);
+
+                const auto size = mGrassTexture.getSize();
+
+                if (size.x > 0 && size.y > 0)
+                {
+                    grass.setScale({
+                        ts / static_cast<float>(size.x),
+                        ts / static_cast<float>(size.y)
+                    });
+                }
+
+                grass.setPosition({
+                    static_cast<float>(x) * ts,
+                    static_cast<float>(y) * ts
+                });
+
+                target.draw(grass, states);
+            }
+            else if (t == TileType::Path)
+            {
+                sf::Sprite path(mPathTexture);
+
+                const auto size = mPathTexture.getSize();
+
+                if (size.x > 0 && size.y > 0)
+                {
+                    path.setScale({
+                        ts / static_cast<float>(size.x),
+                        ts / static_cast<float>(size.y)
+                    });
+                }
+
+                path.setPosition({
+                    static_cast<float>(x) * ts,
+                    static_cast<float>(y) * ts
+                });
+
+                target.draw(path, states);
+            }
+        }
+    }
 }

@@ -55,4 +55,8 @@ private:
 
     std::vector<TileType> mTiles;
     sf::VertexArray mVerts;
+
+    // NEW: grass rendering
+    sf::Texture mGrassTexture;
+    sf::Texture mPathTexture;
 };
