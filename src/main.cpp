@@ -124,6 +124,23 @@ g++ -std=c++17 `
   -Lsrc/lib `
   -lsfml-graphics -lsfml-window -lsfml-system `
   -o src/bin/codemon.exe
+
+  ============================================
+  COMPILE COMMAND (FOR CHUMPS) (INCLUDES TGUI)
+  ============================================
+  g++ -std=c++17 `
+  src/main.cpp `
+  src/battle/Battle.cpp src/battle/Party.cpp `
+  src/states/BattleState.cpp src/states/DebugState.cpp src/states/MainMenuState.cpp src/states/WorldState.cpp `
+  src/world/TileMap.cpp `
+  src/game/Game.cpp src/game/StateStack.cpp `
+  -Isrc -Isrc/include `
+  -Iexternal/TGUI/include `
+  -Lsrc/lib `
+  -Lexternal/TGUI/lib `
+  -ltgui `
+  -lsfml-graphics -lsfml-window -lsfml-system `
+  -o src/bin/codemon.exe
 */
 
 /*test comment*/
