@@ -14,13 +14,15 @@ Codémon is a Pokémon-style RPG built in C++ using SFML. In this world, the cor
   - Windows: `vcpkg install sfml:x64-windows` (SFML 2.6)
   - Linux: `sudo apt install libsfml-dev` (Ubuntu/Debian)
 - **TGUI (optional, macOS only):** Bundled in `external/TGUI/` - builds from source automatically
+  - Windows: Pre-built DLLs in `external/TGUI/bin/` (tgui.dll, tgui-d.dll)
+  - Enables debug code viewer popup (E or F1 key)
 
 ### Build Instructions
 
 **Platform-Specific Notes:**
 - **macOS:** Uses SFML 3.0 + TGUI (built from source). Build is fully automatic with CMake.
-- **Windows:** Install SFML via `vcpkg install sfml:x64-windows` and use `-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake`
-- **Linux:** Ubuntu/Debian users should install `libsfml-dev` package.
+- **Windows:** Install SFML via `vcpkg install sfml:x64-windows` and use `-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake`. TGUI DLLs included.
+- **Linux:** Ubuntu/Debian users should install `libsfml-dev` package. TGUI not available on Linux CI.
 
 ```bash
 # Clone the repository
@@ -57,7 +59,9 @@ ctest --test-dir build --output-on-failure
 
 **Gameplay Features (macOS/Windows):**
 - **Movement:** WASD or Arrow Keys
-- **TGUI Test Window:** F1 (toggle) - shows code snippet viewer
+- **Debug Popup:** E or F1 - opens TGUI code viewer window
+  - Press Enter or click close button (X) to exit popup
+  - Displays interactive TextArea with sample code
 - **Exit Battle:** ESC
 - **Controls:** See [User Manual](./docs/USER_GUIDE.md) for extended controls
 
