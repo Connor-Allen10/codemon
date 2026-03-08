@@ -43,7 +43,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
-        sudo apt-get install -y libsfml-dev cmake
+        sudo apt-get install -y libsfml-dev cmake xvfb
 
     - name: Configure CMake
       run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -55,7 +55,11 @@ jobs:
       working-directory: ./build
       run: |
         echo "::group::Running CTest"
-        ctest -C Release --output-on-failure --verbose
+        if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+          xvfb-run -a ctest -C Release --output-on-failure --verbose
+        else
+          ctest -C Release --output-on-failure --verbose
+        fi
         echo "::endgroup::"
 
     - name: Test Summary
