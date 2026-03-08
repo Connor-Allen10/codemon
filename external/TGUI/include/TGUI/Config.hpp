@@ -124,7 +124,7 @@
 // Define that specifies the mininmum C++ support in both the TGUI code and user code.
 // This constant can be lower than the actual C++ standard version used to compile with,
 // as long as this constant is the same when compiling TGUI and when using the TGUI libs.
-#define TGUI_COMPILED_WITH_CPP_VER 17
+#define TGUI_COMPILED_WITH_CPP_VER 14
 
 // Include the version header when C++20 is available to use the library feature-testing macros
 #if TGUI_COMPILED_WITH_CPP_VER >= 20

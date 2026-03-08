@@ -12,6 +12,13 @@
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
+#if __has_include(<TGUI/TGUI.hpp>) && __has_include(<TGUI/Backend/SFML-Graphics.hpp>)
+#define CODEMON_HAS_TGUI 1
+#include <TGUI/TGUI.hpp>
+#include <TGUI/Backend/SFML-Graphics.hpp>
+#else
+#define CODEMON_HAS_TGUI 0
+#endif
 
 namespace {
 sf::Texture makeDummyTexture() {
@@ -435,6 +442,36 @@ void WorldState::render(sf::RenderTarget& target) {
 
     if (mDebugOpen) {
         target.setView(target.getDefaultView());
+    #if CODEMON_HAS_TGUI
+        sf::RenderWindow window(sf::VideoMode({800, 600}), "TGUI Test");
+        tgui::Gui gui{window};
+
+        auto textArea = tgui::TextArea::create();
+        textArea->setSize({"80%", "70%"});
+        textArea->setPosition({"10%", "15%"});
+        textArea->setText("int main() {\n    return 0;\n}");
+
+        gui.add(textArea);
+
+        while (window.isOpen())
+        {
+            while (const std::optional event = window.pollEvent())
+            {
+                gui.handleEvent(*event);
+
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter)) {
+                    mDebugOpen = !mDebugOpen;
+                    window.close();
+                }
+                    
+            }
+
+            window.clear();
+            gui.draw();
+            window.display();
+        }
+    #else
         target.draw(mOverlay);
+    #endif
     }
 }
