@@ -12,6 +12,25 @@
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
+#if __has_include(<TGUI/TGUI.hpp>) && __has_include(<TGUI/Backend/SFML-Graphics.hpp>)
+#define CODEMON_HAS_TGUI 1
+#include <TGUI/TGUI.hpp>
+#include <TGUI/Backend/SFML-Graphics.hpp>
+#else
+#define CODEMON_HAS_TGUI 0
+#endif
+
+namespace {
+sf::Texture makeDummyTexture() {
+    sf::Texture tex;
+#if SFML_VERSION_MAJOR >= 3
+    tex = sf::Texture(sf::Vector2u{1u, 1u});
+#else
+    tex.create(1u, 1u);
+#endif
+    return tex;
+}
+}
 
 namespace {
 constexpr unsigned kTileSize = 48;
@@ -39,7 +58,7 @@ bool loadTextureFromAny(sf::Texture& tex, std::initializer_list<const char*> pat
 
 WorldState::WorldState(sf::RenderWindow& window)
 : mWindow(window)
-, mDummyTex(sf::Vector2u{1u, 1u})
+, mDummyTex(makeDummyTexture())
 , mPlayer(mDummyTex)
 , mTrainer(mDummyTex) {
     const bool mapLoaded =
@@ -89,9 +108,15 @@ WorldState::WorldState(sf::RenderWindow& window)
     if (mTrainerTexLoaded) {
         mTrainer.setTexture(mTrainerTex, true);
         const auto tb = mTrainer.getLocalBounds();
+#if SFML_VERSION_MAJOR >= 3
         if (tb.size.x > 0.f && tb.size.y > 0.f) {
             mTrainer.setScale({kTileSize / tb.size.x, kTileSize / tb.size.y});
         }
+#else
+        if (tb.width > 0.f && tb.height > 0.f) {
+            mTrainer.setScale(kTileSize / tb.width, kTileSize / tb.height);
+        }
+#endif
     }
 
     mTrainer.setPosition({300.f, 200.f});
@@ -139,7 +164,11 @@ sf::IntRect WorldState::frameRect2x2(int frame) const {
     frame = std::clamp(frame, 0, 3);
     const int col = frame % 2;
     const int row = frame / 2;
+#if SFML_VERSION_MAJOR >= 3
     return sf::IntRect({col * kFrameSize, row * kFrameSize}, {kFrameSize, kFrameSize});
+#else
+    return sf::IntRect(col * kFrameSize, row * kFrameSize, kFrameSize, kFrameSize);
+#endif
 }
 
 sf::Vector2f WorldState::frameOffset(Facing facing, int frame) const {
@@ -165,7 +194,11 @@ void WorldState::updatePlayerVisual() {
 
     mPlayer.setTexture(textureForFacing(mFacing), true);
     mPlayer.setTextureRect(frameRect2x2(mAnimIndex));
+#if SFML_VERSION_MAJOR >= 3
     mPlayer.setScale({1.f, 1.f});
+#else
+    mPlayer.setScale(1.f, 1.f);
+#endif
     mPlayer.setPosition(mPlayerTopLeft + frameOffset(mFacing, mAnimIndex));
     syncFallbackPositions();
 }
@@ -175,7 +208,11 @@ sf::FloatRect WorldState::playerCollisionRectAt(sf::Vector2f topLeft) const {
     constexpr float height = 16.f;
     constexpr float xInset = (kTileSize - width) * 0.5f;
     constexpr float yOffset = kTileSize - height;
+#if SFML_VERSION_MAJOR >= 3
     return sf::FloatRect({topLeft.x + xInset, topLeft.y + yOffset}, {width, height});
+#else
+    return sf::FloatRect(topLeft.x + xInset, topLeft.y + yOffset, width, height);
+#endif
 }
 
 sf::Vector2f WorldState::getPlayerCenter() const {
@@ -303,7 +340,7 @@ void WorldState::applyMovement(sf::Vector2f move, sf::Time dt) {
 void WorldState::handleEvent(const sf::Event& e) {
 #if SFML_VERSION_MAJOR >= 3
     if (const auto* keyPressed = e.getIf<sf::Event::KeyPressed>()) {
-        if (keyPressed->code == sf::Keyboard::Key::F1) {
+        if (keyPressed->code == sf::Keyboard::Key::F1 || keyPressed->code == sf::Keyboard::Key::E) {
             mDebugOpen = !mDebugOpen;
         }
     }
@@ -314,13 +351,18 @@ void WorldState::handleEvent(const sf::Event& e) {
     }
 #else
     if (e.type == sf::Event::KeyPressed) {
-        if (e.key.code == sf::Keyboard::F1) {
+        if (e.key.code == sf::Keyboard::F1 || e.key.code == sf::Keyboard::E) {
             mDebugOpen = !mDebugOpen;
         }
     }
     if (e.type == sf::Event::Resized) {
+#if SFML_VERSION_MAJOR >= 3
         mWorldView.setSize({static_cast<float>(e.size.width), static_cast<float>(e.size.height)});
         mOverlay.setSize({static_cast<float>(e.size.width), static_cast<float>(e.size.height)});
+#else
+        mWorldView.setSize(static_cast<float>(e.size.width), static_cast<float>(e.size.height));
+    mOverlay.setSize(sf::Vector2f(static_cast<float>(e.size.width), static_cast<float>(e.size.height)));
+#endif
         updateCamera();
     }
 #endif
@@ -400,6 +442,41 @@ void WorldState::render(sf::RenderTarget& target) {
 
     if (mDebugOpen) {
         target.setView(target.getDefaultView());
+    #if CODEMON_HAS_TGUI
+        sf::RenderWindow window(sf::VideoMode({800, 600}), "TGUI Test");
+        tgui::Gui gui{window};
+
+        auto textArea = tgui::TextArea::create();
+        textArea->setSize({"80%", "70%"});
+        textArea->setPosition({"10%", "15%"});
+        textArea->setText("int main() {\n    return 0;\n}");
+
+        gui.add(textArea);
+
+        while (window.isOpen())
+        {
+            while (const std::optional event = window.pollEvent())
+            {
+                if (event->is<sf::Event::Closed>()) {
+                    mDebugOpen = !mDebugOpen;
+                    window.close();
+                }
+                
+                gui.handleEvent(*event);
+
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter)) {
+                    mDebugOpen = !mDebugOpen;
+                    window.close();
+                }
+                    
+            }
+
+            window.clear();
+            gui.draw();
+            window.display();
+        }
+    #else
         target.draw(mOverlay);
+    #endif
     }
 }

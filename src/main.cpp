@@ -78,11 +78,18 @@ int main()
         // ------------------------------------------
         std::filesystem::path exeDir = getExecutableDir();
 
-        // Move working directory to project root when running from build/
-        // executable path (e.g., <repo>/build/codemon).
-        std::filesystem::path candidate = exeDir.parent_path();
-        if (std::filesystem::exists(candidate / "assets")) {
-            std::filesystem::current_path(candidate);
+        // Prefer executable directory when build/assets exists.
+        // This supports launching with ./build/codemon from repo root.
+        const std::filesystem::path buildAssets = exeDir / "assets";
+        const std::filesystem::path parentAssets = exeDir.parent_path() / "assets";
+        const std::filesystem::path parentSrcAssets = exeDir.parent_path() / "src" / "assets";
+
+        if (std::filesystem::exists(buildAssets)) {
+            std::filesystem::current_path(exeDir);
+            std::cout << "Assets found - working directory set to: "
+                      << std::filesystem::current_path().string() << std::endl;
+        } else if (std::filesystem::exists(parentAssets) || std::filesystem::exists(parentSrcAssets)) {
+            std::filesystem::current_path(exeDir.parent_path());
             std::cout << "Assets found - working directory set to: "
                       << std::filesystem::current_path().string() << std::endl;
         } else {
@@ -115,6 +122,23 @@ g++ -std=c++17 `
   src/game/Game.cpp src/game/StateStack.cpp `
   -Isrc -Isrc/include `
   -Lsrc/lib `
+  -lsfml-graphics -lsfml-window -lsfml-system `
+  -o src/bin/codemon.exe
+
+  ============================================
+  COMPILE COMMAND (FOR CHUMPS) (INCLUDES TGUI)
+  ============================================
+  g++ -std=c++17 `
+  src/main.cpp `
+  src/battle/Battle.cpp src/battle/Party.cpp `
+  src/states/BattleState.cpp src/states/DebugState.cpp src/states/MainMenuState.cpp src/states/WorldState.cpp `
+  src/world/TileMap.cpp `
+  src/game/Game.cpp src/game/StateStack.cpp `
+  -Isrc -Isrc/include `
+  -Iexternal/TGUI/include `
+  -Lsrc/lib `
+  -Lexternal/TGUI/lib `
+  -ltgui `
   -lsfml-graphics -lsfml-window -lsfml-system `
   -o src/bin/codemon.exe
 */

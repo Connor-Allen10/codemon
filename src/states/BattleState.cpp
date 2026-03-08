@@ -28,6 +28,7 @@ BattleState::BattleState(sf::RenderWindow& window)
     const std::vector<std::string> fontCandidates = {
         "assets/fonts/arial.ttf",
         "../assets/fonts/arial.ttf",
+        "src/assets/fonts/arial.ttf",
         "/System/Library/Fonts/Supplemental/Arial.ttf",
         "/System/Library/Fonts/Supplemental/Helvetica.ttc",
         "/Library/Fonts/Arial.ttf",

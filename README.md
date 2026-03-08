@@ -7,54 +7,63 @@ Codémon is a Pokémon-style RPG built in C++ using SFML. In this world, the cor
 ## ⚡ Quick Start
 
 ### Prerequisites
-- **CMake 3.10 or higher** (check version: `cmake --version`)
+- **CMake 3.20 or higher** (check version: `cmake --version`)
 - **C++ compiler** with C++17 support (GCC 7+, Clang 5+, MSVC 2017+)
 - **SFML library:**
   - macOS: `brew install sfml` (SFML 3.0)
   - Windows: `vcpkg install sfml:x64-windows` (SFML 2.6)
   - Linux: `sudo apt install libsfml-dev` (Ubuntu/Debian)
+- **TGUI (optional, macOS only):** Bundled in `external/TGUI/` - builds from source automatically
+  - Windows: Pre-built DLLs in `external/TGUI/bin/` (tgui.dll, tgui-d.dll)
+  - Enables debug code viewer popup (E or F1 key)
 
 ### Build Instructions
 
 **Platform-Specific Notes:**
-- **macOS:** Uses SFML 3.0. Build should work out of the box with installed SFML.
-- **Windows:** Install SFML via `vcpkg install sfml:x64-windows` and use `-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake`
-- **Linux:** Ubuntu/Debian users should install `libsfml-dev` package.
+- **macOS:** Uses SFML 3.0 + TGUI (built from source). Build is fully automatic with CMake.
+- **Windows:** Install SFML via `vcpkg install sfml:x64-windows` and use `-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake`. TGUI DLLs included.
+- **Linux:** Ubuntu/Debian users should install `libsfml-dev` package. TGUI not available on Linux CI.
 
 ```bash
 # Clone the repository
 git clone https://github.com/Connor-Allen10/codemon.git
 cd codemon
 
-# Create and configure build
-mkdir -p build && cd build
-cmake ..
-cmake --build . -j
-
-# Or for Release mode (faster build and runtime)
-cmake -B build -DCMAKE_BUILD_TYPE=Release
+# Create and configure build (CMake auto-detects platform)
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
 cmake --build build -j
 ```
 
 ### Test Instructions
 ```bash
-# From project root
-cd build
-ctest --output-on-failure
+# From project root (macOS)
+cmake --build build --target run_tests
+./build/run_tests
 ```
-**Expected:** 31 tests passing (25 core logic + 6 state transition tests).
+Or with CTest:
+```bash
+ctest --test-dir build --output-on-failure
+```
+**Expected:** 31 tests passing (24 core logic + 7 state transition tests).
 
 ### Run Instructions
 ```bash
-# From build directory
-./codemon           # macOS/Linux
-./Release/codemon.exe  # Windows (Release mode)
+# From project root (macOS/Linux)
+./build/codemon
 ```
 
-**Controls:**
+```powershell
+# From project root (Windows)
+.\build\Debug\codemon.exe
+```
+
+**Gameplay Features (macOS/Windows):**
 - **Movement:** WASD or Arrow Keys
-- **Debug Overlay:** F1 (toggle)
+- **Debug Popup:** E or F1 - opens TGUI code viewer window
+  - Press Enter or click close button (X) to exit popup
+  - Displays interactive TextArea with sample code
 - **Exit Battle:** ESC
+- **Controls:** See [User Manual](./docs/USER_GUIDE.md) for extended controls
 
 ---
 
