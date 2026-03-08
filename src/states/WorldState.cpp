@@ -340,7 +340,7 @@ void WorldState::applyMovement(sf::Vector2f move, sf::Time dt) {
 void WorldState::handleEvent(const sf::Event& e) {
 #if SFML_VERSION_MAJOR >= 3
     if (const auto* keyPressed = e.getIf<sf::Event::KeyPressed>()) {
-        if (keyPressed->code == sf::Keyboard::Key::F1) {
+        if (keyPressed->code == sf::Keyboard::Key::F1 || keyPressed->code == sf::Keyboard::Key::E) {
             mDebugOpen = !mDebugOpen;
         }
     }
@@ -351,7 +351,7 @@ void WorldState::handleEvent(const sf::Event& e) {
     }
 #else
     if (e.type == sf::Event::KeyPressed) {
-        if (e.key.code == sf::Keyboard::F1) {
+        if (e.key.code == sf::Keyboard::F1 || e.key.code == sf::Keyboard::E) {
             mDebugOpen = !mDebugOpen;
         }
     }
@@ -457,6 +457,11 @@ void WorldState::render(sf::RenderTarget& target) {
         {
             while (const std::optional event = window.pollEvent())
             {
+                if (event->is<sf::Event::Closed>()) {
+                    mDebugOpen = !mDebugOpen;
+                    window.close();
+                }
+                
                 gui.handleEvent(*event);
 
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter)) {
