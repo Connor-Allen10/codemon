@@ -44,7 +44,7 @@ Or with CTest:
 ```bash
 ctest --test-dir build --output-on-failure
 ```
-**Expected:** 31 tests passing (24 core logic + 7 state transition tests).
+**Expected:** 43 tests passing (37 core logic + 6 ChallengeLoader tests).
 
 ### Run Instructions
 ```bash
@@ -59,9 +59,15 @@ ctest --test-dir build --output-on-failure
 
 **Gameplay Features (macOS/Windows):**
 - **Movement:** WASD or Arrow Keys
-- **Debug Popup:** E or F1 - opens TGUI code viewer window
-  - Press Enter or click close button (X) to exit popup
-  - Displays interactive TextArea with sample code
+- **Debug Challenges:** E or F1 - opens debug challenge editor during battles
+  - Read the challenge prompt (shows broken code)
+  - Type the corrected code in the text area
+  - Click Submit to validate your fix
+  - Required keyword hint displayed at bottom
+  - Cancel button exits without submitting
+- **Challenge Customization:** Edit `challenges.txt` to add your own debug puzzles
+  - Format: `prompt|solution|keyword` (one per line)
+  - Falls back to built-in challenges if file missing
 - **Exit Battle:** ESC
 - **Controls:** See [User Manual](./docs/USER_GUIDE.md) for extended controls
 
@@ -99,10 +105,10 @@ For detailed information, see:
 
 ## 🛠 Project Status (Milestone 6: Beta Release)
 We are entering the beta testing phase with core components operational.
-* **Core Logic:** World rendering, player movement, random encounters, and battle state transitions fully implemented.
-* **Testing:** 31 automated tests passing with GitHub Actions CI integration.
-* **Quality:** Comprehensive code documentation (Doxygen-style) and cross-platform compatibility (macOS/Windows/Linux).
-* **Next Phase:** Battle UI prototype implementation and sprite asset integration.
+* **Core Logic:** World rendering, player movement, random encounters, battle state transitions, and debug challenge system fully implemented.
+* **Testing:** 43 automated tests passing with GitHub Actions CI integration.
+* **Quality:** Comprehensive code documentation (Doxygen-style) and cross-platform compatibility (macOS/Linux, Windows CI disabled).
+* **Next Phase:** Battle UI enhancements, sprite asset integration, and additional challenge content.
 
 ## 👥 The Team
 * **Connor Allen:** Project Manager

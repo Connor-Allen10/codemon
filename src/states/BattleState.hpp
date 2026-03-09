@@ -96,6 +96,7 @@ private:
     Debug::Engine mDebugEngine;
     std::string mBattleMessage;
     bool mChallengeSolved = false;
+    std::string mCurrentKeywordHint;
     
     // Static challenge pool shared across all battle instances
     static Debug::ChallengeLoader sChallengeLoader;

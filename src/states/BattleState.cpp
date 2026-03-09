@@ -49,7 +49,8 @@ void applySubmission(Debug::Engine& engine,
 // Returns:
 // - std::string submission when player presses Submit
 // - std::nullopt when player closes/cancels popup
-std::optional<std::string> runDebugEditorPopup(const std::string& prompt) {
+std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
+                                               const std::string& keywordHint) {
 #if SFML_VERSION_MAJOR >= 3
     sf::RenderWindow popup(sf::VideoMode({960, 640}), "CodeMon Debug Editor", sf::Style::Titlebar | sf::Style::Close);
 #else
@@ -90,6 +91,7 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt) {
     editor->setSize({"94%", "49%"});
     // Start with blank editor so player must type the correction
     editor->setText("");
+    editor->setTextSize(22);
     editor->getRenderer()->setBackgroundColor(tgui::Color(55, 55, 65));
     editor->getRenderer()->setTextColor(tgui::Color::White);
     editor->getRenderer()->setCaretColor(tgui::Color::White);
@@ -111,7 +113,10 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt) {
     cancelButton->getRenderer()->setTextColor(tgui::Color::White);
     panel->add(cancelButton);
 
-    auto hint = tgui::Label::create("Required keyword hint will appear here");
+    const std::string hintText = keywordHint.empty()
+        ? "No required keyword for this challenge."
+        : ("Required keyword: " + keywordHint);
+    auto hint = tgui::Label::create(hintText);
     hint->setPosition({"25%", "85%"});
     hint->setTextSize(14);
     hint->getRenderer()->setTextColor(tgui::Color(200, 200, 150));
@@ -217,9 +222,11 @@ BattleState::BattleState(sf::RenderWindow& window)
     // Challenge selection is random on each battle start for variety.
     auto maybeChallenge = sChallengeLoader.getRandomChallenge();
     if (maybeChallenge) {
+        mCurrentKeywordHint = maybeChallenge->keywordHint;
         mDebugEngine.startChallenge(*maybeChallenge);
     } else {
         // Fallback if loader completely fails (shouldn't happen with defaults)
+        mCurrentKeywordHint = "return";
         mDebugEngine.startChallenge(Debug::Challenge{
             "Fix bug: change 'retun 0;' to valid C++",
             "return 0;",
@@ -250,7 +257,7 @@ void BattleState::handleEvent(const sf::Event& e) {
         // Open TGUI editor popup and submit the player's typed solution.
         if ((keyPressed->code == sf::Keyboard::Key::E || keyPressed->code == sf::Keyboard::Key::F1) &&
             mDebugEngine.hasActiveChallenge()) {
-            const auto submission = runDebugEditorPopup(mDebugEngine.currentPrompt());
+            const auto submission = runDebugEditorPopup(mDebugEngine.currentPrompt(), mCurrentKeywordHint);
             if (submission.has_value()) {
                 applySubmission(mDebugEngine, submission.value(), mBattleMessage, mChallengeSolved);
             }
@@ -287,7 +294,7 @@ void BattleState::handleEvent(const sf::Event& e) {
         // Open TGUI editor popup and submit the player's typed solution.
         if ((e.key.code == sf::Keyboard::E || e.key.code == sf::Keyboard::F1) &&
             mDebugEngine.hasActiveChallenge()) {
-            const auto submission = runDebugEditorPopup(mDebugEngine.currentPrompt());
+            const auto submission = runDebugEditorPopup(mDebugEngine.currentPrompt(), mCurrentKeywordHint);
             if (submission.has_value()) {
                 applySubmission(mDebugEngine, submission.value(), mBattleMessage, mChallengeSolved);
             }
