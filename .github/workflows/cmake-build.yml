@@ -52,10 +52,10 @@ jobs:
       with:
         vcpkgGitCommitId: '1e199d32ad53aab1defda61ce41c380302e3f95c'
 
-    - name: Install SFML (Windows)
+    - name: Install SFML and TGUI (Windows)
       if: matrix.os == 'windows-latest'
       run: |
-        vcpkg install sfml:x64-windows
+        vcpkg install sfml:x64-windows tgui:x64-windows
 
     - name: Configure CMake (Windows)
       if: matrix.os == 'windows-latest'
