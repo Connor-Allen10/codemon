@@ -59,4 +59,5 @@ private:
     // NEW: grass rendering
     sf::Texture mGrassTexture;
     sf::Texture mPathTexture;
+    sf::Texture mTreeTexture;
 };

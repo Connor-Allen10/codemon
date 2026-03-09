@@ -19,6 +19,10 @@ TileMap::TileMap(unsigned tileSizePx)
     if (!mPathTexture.loadFromFile("assets/path_tile.png")) {
         printf("Failed to load path_tile.png\n");
     }
+
+    if (!mTreeTexture.loadFromFile("assets/tree_tile.png")) {
+        printf("Failed to load tree_tile.png\n");
+    }
 }
 
 bool TileMap::inBounds(int tx, int ty) const {
@@ -39,7 +43,7 @@ sf::Color TileMap::colorFor(TileType t) const {
     switch (t) {
         case TileType::Path:  return sf::Color(210, 190, 140); // tan
         case TileType::Grass: return sf::Color(120, 170, 120); // soft green
-        case TileType::Wall:  return sf::Color(20,  70,  30);  // forest green
+        case TileType::Wall:  return sf::Color(120, 170, 120);  // forest green
         default:              return sf::Color::Magenta;
     }
 }
@@ -198,6 +202,7 @@ bool TileMap::isEncounterAt(const sf::Vector2f& worldPos) const {
 
 void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
+    // draw the base mesh
     target.draw(mVerts, states);
 
     const float ts = static_cast<float>(mTileSize);
@@ -206,14 +211,13 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const
     {
         for (unsigned x = 0; x < mWidth; ++x)
         {
-            const TileType t = tileAt(x, y);
+            TileType t = tileAt(static_cast<int>(x), static_cast<int>(y));
 
             if (t == TileType::Grass)
             {
                 sf::Sprite grass(mGrassTexture);
 
-                const auto size = mGrassTexture.getSize();
-
+                auto size = mGrassTexture.getSize();
                 if (size.x > 0 && size.y > 0)
                 {
                     grass.setScale({
@@ -233,8 +237,7 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const
             {
                 sf::Sprite path(mPathTexture);
 
-                const auto size = mPathTexture.getSize();
-
+                auto size = mPathTexture.getSize();
                 if (size.x > 0 && size.y > 0)
                 {
                     path.setScale({
@@ -249,6 +252,37 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const
                 });
 
                 target.draw(path, states);
+            }
+            else if (t == TileType::Wall)
+            {
+                sf::Sprite tree(mTreeTexture);
+
+                auto size = mTreeTexture.getSize();
+                if (size.x > 0 && size.y > 0)
+                {
+                    const float baseScaleX = ts / static_cast<float>(size.x);
+                    const float baseScaleY = ts / static_cast<float>(size.y);
+
+                    const float treeScaleMultiplier = 2.0f;
+
+                    tree.setScale({
+                        baseScaleX * treeScaleMultiplier,
+                        baseScaleY * treeScaleMultiplier
+                    });
+
+                    const float drawnWidth  = static_cast<float>(size.x) * baseScaleX * treeScaleMultiplier;
+                    const float drawnHeight = static_cast<float>(size.y) * baseScaleY * treeScaleMultiplier;
+
+                    // shift tree slightly downward
+                    const float downwardOffset = ts * 0.15f;
+
+                    tree.setPosition({
+                        static_cast<float>(x) * ts + (ts - drawnWidth) / 2.0f,
+                        static_cast<float>(y) * ts + (ts - drawnHeight) + downwardOffset
+                    });
+                }
+
+                target.draw(tree, states);
             }
         }
     }
