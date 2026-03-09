@@ -96,6 +96,7 @@ private:
     Debug::Engine mDebugEngine;
     std::string mBattleMessage;
     bool mChallengeSolved = false;
+    bool mSubmissionFailed = false;  ///< True if last submission was incorrect
     std::string mCurrentKeywordHint;
     
     // Static challenge pool shared across all battle instances

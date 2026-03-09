@@ -38,10 +38,12 @@ namespace {
 void applySubmission(Debug::Engine& engine,
                      const std::string& submission,
                      std::string& message,
-                     bool& solved) {
+                     bool& solved,
+                     bool& failed) {
     const ValidationResult result = engine.submit(submission);
     message = result.feedback;
     solved = result.success;
+    failed = !result.success;
 }
 
 #if CODEMON_HAS_TGUI
@@ -259,7 +261,7 @@ void BattleState::handleEvent(const sf::Event& e) {
             mDebugEngine.hasActiveChallenge()) {
             const auto submission = runDebugEditorPopup(mDebugEngine.currentPrompt(), mCurrentKeywordHint);
             if (submission.has_value()) {
-                applySubmission(mDebugEngine, submission.value(), mBattleMessage, mChallengeSolved);
+                applySubmission(mDebugEngine, submission.value(), mBattleMessage, mChallengeSolved, mSubmissionFailed);
             }
         }
 #else
@@ -267,14 +269,14 @@ void BattleState::handleEvent(const sf::Event& e) {
         // Submits "return 0;" which matches the expected answer.
         // On success: feedback = "Correct! ...", mChallengeSolved = true, background turns green
         if (keyPressed->code == sf::Keyboard::Key::Enter && mDebugEngine.hasActiveChallenge()) {
-            applySubmission(mDebugEngine, "return 0;", mBattleMessage, mChallengeSolved);
+            applySubmission(mDebugEngine, "return 0;", mBattleMessage, mChallengeSolved, mSubmissionFailed);
         }
 
         // Backspace key: Submit WRONG answer to test failure path
         // Submits "retun 0;" (typo) which doesn't match expected answer.
         // On failure: feedback = "Incorrect. ...", mChallengeSolved = false, challenge stays active
         if (keyPressed->code == sf::Keyboard::Key::Backspace && mDebugEngine.hasActiveChallenge()) {
-            applySubmission(mDebugEngine, "retun 0;", mBattleMessage, mChallengeSolved);
+            applySubmission(mDebugEngine, "retun 0;", mBattleMessage, mChallengeSolved, mSubmissionFailed);
         }
 #endif
     }
@@ -296,20 +298,20 @@ void BattleState::handleEvent(const sf::Event& e) {
             mDebugEngine.hasActiveChallenge()) {
             const auto submission = runDebugEditorPopup(mDebugEngine.currentPrompt(), mCurrentKeywordHint);
             if (submission.has_value()) {
-                applySubmission(mDebugEngine, submission.value(), mBattleMessage, mChallengeSolved);
+                applySubmission(mDebugEngine, submission.value(), mBattleMessage, mChallengeSolved, mSubmissionFailed);
             }
         }
 #else
         // Enter/Return key: Submit CORRECT answer ("return 0;")
         // Tests success path for Debug::Engine validation
         if (e.key.code == sf::Keyboard::Return && mDebugEngine.hasActiveChallenge()) {
-            applySubmission(mDebugEngine, "return 0;", mBattleMessage, mChallengeSolved);
+            applySubmission(mDebugEngine, "return 0;", mBattleMessage, mChallengeSolved, mSubmissionFailed);
         }
 
         // Backspace key: Submit WRONG answer ("retun 0;" with typo)
         // Tests failure path for Debug::Engine validation
         if (e.key.code == sf::Keyboard::BackSpace && mDebugEngine.hasActiveChallenge()) {
-            applySubmission(mDebugEngine, "retun 0;", mBattleMessage, mChallengeSolved);
+            applySubmission(mDebugEngine, "retun 0;", mBattleMessage, mChallengeSolved, mSubmissionFailed);
         }
 #endif
     }
@@ -329,9 +331,12 @@ void BattleState::render(sf::RenderTarget& target) {
 
     // Visual feedback: Change background color based on challenge state
     // - Green (20, 120, 40): Challenge solved successfully
-    // - Purple (64, 0, 128): Challenge active/unsolved (default battle color)
+    // - Red (150, 0, 0): Last submission was incorrect
+    // - Purple (64, 0, 128): Challenge active, no attempt yet (default battle color)
     if (mChallengeSolved) {
         mBackground.setFillColor(sf::Color(20, 120, 40));
+    } else if (mSubmissionFailed) {
+        mBackground.setFillColor(sf::Color(150, 0, 0));
     } else {
         mBackground.setFillColor(sf::Color(64, 0, 128));
     }
