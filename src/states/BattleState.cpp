@@ -6,8 +6,8 @@
  * The battle state presents coding challenges that players must solve by submitting
  * correct code fixes. Key features:
  * - Debug::Engine manages challenge lifecycle (start, submit, validation)
- * - Enter key submits correct answer for testing
- * - Backspace key submits incorrect answer to test failure path
+ * - Step 3: TGUI popup editor (E/F1) captures user code and submits it
+ * - Fallback mode (no TGUI): Enter/Backspace test the validation paths
  * - Visual feedback changes background color on success
  * - Challenge prompt and feedback messages displayed via SFML text rendering
  */
@@ -18,6 +18,128 @@
 #include <filesystem>
 #include <vector>
 #include <iostream>
+#include <optional>
+
+#if __has_include(<TGUI/TGUI.hpp>) && __has_include(<TGUI/Backend/SFML-Graphics.hpp>)
+#define CODEMON_HAS_TGUI 1
+#include <TGUI/TGUI.hpp>
+#include <TGUI/Backend/SFML-Graphics.hpp>
+#else
+#define CODEMON_HAS_TGUI 0
+#endif
+
+namespace {
+// Centralized helper so all submission paths (TGUI and fallback hotkeys)
+// update BattleState UI fields in one place.
+void applySubmission(Debug::Engine& engine,
+                     const std::string& submission,
+                     std::string& message,
+                     bool& solved) {
+    const ValidationResult result = engine.submit(submission);
+    message = result.feedback;
+    solved = result.success;
+}
+
+#if CODEMON_HAS_TGUI
+// UI: modal editor popup used during battle.
+// Returns:
+// - std::string submission when player presses Submit
+// - std::nullopt when player closes/cancels popup
+std::optional<std::string> runDebugEditorPopup(const std::string& prompt) {
+#if SFML_VERSION_MAJOR >= 3
+    sf::RenderWindow popup(sf::VideoMode({960, 640}), "CodeMon Debug Editor", sf::Style::Titlebar | sf::Style::Close);
+#else
+    sf::RenderWindow popup(sf::VideoMode(960, 640), "CodeMon Debug Editor", sf::Style::Titlebar | sf::Style::Close);
+#endif
+
+    tgui::Gui gui{popup};
+
+    auto panel = tgui::Panel::create({"92%", "92%"});
+    panel->setPosition({"4%", "4%"});
+    gui.add(panel);
+
+    // Header + prompt context so the player knows what to fix.
+    auto title = tgui::Label::create("BATTLE DEBUG CHALLENGE");
+    title->setPosition({"3%", "3%"});
+    title->setTextSize(26);
+    panel->add(title);
+
+    auto promptLabel = tgui::Label::create("Prompt: " + prompt);
+    promptLabel->setPosition({"3%", "13%"});
+    promptLabel->setTextSize(18);
+    promptLabel->setAutoSize(false);
+    promptLabel->setSize({"94%", "10%"});
+    panel->add(promptLabel);
+
+    auto editor = tgui::TextArea::create();
+    editor->setPosition({"3%", "26%"});
+    editor->setSize({"94%", "52%"});
+    // Starter code to reduce friction for the first attempt.
+    editor->setText("return 0;");
+    panel->add(editor);
+
+    auto submitButton = tgui::Button::create("Submit");
+    submitButton->setPosition({"67%", "82%"});
+    submitButton->setSize({"14%", "10%"});
+    panel->add(submitButton);
+
+    auto cancelButton = tgui::Button::create("Cancel");
+    cancelButton->setPosition({"83%", "82%"});
+    cancelButton->setSize({"14%", "10%"});
+    panel->add(cancelButton);
+
+    auto hint = tgui::Label::create("Tip: include keyword 'return'.");
+    hint->setPosition({"3%", "84%"});
+    hint->setTextSize(16);
+    panel->add(hint);
+
+    bool submitted = false;
+    std::string submission;
+
+    // Submit captures textbox content and exits the modal loop.
+    submitButton->onPress([&]() {
+        submission = editor->getText().toStdString();
+        submitted = true;
+        popup.close();
+    });
+
+    // Cancel just closes without changing challenge state.
+    cancelButton->onPress([&]() {
+        popup.close();
+    });
+
+    while (popup.isOpen()) {
+#if SFML_VERSION_MAJOR >= 3
+    // SFML 3 event model (std::optional from pollEvent).
+        while (const std::optional event = popup.pollEvent()) {
+            if (event->is<sf::Event::Closed>()) {
+                popup.close();
+            }
+            gui.handleEvent(*event);
+        }
+#else
+    // SFML 2 event model.
+        sf::Event event;
+        while (popup.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                popup.close();
+            }
+            gui.handleEvent(event);
+        }
+#endif
+
+        popup.clear(sf::Color(25, 25, 35));
+        gui.draw();
+        popup.display();
+    }
+
+    if (submitted) {
+        return submission;
+    }
+    return std::nullopt;
+}
+#endif
+}
 
 BattleState::BattleState(sf::RenderWindow& window)
 : mWindow(window) {
@@ -77,7 +199,13 @@ BattleState::BattleState(sf::RenderWindow& window)
         "return 0;",
         "return"
     });
+#if CODEMON_HAS_TGUI
+    // Default hint path: user opens editor and types their own fix.
+    mBattleMessage = "Battle started. Press E or F1 to open Debug Editor. ESC = exit.";
+#else
+    // Fallback path used when TGUI is unavailable on the platform/build.
     mBattleMessage = "Battle started. Press Enter to submit fix. Backspace = wrong attempt. ESC = exit.";
+#endif
 
     std::cout << "[BattleState] Initialized\n";
 }
@@ -91,23 +219,30 @@ void BattleState::handleEvent(const sf::Event& e) {
             std::cout << "[BattleState] Exit requested\n";
         }
 
+#if CODEMON_HAS_TGUI
+        // Open TGUI editor popup and submit the player's typed solution.
+        if ((keyPressed->code == sf::Keyboard::Key::E || keyPressed->code == sf::Keyboard::Key::F1) &&
+            mDebugEngine.hasActiveChallenge()) {
+            const auto submission = runDebugEditorPopup(mDebugEngine.currentPrompt());
+            if (submission.has_value()) {
+                applySubmission(mDebugEngine, submission.value(), mBattleMessage, mChallengeSolved);
+            }
+        }
+#else
         // Enter key: Submit CORRECT answer to test success path
         // Submits "return 0;" which matches the expected answer.
         // On success: feedback = "Correct! ...", mChallengeSolved = true, background turns green
         if (keyPressed->code == sf::Keyboard::Key::Enter && mDebugEngine.hasActiveChallenge()) {
-            const ValidationResult r = mDebugEngine.submit("return 0;");
-            mBattleMessage = r.feedback;
-            mChallengeSolved = r.success;
+            applySubmission(mDebugEngine, "return 0;", mBattleMessage, mChallengeSolved);
         }
 
         // Backspace key: Submit WRONG answer to test failure path
         // Submits "retun 0;" (typo) which doesn't match expected answer.
         // On failure: feedback = "Incorrect. ...", mChallengeSolved = false, challenge stays active
         if (keyPressed->code == sf::Keyboard::Key::Backspace && mDebugEngine.hasActiveChallenge()) {
-            const ValidationResult r = mDebugEngine.submit("retun 0;");
-            mBattleMessage = r.feedback;
-            mChallengeSolved = r.success;
+            applySubmission(mDebugEngine, "retun 0;", mBattleMessage, mChallengeSolved);
         }
+#endif
     }
     if (const auto* resized = e.getIf<sf::Event::Resized>()) {
         mBattleView.setSize({static_cast<float>(resized->size.x), static_cast<float>(resized->size.y)});
@@ -121,21 +256,28 @@ void BattleState::handleEvent(const sf::Event& e) {
             std::cout << "[BattleState] Exit requested\n";
         }
 
+#if CODEMON_HAS_TGUI
+        // Open TGUI editor popup and submit the player's typed solution.
+        if ((e.key.code == sf::Keyboard::E || e.key.code == sf::Keyboard::F1) &&
+            mDebugEngine.hasActiveChallenge()) {
+            const auto submission = runDebugEditorPopup(mDebugEngine.currentPrompt());
+            if (submission.has_value()) {
+                applySubmission(mDebugEngine, submission.value(), mBattleMessage, mChallengeSolved);
+            }
+        }
+#else
         // Enter/Return key: Submit CORRECT answer ("return 0;")
         // Tests success path for Debug::Engine validation
         if (e.key.code == sf::Keyboard::Return && mDebugEngine.hasActiveChallenge()) {
-            const ValidationResult r = mDebugEngine.submit("return 0;");
-            mBattleMessage = r.feedback;
-            mChallengeSolved = r.success;
+            applySubmission(mDebugEngine, "return 0;", mBattleMessage, mChallengeSolved);
         }
 
         // Backspace key: Submit WRONG answer ("retun 0;" with typo)
         // Tests failure path for Debug::Engine validation
         if (e.key.code == sf::Keyboard::BackSpace && mDebugEngine.hasActiveChallenge()) {
-            const ValidationResult r = mDebugEngine.submit("retun 0;");
-            mBattleMessage = r.feedback;
-            mChallengeSolved = r.success;
+            applySubmission(mDebugEngine, "retun 0;", mBattleMessage, mChallengeSolved);
         }
+#endif
     }
     if (e.type == sf::Event::Resized) {
         mBattleView.setSize({static_cast<float>(e.size.width), static_cast<float>(e.size.height)});
@@ -184,12 +326,22 @@ void BattleState::render(sf::RenderTarget& target) {
         ? ("Challenge: " + mDebugEngine.currentPrompt())
         : std::string("Challenge solved. Press ESC to return.");
 
+#if CODEMON_HAS_TGUI
+    // Control text switches based on whether full editor mode is compiled in.
+    const std::string controlsLine = "Controls: E/F1 open editor, ESC exits battle";
+#else
+    const std::string controlsLine = "Controls: Enter=correct test, Backspace=wrong test, ESC exits";
+#endif
+
 #if SFML_VERSION_MAJOR >= 3
     sf::Text prompt(mFont, promptLine, 20);
+    sf::Text controls(mFont, controlsLine, 18);
 #else
     sf::Text prompt(promptLine, mFont, 20);
+    sf::Text controls(controlsLine, mFont, 18);
 #endif
     prompt.setFillColor(sf::Color(220, 220, 140));
+    controls.setFillColor(sf::Color(200, 200, 200));
         
         // Center text on screen
 #if SFML_VERSION_MAJOR >= 3
@@ -204,6 +356,7 @@ void BattleState::render(sf::RenderTarget& target) {
 
         subtitle.setPosition({40.f, static_cast<float>(mWindow.getSize().y) * 0.55f});
         prompt.setPosition({40.f, static_cast<float>(mWindow.getSize().y) * 0.65f});
+        controls.setPosition({40.f, static_cast<float>(mWindow.getSize().y) * 0.73f});
         
         // Apply pulse effect to alpha channel (fade in/out)
         const float pulse = 0.5f + 0.5f * std::sin(mTimer * 3.f);
@@ -213,5 +366,6 @@ void BattleState::render(sf::RenderTarget& target) {
         target.draw(title);
         target.draw(subtitle);
         target.draw(prompt);
+        target.draw(controls);
     }
 }
