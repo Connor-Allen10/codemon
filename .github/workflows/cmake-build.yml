@@ -50,7 +50,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       uses: lukka/run-vcpkg@v11
       with:
-        vcpkgGitCommitId: 'c8696863d371ab7f46e213d8f5ca923c4aef2a00'
+        vcpkgGitCommitId: '1e199d32ad53aab1defda61ce41c380302e3f95c'
 
     - name: Install SFML (Windows)
       if: matrix.os == 'windows-latest'
