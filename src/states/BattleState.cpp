@@ -28,6 +28,10 @@
 #define CODEMON_HAS_TGUI 0
 #endif
 
+// Static challenge loader shared across all battle instances
+// Attempts to load from "challenges.txt" in working directory, falls back to 8 defaults
+Debug::ChallengeLoader BattleState::sChallengeLoader("challenges.txt");
+
 namespace {
 // Centralized helper so all submission paths (TGUI and fallback hotkeys)
 // update BattleState UI fields in one place.
@@ -200,18 +204,21 @@ BattleState::BattleState(sf::RenderWindow& window)
         std::cerr << "WARNING: Failed to load battle font. Text will not display.\n";
     }
 
-    // ===== Debug::Engine Integration =====
-    // Start a hardcoded debug challenge for Step 2 testing.
-    // Challenge: Fix typo in C++ return statement ("retun" -> "return")
-    // - Prompt: "Fix bug: change 'retun 0;' to valid C++"
-    // - Expected answer: "return 0;"
-    // - Required keyword: "return" (must appear in submission)
-    // This will later be replaced with dynamic challenge loading in Step 3.
-    mDebugEngine.startChallenge(Debug::Challenge{
-        "Fix bug: change 'retun 0;' to valid C++",
-        "return 0;",
-        "return"
-    });
+    // ===== Debug::Engine Integration (Dynamic Loading) =====
+    // Load random challenge from ChallengeLoader.
+    // The loader reads from file if available, otherwise uses 8 hardcoded defaults.
+    // Challenge selection is random on each battle start for variety.
+    auto maybeChallenge = sChallengeLoader.getRandomChallenge();
+    if (maybeChallenge) {
+        mDebugEngine.startChallenge(*maybeChallenge);
+    } else {
+        // Fallback if loader completely fails (shouldn't happen with defaults)
+        mDebugEngine.startChallenge(Debug::Challenge{
+            "Fix bug: change 'retun 0;' to valid C++",
+            "return 0;",
+            "return"
+        });
+    }
 #if CODEMON_HAS_TGUI
     // Default hint path: user opens editor and types their own fix.
     mBattleMessage = "Battle started. Press E or F1 to open Debug Editor. ESC = exit.";

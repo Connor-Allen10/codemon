@@ -1,0 +1,17 @@
+# Challenge file for CodeMon debug engine
+# Format: prompt|solution|keyword
+# Lines starting with # are comments
+# Empty lines are ignored
+
+Fix bug: change 'retun 0;' to valid C++|return 0;|return
+Fix bug: missing semicolon after 'int x = 5'|int x = 5;|;
+Fix bug: 'cout' should be 'std::cout'|std::cout << "Hello";|std::
+Fix bug: array index starts at 0, not 1|arr[0]|0
+Fix bug: use '==' not '=' in if condition|if (x == 5)|==
+Fix bug: close string with double quote|"Hello World"|"
+Fix bug: '#inclde' should be '#include'|#include|#include
+Fix bug: 'deleet' keyword should be 'delete'|delete ptr;|delete
+Fix bug: 'vod' should be 'void'|void function() {}|void
+Fix bug: 'innt' typo in variable declaration|int count = 0;|int
+Fix bug: missing closing brace '}' in function|int sum(int a, int b) { return a + b; }|}
+Fix bug: 'std::vector<int> v(10)' syntax|std::vector<int> v(10);|vector

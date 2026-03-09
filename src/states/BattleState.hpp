@@ -12,6 +12,7 @@
 #include <SFML/Graphics.hpp>
 #include "../game/State.hpp"
 #include "../debug/DebugChallenge.hpp"
+#include "../debug/ChallengeLoader.hpp"
 
 /**
  * @class BattleState
@@ -91,8 +92,11 @@ private:
     bool mExitRequested = false;         ///< Whether ESC was pressed
     float mTimer = 0.f;                  ///< Timer for animations (pulse effect)
 
-    // Step 2 debug-engine integration (UI core wired into battle)
+    // Debug-engine integration with dynamic challenge loading
     Debug::Engine mDebugEngine;
     std::string mBattleMessage;
     bool mChallengeSolved = false;
+    
+    // Static challenge pool shared across all battle instances
+    static Debug::ChallengeLoader sChallengeLoader;
 };
