@@ -11,6 +11,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "../game/State.hpp"
+#include "../debug/DebugChallenge.hpp"
 
 /**
  * @class BattleState
@@ -89,4 +90,9 @@ private:
     // Battle state
     bool mExitRequested = false;         ///< Whether ESC was pressed
     float mTimer = 0.f;                  ///< Timer for animations (pulse effect)
+
+    // Step 2 debug-engine integration (UI core wired into battle)
+    Debug::Engine mDebugEngine;
+    std::string mBattleMessage;
+    bool mChallengeSolved = false;
 };
