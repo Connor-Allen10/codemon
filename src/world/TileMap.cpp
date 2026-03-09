@@ -5,19 +5,6 @@
 #include <cctype>
 #include <cmath>
 #include <algorithm>
-#include <iostream>
-
-namespace {
-bool loadTextureFromAny(sf::Texture& tex, std::initializer_list<const char*> paths) {
-    for (const char* path : paths) {
-        if (tex.loadFromFile(path)) {
-            tex.setSmooth(false);
-            return true;
-        }
-    }
-    return false;
-}
-}
 
 TileMap::TileMap() : TileMap(48) {}
 
@@ -25,18 +12,16 @@ TileMap::TileMap(unsigned tileSizePx)
 : mTileSize(tileSizePx) {
     mVerts.setPrimitiveType(sf::PrimitiveType::Triangles);
 
-    if (!loadTextureFromAny(mGrassTexture, {
-        "src/assets/grass_tile.png", "assets/grass_tile.png",
-        "../src/assets/grass_tile.png", "../assets/grass_tile.png"
-    })) {
-        std::cerr << "WARNING: Failed to load grass tile texture. Using mesh colors fallback.\n";
+    if (!mGrassTexture.loadFromFile("assets/grass_tile.png")) {
+        printf("Failed to load grass_tile.png\n");
     }
 
-    if (!loadTextureFromAny(mPathTexture, {
-        "src/assets/path_tile.png", "assets/path_tile.png",
-        "../src/assets/path_tile.png", "../assets/path_tile.png"
-    })) {
-        std::cerr << "WARNING: Failed to load path tile texture. Using mesh colors fallback.\n";
+    if (!mPathTexture.loadFromFile("assets/path_tile.png")) {
+        printf("Failed to load path_tile.png\n");
+    }
+
+    if (!mTreeTexture.loadFromFile("assets/tree_tile.png")) {
+        printf("Failed to load tree_tile.png\n");
     }
 }
 
@@ -58,7 +43,7 @@ sf::Color TileMap::colorFor(TileType t) const {
     switch (t) {
         case TileType::Path:  return sf::Color(210, 190, 140); // tan
         case TileType::Grass: return sf::Color(120, 170, 120); // soft green
-        case TileType::Wall:  return sf::Color(20,  70,  30);  // forest green
+        case TileType::Wall:  return sf::Color(120, 170, 120);  // forest green
         default:              return sf::Color::Magenta;
     }
 }
@@ -215,70 +200,89 @@ bool TileMap::isEncounterAt(const sf::Vector2f& worldPos) const {
     return RulesFor(t).encounter;
 }
 
-void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const
+{
+    // draw the base mesh
     target.draw(mVerts, states);
 
     const float ts = static_cast<float>(mTileSize);
 
-    for (unsigned y = 0; y < mHeight; ++y) {
-        for (unsigned x = 0; x < mWidth; ++x) {
-            const TileType t = tileAt(static_cast<int>(x), static_cast<int>(y));
+    for (unsigned y = 0; y < mHeight; ++y)
+    {
+        for (unsigned x = 0; x < mWidth; ++x)
+        {
+            TileType t = tileAt(static_cast<int>(x), static_cast<int>(y));
 
-            if (t == TileType::Grass) {
-                const auto size = mGrassTexture.getSize();
-                if (size.x == 0 || size.y == 0) {
-                    continue;
+            if (t == TileType::Grass)
+            {
+                sf::Sprite grass(mGrassTexture);
+
+                auto size = mGrassTexture.getSize();
+                if (size.x > 0 && size.y > 0)
+                {
+                    grass.setScale({
+                        ts / static_cast<float>(size.x),
+                        ts / static_cast<float>(size.y)
+                    });
                 }
 
-                sf::Sprite grass(mGrassTexture);
-#if SFML_VERSION_MAJOR >= 3
-                grass.setScale({
-                    ts / static_cast<float>(size.x),
-                    ts / static_cast<float>(size.y)
-                });
                 grass.setPosition({
                     static_cast<float>(x) * ts,
                     static_cast<float>(y) * ts
                 });
-#else
-                grass.setScale(
-                    ts / static_cast<float>(size.x),
-                    ts / static_cast<float>(size.y)
-                );
-                grass.setPosition(
-                    static_cast<float>(x) * ts,
-                    static_cast<float>(y) * ts
-                );
-#endif
+
                 target.draw(grass, states);
             }
-            else if (t == TileType::Path) {
-                const auto size = mPathTexture.getSize();
-                if (size.x == 0 || size.y == 0) {
-                    continue;
+            else if (t == TileType::Path)
+            {
+                sf::Sprite path(mPathTexture);
+
+                auto size = mPathTexture.getSize();
+                if (size.x > 0 && size.y > 0)
+                {
+                    path.setScale({
+                        ts / static_cast<float>(size.x),
+                        ts / static_cast<float>(size.y)
+                    });
                 }
 
-                sf::Sprite path(mPathTexture);
-#if SFML_VERSION_MAJOR >= 3
-                path.setScale({
-                    ts / static_cast<float>(size.x),
-                    ts / static_cast<float>(size.y)
-                });
                 path.setPosition({
                     static_cast<float>(x) * ts,
                     static_cast<float>(y) * ts
                 });
-#else
-                path.setScale(
-                    ts / static_cast<float>(size.x),
-                    ts / static_cast<float>(size.y)
-                );
-                path.setPosition(
-                    static_cast<float>(x) * ts,
-                    static_cast<float>(y) * ts
-                );
-#endif
+
                 target.draw(path, states);
+            }
+            else if (t == TileType::Wall)
+            {
+                sf::Sprite tree(mTreeTexture);
+
+                auto size = mTreeTexture.getSize();
+                if (size.x > 0 && size.y > 0)
+                {
+                    const float baseScaleX = ts / static_cast<float>(size.x);
+                    const float baseScaleY = ts / static_cast<float>(size.y);
+
+                    const float treeScaleMultiplier = 2.0f;
+
+                    tree.setScale({
+                        baseScaleX * treeScaleMultiplier,
+                        baseScaleY * treeScaleMultiplier
+                    });
+
+                    const float drawnWidth  = static_cast<float>(size.x) * baseScaleX * treeScaleMultiplier;
+                    const float drawnHeight = static_cast<float>(size.y) * baseScaleY * treeScaleMultiplier;
+
+                    // shift tree slightly downward
+                    const float downwardOffset = ts * 0.15f;
+
+                    tree.setPosition({
+                        static_cast<float>(x) * ts + (ts - drawnWidth) / 2.0f,
+                        static_cast<float>(y) * ts + (ts - drawnHeight) + downwardOffset
+                    });
+                }
+
+                target.draw(tree, states);
             }
         }
     }
