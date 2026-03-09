@@ -78,11 +78,18 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt) {
     promptLabel->getRenderer()->setTextColor(tgui::Color(220, 220, 220));
     panel->add(promptLabel);
 
+    // Instruction label explaining what to do
+    auto instructionLabel = tgui::Label::create("Type the corrected code below:");
+    instructionLabel->setPosition({"3%", "24%"});
+    instructionLabel->setTextSize(14);
+    instructionLabel->getRenderer()->setTextColor(tgui::Color(180, 180, 180));
+    panel->add(instructionLabel);
+
     auto editor = tgui::TextArea::create();
-    editor->setPosition({"3%", "26%"});
-    editor->setSize({"94%", "52%"});
-    // Starter code to reduce friction for the first attempt.
-    editor->setText("return 0;");
+    editor->setPosition({"3%", "29%"});
+    editor->setSize({"94%", "49%"});
+    // Start with blank editor so player must type the correction
+    editor->setText("");
     editor->getRenderer()->setBackgroundColor(tgui::Color(55, 55, 65));
     editor->getRenderer()->setTextColor(tgui::Color::White);
     editor->getRenderer()->setCaretColor(tgui::Color::White);
@@ -91,23 +98,23 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt) {
     panel->add(editor);
 
     auto submitButton = tgui::Button::create("Submit");
-    submitButton->setPosition({"67%", "82%"});
+    submitButton->setPosition({"67%", "85%"});
     submitButton->setSize({"14%", "10%"});
     submitButton->getRenderer()->setBackgroundColor(tgui::Color(60, 120, 60));
     submitButton->getRenderer()->setTextColor(tgui::Color::White);
     panel->add(submitButton);
 
     auto cancelButton = tgui::Button::create("Cancel");
-    cancelButton->setPosition({"83%", "82%"});
+    cancelButton->setPosition({"82%", "85%"});
     cancelButton->setSize({"14%", "10%"});
     cancelButton->getRenderer()->setBackgroundColor(tgui::Color(120, 60, 60));
     cancelButton->getRenderer()->setTextColor(tgui::Color::White);
     panel->add(cancelButton);
 
-    auto hint = tgui::Label::create("Tip: include keyword 'return'.");
-    hint->setPosition({"3%", "84%"});
-    hint->setTextSize(16);
-    hint->getRenderer()->setTextColor(tgui::Color(180, 180, 140));
+    auto hint = tgui::Label::create("Required keyword hint will appear here");
+    hint->setPosition({"25%", "85%"});
+    hint->setTextSize(14);
+    hint->getRenderer()->setTextColor(tgui::Color(200, 200, 150));
     panel->add(hint);
 
     bool submitted = false;
