@@ -56,12 +56,14 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt) {
 
     auto panel = tgui::Panel::create({"92%", "92%"});
     panel->setPosition({"4%", "4%"});
+    panel->getRenderer()->setBackgroundColor(tgui::Color(45, 45, 55));
     gui.add(panel);
 
     // Header + prompt context so the player knows what to fix.
     auto title = tgui::Label::create("BATTLE DEBUG CHALLENGE");
     title->setPosition({"3%", "3%"});
     title->setTextSize(26);
+    title->getRenderer()->setTextColor(tgui::Color::White);
     panel->add(title);
 
     auto promptLabel = tgui::Label::create("Prompt: " + prompt);
@@ -69,6 +71,7 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt) {
     promptLabel->setTextSize(18);
     promptLabel->setAutoSize(false);
     promptLabel->setSize({"94%", "10%"});
+    promptLabel->getRenderer()->setTextColor(tgui::Color(220, 220, 220));
     panel->add(promptLabel);
 
     auto editor = tgui::TextArea::create();
@@ -76,21 +79,31 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt) {
     editor->setSize({"94%", "52%"});
     // Starter code to reduce friction for the first attempt.
     editor->setText("return 0;");
+    editor->getRenderer()->setBackgroundColor(tgui::Color(55, 55, 65));
+    editor->getRenderer()->setTextColor(tgui::Color::White);
+    editor->getRenderer()->setCaretColor(tgui::Color::White);
+    editor->getRenderer()->setSelectedTextBackgroundColor(tgui::Color(80, 80, 120));
+    editor->getRenderer()->setBorderColor(tgui::Color(70, 70, 80));
     panel->add(editor);
 
     auto submitButton = tgui::Button::create("Submit");
     submitButton->setPosition({"67%", "82%"});
     submitButton->setSize({"14%", "10%"});
+    submitButton->getRenderer()->setBackgroundColor(tgui::Color(60, 120, 60));
+    submitButton->getRenderer()->setTextColor(tgui::Color::White);
     panel->add(submitButton);
 
     auto cancelButton = tgui::Button::create("Cancel");
     cancelButton->setPosition({"83%", "82%"});
     cancelButton->setSize({"14%", "10%"});
+    cancelButton->getRenderer()->setBackgroundColor(tgui::Color(120, 60, 60));
+    cancelButton->getRenderer()->setTextColor(tgui::Color::White);
     panel->add(cancelButton);
 
     auto hint = tgui::Label::create("Tip: include keyword 'return'.");
     hint->setPosition({"3%", "84%"});
     hint->setTextSize(16);
+    hint->getRenderer()->setTextColor(tgui::Color(180, 180, 140));
     panel->add(hint);
 
     bool submitted = false;
@@ -128,7 +141,7 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt) {
         }
 #endif
 
-        popup.clear(sf::Color(25, 25, 35));
+        popup.clear(sf::Color(35, 35, 45));
         gui.draw();
         popup.display();
     }
