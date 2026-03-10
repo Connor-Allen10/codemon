@@ -135,6 +135,8 @@ g++ -std=c++17 `
         cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DTGUI_BACKEND=SFML_GRAPHICS -DSFML_DIR="C:\personal_projects\codemon\src\lib\cmake\SFML"
         mingw32-make
 
+        **note: C:\personal_projects\codemon\src\lib\cmake\SFML    *personal_projects* will need to be adjusted to the folder where you keep your project directory**
+
     2. go back to project root.
 
     3. Run compile command below
