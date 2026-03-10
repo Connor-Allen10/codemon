@@ -8,15 +8,6 @@
 MainMenuState::MainMenuState(sf::RenderWindow& window)
 : mWindow(window)
 {
-    const auto ws = mWindow.getSize();
-
-    mMenuView = sf::View(sf::FloatRect(
-        {0.f, 0.f},
-        {static_cast<float>(ws.x), static_cast<float>(ws.y)}
-    ));
-
-    mBackground.setPosition({0.f, 0.f});
-    mBackground.setSize({static_cast<float>(ws.x), static_cast<float>(ws.y)});
     mBackground.setFillColor(sf::Color(10, 10, 30));
 
     const std::vector<std::string> fontCandidates = {
@@ -53,7 +44,8 @@ MainMenuState::MainMenuState(sf::RenderWindow& window)
     std::cout << "[MainMenuState] Initialized\n";
 }
 
-void MainMenuState::handleEvent(const sf::Event& e) {
+void MainMenuState::handleEvent(const sf::Event& e)
+{
 #if SFML_VERSION_MAJOR >= 3
     if (const auto* keyPressed = e.getIf<sf::Event::KeyPressed>()) {
         if (keyPressed->code == sf::Keyboard::Key::Enter ||
@@ -65,17 +57,6 @@ void MainMenuState::handleEvent(const sf::Event& e) {
         if (keyPressed->code == sf::Keyboard::Key::Escape) {
             mWindow.close();
         }
-    }
-
-    if (const auto* resized = e.getIf<sf::Event::Resized>()) {
-        mMenuView.setSize({
-            static_cast<float>(resized->size.x),
-            static_cast<float>(resized->size.y)
-        });
-        mBackground.setSize({
-            static_cast<float>(resized->size.x),
-            static_cast<float>(resized->size.y)
-        });
     }
 #else
     if (e.type == sf::Event::KeyPressed) {
@@ -89,26 +70,27 @@ void MainMenuState::handleEvent(const sf::Event& e) {
             mWindow.close();
         }
     }
-
-    if (e.type == sf::Event::Resized) {
-        mMenuView.setSize({
-            static_cast<float>(e.size.width),
-            static_cast<float>(e.size.height)
-        });
-        mBackground.setSize({
-            static_cast<float>(e.size.width),
-            static_cast<float>(e.size.height)
-        });
-    }
 #endif
 }
 
-void MainMenuState::update(sf::Time dt) {
+void MainMenuState::update(sf::Time dt)
+{
     mTimer += dt.asSeconds();
 }
 
-void MainMenuState::render(sf::RenderTarget& target) {
-    target.setView(mMenuView);
+void MainMenuState::render(sf::RenderTarget& target)
+{
+    const sf::Vector2u size = target.getSize();
+    const float width  = static_cast<float>(size.x);
+    const float height = static_cast<float>(size.y);
+
+    // Create a fresh fullscreen view every frame based on the actual target size
+    sf::View menuView(sf::FloatRect({0.f, 0.f}, {width, height}));
+    target.setView(menuView);
+
+    // Fill the whole screen
+    mBackground.setPosition({0.f, 0.f});
+    mBackground.setSize({width, height});
     target.draw(mBackground);
 
     if (mFontLoaded) {
@@ -129,34 +111,34 @@ void MainMenuState::render(sf::RenderTarget& target) {
 #if SFML_VERSION_MAJOR >= 3
         const auto titleBounds = title.getLocalBounds();
         title.setOrigin({
-            titleBounds.size.x * 0.5f,
-            titleBounds.size.y * 0.5f
+            titleBounds.position.x + titleBounds.size.x * 0.5f,
+            titleBounds.position.y + titleBounds.size.y * 0.5f
         });
 
         const auto subtitleBounds = subtitle.getLocalBounds();
         subtitle.setOrigin({
-            subtitleBounds.size.x * 0.5f,
-            subtitleBounds.size.y * 0.5f
+            subtitleBounds.position.x + subtitleBounds.size.x * 0.5f,
+            subtitleBounds.position.y + subtitleBounds.size.y * 0.5f
         });
 #else
         const auto titleBounds = title.getLocalBounds();
         title.setOrigin({
-            titleBounds.width * 0.5f,
-            titleBounds.height * 0.5f
+            titleBounds.left + titleBounds.width * 0.5f,
+            titleBounds.top + titleBounds.height * 0.5f
         });
 
         const auto subtitleBounds = subtitle.getLocalBounds();
         subtitle.setOrigin({
-            subtitleBounds.width * 0.5f,
-            subtitleBounds.height * 0.5f
+            subtitleBounds.left + subtitleBounds.width * 0.5f,
+            subtitleBounds.top + subtitleBounds.height * 0.5f
         });
 #endif
 
-        const float centerX = static_cast<float>(mWindow.getSize().x) * 0.5f;
-        const float centerY = static_cast<float>(mWindow.getSize().y) * 0.5f;
+        const float centerX = width * 0.5f;
+        const float centerY = height * 0.5f;
 
-        title.setPosition({centerX, centerY - 80.f});
-        subtitle.setPosition({centerX, centerY + 10.f});
+        title.setPosition({centerX, centerY - 60.f});
+        subtitle.setPosition({centerX, centerY + 20.f});
 
         target.draw(title);
         target.draw(subtitle);
