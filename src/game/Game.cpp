@@ -1,13 +1,7 @@
-/**
- * @file Game.cpp
- * @brief Implementation of the main Game class.
- */
-
 #include "Game.hpp"
-#include "../states/WorldState.hpp"
 
-// Fixed timestep: 16.67ms per frame = 60 FPS
-const sf::Time Game::TimePerFrame = sf::seconds(1.f / 60.f);
+#include "../states/WorldState.hpp"
+#include "../states/MainMenuState.hpp"
 
 Game::Game()
 : mWindow(sf::VideoMode({960, 540}), "Codemon")
@@ -15,59 +9,41 @@ Game::Game()
 {
     mWindow.setFramerateLimit(60);
     mStates.setRenderTarget(&mWindow);
+
+    // Push the world first so it sits underneath the menu.
     mStates.push(std::make_unique<WorldState>(mWindow));
+
+    // Push the main menu on top so the game starts there.
+    mStates.push(std::make_unique<MainMenuState>(mWindow));
 }
 
-
-void Game::run() {
+void Game::run()
+{
     sf::Clock clock;
-    sf::Time timeSinceLastUpdate = sf::Time::Zero;
 
     while (mWindow.isOpen()) {
-        // Measure frame time
         sf::Time dt = clock.restart();
-        timeSinceLastUpdate += dt;
 
-        // Fixed timestep update: always 16.67ms per update
-        // Multiple updates may happen if frame took too long
-        while (timeSinceLastUpdate >= TimePerFrame) {
-            timeSinceLastUpdate -= TimePerFrame;
-            processEvents();
-            update(TimePerFrame);
-        }
+        while (auto eventOpt = mWindow.pollEvent()) {
+            const sf::Event& event = *eventOpt;
 
-        // Render as fast as possible (limited by vsync/framerate)
-        render();
-    }
-}
-
-void Game::processEvents() {
 #if SFML_VERSION_MAJOR >= 3
-    while (auto e = mWindow.pollEvent()) {
-        if (e->is<sf::Event::Closed>()) {
-            mWindow.close();
-            return;
-        }
-        mStates.handleEvent(*e);
-    }
+            if (event.is<sf::Event::Closed>()) {
+                mWindow.close();
+            }
 #else
-    sf::Event e;
-    while (mWindow.pollEvent(e)) {
-        if (e.type == sf::Event::Closed) {
-            mWindow.close();
-            return;
-        }
-        mStates.handleEvent(e);
-    }
+            if (event.type == sf::Event::Closed) {
+                mWindow.close();
+            }
 #endif
-}
 
-void Game::update(sf::Time dt) {
-    mStates.update(dt);
-}
+            mStates.handleEvent(event);
+        }
 
-void Game::render() {
-    mWindow.clear();
-    mStates.render();
-    mWindow.display();
+        mStates.update(dt);
+
+        mWindow.clear();
+        mStates.render();
+        mWindow.display();
+    }
 }
