@@ -125,6 +125,21 @@ g++ -std=c++17 `
   -lsfml-graphics -lsfml-window -lsfml-system `
   -o src/bin/codemon.exe
 
+    ===============================
+    Run before TGUI compile Command
+    ===============================
+
+    1. cd external/TGUI
+        mkdir build -Force
+        cd build
+        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DTGUI_BACKEND=SFML_GRAPHICS -DSFML_DIR="C:\personal_projects\codemon\src\lib\cmake\SFML"
+        mingw32-make
+
+    2. go back to project root.
+
+    3. Run compile command below
+  
+
   ============================================
   COMPILE COMMAND (FOR CHUMPS) (INCLUDES TGUI)
   ============================================
@@ -137,10 +152,11 @@ g++ -std=c++17 `
   -Isrc -Isrc/include `
   -Iexternal/TGUI/include `
   -Lsrc/lib `
-  -Lexternal/TGUI/lib `
+  -Lexternal/TGUI/build/lib `
   -ltgui `
   -lsfml-graphics -lsfml-window -lsfml-system `
   -o src/bin/codemon.exe
 */
+
 
 /*test comment*/
