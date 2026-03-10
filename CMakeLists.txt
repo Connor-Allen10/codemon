@@ -112,6 +112,7 @@ add_executable(run_tests ${TEST_SOURCES})
 target_sources(run_tests PRIVATE
     src/world/TileMap.cpp
     src/debug/DebugChallenge.cpp
+    src/debug/ChallengeLoader.cpp
     src/states/WorldState.cpp
     src/states/BattleState.cpp
     src/game/StateStack.cpp

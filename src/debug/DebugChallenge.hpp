@@ -58,4 +58,57 @@ private:
     bool victoryForced = false;
 };
 
+/**
+ * @brief Minimal core debug engine that manages one active challenge.
+ *
+ * This is intentionally UI-agnostic and can be reused by BattleState,
+ * DebugState, and future TGUI views.
+ */
+class Engine {
+public:
+    /// Load a new active challenge (replaces previous one if any).
+    void startChallenge(Challenge challenge) {
+        mActive = std::move(challenge);
+        mHasActive = true;
+        mLastResult = ValidationResult{};
+    }
+
+    /// Whether there is a challenge currently active.
+    bool hasActiveChallenge() const { return mHasActive; }
+
+    /// Prompt for the active challenge, or empty string if inactive.
+    std::string currentPrompt() const {
+        return mHasActive ? mActive.prompt : std::string{};
+    }
+
+    /// Submit an answer to the active challenge.
+    /// Returns failure if no challenge is active.
+    ValidationResult submit(const std::string& submission) {
+        if (!mHasActive) {
+            mLastResult = {false, "No active challenge.", 0.0f};
+            return mLastResult;
+        }
+
+        mLastResult = mActive.validate(submission);
+        if (mLastResult.success) {
+            mHasActive = false;
+        }
+        return mLastResult;
+    }
+
+    /// Last validation result returned by submit().
+    const ValidationResult& lastResult() const { return mLastResult; }
+
+    /// Clear active challenge and cached result.
+    void reset() {
+        mHasActive = false;
+        mLastResult = ValidationResult{};
+    }
+
+private:
+    Challenge mActive{"", "", ""};
+    bool mHasActive = false;
+    ValidationResult mLastResult{};
+};
+
 } // namespace Debug

@@ -11,6 +11,8 @@
 
 #include <SFML/Graphics.hpp>
 #include "../game/State.hpp"
+#include "../debug/DebugChallenge.hpp"
+#include "../debug/ChallengeLoader.hpp"
 
 /**
  * @class BattleState
@@ -89,4 +91,14 @@ private:
     // Battle state
     bool mExitRequested = false;         ///< Whether ESC was pressed
     float mTimer = 0.f;                  ///< Timer for animations (pulse effect)
+
+    // Debug-engine integration with dynamic challenge loading
+    Debug::Engine mDebugEngine;
+    std::string mBattleMessage;
+    bool mChallengeSolved = false;
+    bool mSubmissionFailed = false;  ///< True if last submission was incorrect
+    std::string mCurrentKeywordHint;
+    
+    // Static challenge pool shared across all battle instances
+    static Debug::ChallengeLoader sChallengeLoader;
 };

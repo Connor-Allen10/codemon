@@ -11,8 +11,11 @@ jobs:
     name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
+        # Temporarily disable Windows until TGUI/vcpkg issues are resolved
         os: [macos-latest, ubuntu-latest]
+        # os: [macos-latest, ubuntu-latest, windows-latest]
 
     steps:
     - uses: actions/checkout@v4
@@ -43,23 +46,52 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
-        sudo apt-get install -y libsfml-dev cmake
+        sudo apt-get install -y libsfml-dev cmake xvfb
 
-    - name: Configure CMake
+    - name: Setup vcpkg (Windows)
+      if: matrix.os == 'windows-latest'
+      uses: lukka/run-vcpkg@v11
+      with:
+        vcpkgGitCommitId: '1e199d32ad53aab1defda61ce41c380302e3f95c'
+
+    - name: Install SFML and TGUI (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        vcpkg install sfml:x64-windows tgui:x64-windows
+
+    - name: Configure CMake (Windows)
+      if: matrix.os == 'windows-latest'
+      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+
+    - name: Configure CMake (Unix)
+      if: matrix.os != 'windows-latest'
       run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 
     - name: Build Project
       run: cmake --build build --config Release
 
-    - name: Run Tests
+    - name: Run Tests (Unix)
+      if: matrix.os != 'windows-latest'
+      working-directory: ./build
+      run: |
+        echo "::group::Running CTest"
+        if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+          xvfb-run -a ctest -C Release --output-on-failure --verbose
+        else
+          ctest -C Release --output-on-failure --verbose
+        fi
+        echo "::endgroup::"
+
+    - name: Run Tests (Windows)
+      if: matrix.os == 'windows-latest'
       working-directory: ./build
       run: |
         echo "::group::Running CTest"
         ctest -C Release --output-on-failure --verbose
         echo "::endgroup::"
 
-    - name: Test Summary
-      if: always()
+    - name: Test Summary (Unix)
+      if: always() && matrix.os != 'windows-latest'
       working-directory: ./build
       run: |
         echo "### Test Results for ${{ matrix.os }} :test_tube:" >> $GITHUB_STEP_SUMMARY
@@ -70,3 +102,17 @@ jobs:
           echo "✅ All $TEST_COUNT tests passed" >> $GITHUB_STEP_SUMMARY
         fi
         echo "" >> $GITHUB_STEP_SUMMARY
+
+    - name: Test Summary (Windows)
+      if: always() && matrix.os == 'windows-latest'
+      working-directory: ./build
+      shell: pwsh
+      run: |
+        Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "### Test Results for ${{ matrix.os }} :test_tube:"
+        $output = ctest -C Release -N 2>&1 | Out-String
+        if ($output -match "Total Tests: 0") {
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "⚠️ No tests found"
+        } elseif ($output -match "Total Tests: (\d+)") {
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "✅ All $($matches[1]) tests passed"
+        }
+        Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value ""
