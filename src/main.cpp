@@ -149,6 +149,7 @@ g++ -std=c++17 `
   src/states/BattleState.cpp src/states/DebugState.cpp src/states/MainMenuState.cpp src/states/WorldState.cpp `
   src/world/TileMap.cpp `
   src/game/Game.cpp src/game/StateStack.cpp `
+  src/debug/ChallengeLoader.cpp src/debug/DebugChallenge.cpp `
   -Isrc -Isrc/include `
   -Iexternal/TGUI/include `
   -Lsrc/lib `
