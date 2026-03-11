@@ -54,12 +54,14 @@ void applySubmission(Debug::Engine& engine,
 std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
                                                const std::string& keywordHint) {
 #if SFML_VERSION_MAJOR >= 3
-    sf::RenderWindow popup(sf::VideoMode({960, 640}), "CodeMon Debug Editor", sf::Style::Titlebar | sf::Style::Close);
+    sf::RenderWindow popup(sf::VideoMode({1120, 820}), "CodeMon Debug Editor", sf::Style::Titlebar | sf::Style::Close);
 #else
-    sf::RenderWindow popup(sf::VideoMode(960, 640), "CodeMon Debug Editor", sf::Style::Titlebar | sf::Style::Close);
+    sf::RenderWindow popup(sf::VideoMode(1120, 820), "CodeMon Debug Editor", sf::Style::Titlebar | sf::Style::Close);
 #endif
 
     tgui::Gui gui{popup};
+    // Allow Tab to insert indentation inside TextArea instead of changing widget focus.
+    gui.setTabKeyUsageEnabled(false);
 
     auto panel = tgui::Panel::create({"92%", "92%"});
     panel->setPosition({"4%", "4%"});
@@ -73,24 +75,33 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
     title->getRenderer()->setTextColor(tgui::Color::White);
     panel->add(title);
 
-    auto promptLabel = tgui::Label::create("Prompt: " + prompt);
-    promptLabel->setPosition({"3%", "13%"});
-    promptLabel->setTextSize(18);
-    promptLabel->setAutoSize(false);
-    promptLabel->setSize({"94%", "10%"});
-    promptLabel->getRenderer()->setTextColor(tgui::Color(220, 220, 220));
+    auto promptLabel = tgui::Label::create("Broken code:");
+    promptLabel->setPosition({"3%", "12%"});
+    promptLabel->setTextSize(16);
+    promptLabel->getRenderer()->setTextColor(tgui::Color(210, 210, 210));
     panel->add(promptLabel);
 
+    auto promptView = tgui::TextArea::create();
+    promptView->setPosition({"3%", "16%"});
+    promptView->setSize({"94%", "31%"});
+    promptView->setText(prompt);
+    promptView->setReadOnly(true);
+    promptView->setTextSize(18);
+    promptView->getRenderer()->setBackgroundColor(tgui::Color(50, 50, 60));
+    promptView->getRenderer()->setTextColor(tgui::Color(220, 220, 220));
+    promptView->getRenderer()->setBorderColor(tgui::Color(70, 70, 80));
+    panel->add(promptView);
+
     // Instruction label explaining what to do
-    auto instructionLabel = tgui::Label::create("Type the corrected code below:");
-    instructionLabel->setPosition({"3%", "24%"});
+    auto instructionLabel = tgui::Label::create("Type the corrected code below (Tab inserts indentation):");
+    instructionLabel->setPosition({"3%", "50%"});
     instructionLabel->setTextSize(14);
     instructionLabel->getRenderer()->setTextColor(tgui::Color(180, 180, 180));
     panel->add(instructionLabel);
 
     auto editor = tgui::TextArea::create();
-    editor->setPosition({"3%", "29%"});
-    editor->setSize({"94%", "49%"});
+    editor->setPosition({"3%", "54%"});
+    editor->setSize({"94%", "28%"});
     // Start with blank editor so player must type the correction
     editor->setText("");
     editor->setTextSize(22);
@@ -100,16 +111,17 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
     editor->getRenderer()->setSelectedTextBackgroundColor(tgui::Color(80, 80, 120));
     editor->getRenderer()->setBorderColor(tgui::Color(70, 70, 80));
     panel->add(editor);
+    editor->setFocused(true);
 
     auto submitButton = tgui::Button::create("Submit");
-    submitButton->setPosition({"67%", "85%"});
+    submitButton->setPosition({"67%", "86%"});
     submitButton->setSize({"14%", "10%"});
     submitButton->getRenderer()->setBackgroundColor(tgui::Color(60, 120, 60));
     submitButton->getRenderer()->setTextColor(tgui::Color::White);
     panel->add(submitButton);
 
     auto cancelButton = tgui::Button::create("Cancel");
-    cancelButton->setPosition({"82%", "85%"});
+    cancelButton->setPosition({"82%", "86%"});
     cancelButton->setSize({"14%", "10%"});
     cancelButton->getRenderer()->setBackgroundColor(tgui::Color(120, 60, 60));
     cancelButton->getRenderer()->setTextColor(tgui::Color::White);
@@ -119,7 +131,7 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
         ? "No required keyword for this challenge."
         : ("Required keyword: " + keywordHint);
     auto hint = tgui::Label::create(hintText);
-    hint->setPosition({"25%", "85%"});
+    hint->setPosition({"3%", "87%"});
     hint->setTextSize(14);
     hint->getRenderer()->setTextColor(tgui::Color(200, 200, 150));
     panel->add(hint);
@@ -344,10 +356,9 @@ void BattleState::render(sf::RenderTarget& target) {
     target.draw(mBackground);
     
     // ===== Debug UI Text Rendering =====
-    // Three-line layout for battle debug interface:
+    // Two-line layout for battle debug interface:
     // 1. Title: "BATTLE DEBUG" with pulsing alpha animation
-    // 2. Subtitle: Feedback message (mBattleMessage) showing validation result
-    // 3. Prompt: Current challenge prompt or completion message
+    // 2. Subtitle: Feedback/instruction message (mBattleMessage)
     if (mFontLoaded) {
         // SFML 3.0 vs 2.x have different Text constructor parameter order
 #if SFML_VERSION_MAJOR >= 3
@@ -360,28 +371,6 @@ void BattleState::render(sf::RenderTarget& target) {
     title.setFillColor(sf::Color::White);
     subtitle.setFillColor(sf::Color(230, 230, 230));
 
-    // Prompt line shows active challenge or completion message
-    std::string promptLine = mDebugEngine.hasActiveChallenge()
-        ? ("Challenge: " + mDebugEngine.currentPrompt())
-        : std::string("Challenge solved. Press ESC to return.");
-
-#if CODEMON_HAS_TGUI
-    // Control text switches based on whether full editor mode is compiled in.
-    const std::string controlsLine = "Controls: E/F1 open editor, ESC exits battle";
-#else
-    const std::string controlsLine = "Controls: Enter=correct test, Backspace=wrong test, ESC exits";
-#endif
-
-#if SFML_VERSION_MAJOR >= 3
-    sf::Text prompt(mFont, promptLine, 20);
-    sf::Text controls(mFont, controlsLine, 18);
-#else
-    sf::Text prompt(promptLine, mFont, 20);
-    sf::Text controls(controlsLine, mFont, 18);
-#endif
-    prompt.setFillColor(sf::Color(220, 220, 140));
-    controls.setFillColor(sf::Color(200, 200, 200));
-        
         // Center text on screen
 #if SFML_VERSION_MAJOR >= 3
         const auto bounds = title.getLocalBounds();
@@ -394,8 +383,6 @@ void BattleState::render(sf::RenderTarget& target) {
                    static_cast<float>(mWindow.getSize().y) * 0.35f});
 
         subtitle.setPosition({40.f, static_cast<float>(mWindow.getSize().y) * 0.55f});
-        prompt.setPosition({40.f, static_cast<float>(mWindow.getSize().y) * 0.65f});
-        controls.setPosition({40.f, static_cast<float>(mWindow.getSize().y) * 0.73f});
         
         // Apply pulse effect to alpha channel (fade in/out)
         const float pulse = 0.5f + 0.5f * std::sin(mTimer * 3.f);
@@ -404,7 +391,5 @@ void BattleState::render(sf::RenderTarget& target) {
 
         target.draw(title);
         target.draw(subtitle);
-        target.draw(prompt);
-        target.draw(controls);
     }
 }
