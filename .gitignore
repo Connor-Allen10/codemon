@@ -10,6 +10,7 @@ codemontest
 src/bin/*.exe
 src/bin/*.dll
 src/bin/*.pdb
+external/
 
 # Ignore built TGUI executables and generated docs
 external/TGUI/gui-builder/gui-builder
