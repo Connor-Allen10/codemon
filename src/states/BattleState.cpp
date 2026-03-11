@@ -73,7 +73,7 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
     title->getRenderer()->setTextColor(tgui::Color::White);
     panel->add(title);
 
-    auto promptLabel = tgui::Label::create("Prompt: " + prompt);
+    auto promptLabel = tgui::Label::create("Something is wrong with this code! ");
     promptLabel->setPosition({"3%", "13%"});
     promptLabel->setTextSize(18);
     promptLabel->setAutoSize(false);
@@ -92,7 +92,7 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
     editor->setPosition({"3%", "29%"});
     editor->setSize({"94%", "49%"});
     // Start with blank editor so player must type the correction
-    editor->setText("");
+    editor->setText(prompt);
     editor->setTextSize(22);
     editor->getRenderer()->setBackgroundColor(tgui::Color(55, 55, 65));
     editor->getRenderer()->setTextColor(tgui::Color::White);
@@ -362,7 +362,7 @@ void BattleState::render(sf::RenderTarget& target) {
 
     // Prompt line shows active challenge or completion message
     std::string promptLine = mDebugEngine.hasActiveChallenge()
-        ? ("Challenge: " + mDebugEngine.currentPrompt())
+        ? ("Can you find what's wrong with the following code?")
         : std::string("Challenge solved. Press ESC to return.");
 
 #if CODEMON_HAS_TGUI
