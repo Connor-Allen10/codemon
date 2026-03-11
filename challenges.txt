@@ -2,9 +2,3 @@
 # Format: prompt|solution|keyword
 # Lines starting with # are comments
 # Empty lines are ignored
-
-Fix this typo: retun 0;|return 0;|return
-Add the missing semicolon: int x = 5|int x = 5;|;
-Use std namespace: cout << "Hi";|std::cout << "Hi";|std::
-Fix assignment in if: if (x = 5)|if (x == 5)|==
-Fix include typo: #inclde <iostream>|#include <iostream>|#include
