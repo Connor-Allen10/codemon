@@ -67,10 +67,21 @@ bool ChallengeLoader::loadFromFile(const std::string& filePath) {
 void ChallengeLoader::initializeDefaults() {
     mChallenges = {
         Challenge{
-            "Fix bug: change 'retun 0;' to valid C++",
-            "return 0;",
-            "return"
+            "#inclde <iostream>\n int main(){\n    std::cout << \"Hello!\"; }",
+            "#include <iostream>\n int main(){\n    std::cout << \"Hello!\"; }",
+            ""
         },
+        Challenge{
+            "void push_front(int value) {\n    Node* new_node = new Node;\n    new_node->data = value;\n    new_node->next = head\n    head = new_node;\n    length++;\n}",
+            "void push_front(int value) {\nNode* new_node = new Node;\nnew_node->data = value;\nnew_node->next = head;\nhead = new_node;\nlength++;\n}",
+            ""
+        },
+        Challenge{
+            "void sayhello(int n) {\n    if (x = 5) {\n    std::cout << \"Hello! \" << std::endl;\n    }\n}",
+            "void sayhello(int n) {\n    if (x == 5) {\n    std::cout << \"Hello! \" << std::endl;\n    }\n}",
+            ""
+        },
+        /*
         Challenge{
             "Fix bug: missing semicolon after 'int x = 5'",
             "int x = 5;",
@@ -106,6 +117,7 @@ void ChallengeLoader::initializeDefaults() {
             "delete ptr;",
             "delete"
         }
+        */
     };
 
     std::cout << "[ChallengeLoader] Initialized " << mChallenges.size() 
