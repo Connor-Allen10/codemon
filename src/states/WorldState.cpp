@@ -119,7 +119,8 @@ WorldState::WorldState(sf::RenderWindow& window)
 #endif
     }
 
-    mTrainer.setPosition({300.f, 200.f});
+    // mTrainer.setPosition({300.f, 200.f});
+    mTrainer.setColor(sf::Color(0,0,0,0));
 
     mPlayerFallback.setSize({static_cast<float>(kTileSize), static_cast<float>(kTileSize)});
     mPlayerFallback.setFillColor(sf::Color::Blue);
@@ -341,7 +342,7 @@ void WorldState::handleEvent(const sf::Event& e) {
 #if SFML_VERSION_MAJOR >= 3
     if (const auto* keyPressed = e.getIf<sf::Event::KeyPressed>()) {
         if (keyPressed->code == sf::Keyboard::Key::F1 || keyPressed->code == sf::Keyboard::Key::E) {
-            mDebugOpen = !mDebugOpen;
+            // mDebugOpen = !mDebugOpen;
         }
     }
     if (const auto* resized = e.getIf<sf::Event::Resized>()) {
