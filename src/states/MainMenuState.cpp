@@ -7,8 +7,29 @@
 
 MainMenuState::MainMenuState(sf::RenderWindow& window)
 : mWindow(window)
+, mBackgroundSprite(mBackgroundTexture)
 {
     mBackground.setFillColor(sf::Color(10, 10, 30));
+
+    const std::vector<std::string> backgroundCandidates = {
+        "src/assets/MainMenu.png",
+        "assets/MainMenu.png",
+        "./src/assets/MainMenu.png",
+        "./assets/MainMenu.png"
+    };
+
+    for (const auto& path : backgroundCandidates) {
+        if (mBackgroundTexture.loadFromFile(path)) {
+            mBackgroundTexture.setSmooth(true);
+            mBackgroundSprite.setTexture(mBackgroundTexture, true);
+            mBackgroundTextureLoaded = true;
+            break;
+        }
+    }
+
+    if (!mBackgroundTextureLoaded) {
+        std::cerr << "WARNING: Failed to load main menu background image. Using solid color fallback.\n";
+    }
 
     const std::vector<std::string> fontCandidates = {
         "assets/fonts/arial.ttf",
@@ -88,32 +109,46 @@ void MainMenuState::render(sf::RenderTarget& target)
     sf::View menuView(sf::FloatRect({0.f, 0.f}, {width, height}));
     target.setView(menuView);
 
-    // Fill the whole screen
-    mBackground.setPosition({0.f, 0.f});
-    mBackground.setSize({width, height});
-    target.draw(mBackground);
+    if (mBackgroundTextureLoaded) {
+        const sf::Vector2u texSize = mBackgroundTexture.getSize();
+        if (texSize.x > 0 && texSize.y > 0) {
+            mBackgroundSprite.setPosition({0.f, 0.f});
+            mBackgroundSprite.setScale({
+                width / static_cast<float>(texSize.x),
+                height / static_cast<float>(texSize.y)
+            });
+            target.draw(mBackgroundSprite);
+        }
+    } else {
+        // Fill the whole screen
+        mBackground.setPosition({0.f, 0.f});
+        mBackground.setSize({width, height});
+        target.draw(mBackground);
+    }
 
     if (mFontLoaded) {
 #if SFML_VERSION_MAJOR >= 3
-        sf::Text title(mFont, "CODEMON", 72);
+        // sf::Text title(mFont, "CODEMON", 72);
         sf::Text subtitle(mFont, "Press ENTER to Start", 30);
 #else
         sf::Text title("CODEMON", mFont, 72);
         sf::Text subtitle("Press ENTER to Start", mFont, 30);
 #endif
 
-        title.setFillColor(sf::Color::White);
+        // title.setFillColor(sf::Color::White);
 
         const float pulse = 0.5f + 0.5f * std::sin(mTimer * 2.5f);
         const auto alpha = static_cast<std::uint8_t>(140 + 115 * pulse);
         subtitle.setFillColor(sf::Color(255, 255, 255, alpha));
 
 #if SFML_VERSION_MAJOR >= 3
-        const auto titleBounds = title.getLocalBounds();
+        /*
+         const auto titleBounds = title.getLocalBounds();
         title.setOrigin({
             titleBounds.position.x + titleBounds.size.x * 0.5f,
             titleBounds.position.y + titleBounds.size.y * 0.5f
         });
+        */
 
         const auto subtitleBounds = subtitle.getLocalBounds();
         subtitle.setOrigin({
@@ -137,10 +172,10 @@ void MainMenuState::render(sf::RenderTarget& target)
         const float centerX = width * 0.5f;
         const float centerY = height * 0.5f;
 
-        title.setPosition({centerX, centerY - 60.f});
+        // title.setPosition({centerX, centerY - 60.f});
         subtitle.setPosition({centerX, centerY + 20.f});
 
-        target.draw(title);
+        // target.draw(title);
         target.draw(subtitle);
     }
 }
