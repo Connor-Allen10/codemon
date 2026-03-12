@@ -17,53 +17,53 @@ Before installing Codemon, you must have the following software installed on you
 
 ### 1. C++ Compiler
 - **macOS**: Install Xcode Command Line Tools
-  ```bash
-  xcode-select --install
-  ```
+```bash
+xcode-select --install
+```
 - **Linux (Ubuntu/Debian)**: Install build essentials
-  ```bash
-  sudo apt-get update
-  sudo apt-get install build-essential
-  ```
+```bash
+sudo apt-get update
+sudo apt-get install build-essential
+```
 - **Windows**: Install Visual Studio Community with C++ support or MinGW
 
 ### 2. CMake (3.20 or higher)
-- **macOS**: 
-  ```bash
-  brew install cmake
-  ```
+- **macOS**:
+```bash
+brew install cmake
+```
 - **Linux**:
-  ```bash
-  sudo apt-get install cmake
-  ```
+```bash
+sudo apt-get install cmake
+```
 - **Windows**: Download from [cmake.org](https://cmake.org/download)
 
 ### 3. Git
 - **macOS**:
-  ```bash
-  brew install git
-  ```
+```bash
+brew install git
+```
 - **Linux**:
-  ```bash
-  sudo apt-get install git
-  ```
+```bash
+sudo apt-get install git
+```
 - **Windows**: Download from [git-scm.com](https://git-scm.com)
 
 ### 4. SFML 3.0 (or 2.6+)
 This dependency is required. Codemon supports both SFML 3.0 and SFML 2.6+.
 
 - **macOS**:
-  ```bash
-  brew install sfml
-  ```
+```bash
+brew install sfml
+```
 - **Linux**:
-  ```bash
-  sudo apt-get install libsfml-dev
-  ```
+```bash
+sudo apt-get install libsfml-dev
+```
 - **Windows**: Download precompiled binaries from [sfml-dev.org](https://www.sfml-dev.org/download.php) or use vcpkg:
-  ```bash
-  vcpkg install sfml
-  ```
+```bash
+vcpkg install sfml
+```
 
 ### 5. Google Test (for running tests)
 This is included as a CMake dependency and downloads automatically during build.
@@ -179,83 +179,83 @@ ctest --output-on-failure
 All tests should pass (43 tests total):
 ```
 [==========] 43 tests from X test suites ran.
-[  PASSED  ] 43 tests.
+[ PASSED ] 43 tests.
 ```
 
 ## Troubleshooting
 
 ### Issue: CMake configuration fails with "SFML not found"
-**Solution**: 
+**Solution**:
 - Ensure SFML is installed (see Prerequisites above)
 - On macOS with Homebrew, set the prefix path:
-  ```bash
-  cmake .. -DCMAKE_PREFIX_PATH=$(brew --prefix sfml)
-  ```
+```bash
+cmake .. -DCMAKE_PREFIX_PATH=$(brew --prefix sfml)
+```
 
 ### Issue: Build fails with linker errors
 **Solution**:
 - Ensure all dependencies are installed
 - Try a clean rebuild:
-  ```bash
-  cd build
-  rm -rf *
-  cmake ..
-  cmake --build .
-  ```
+```bash
+cd build
+rm -rf *
+cmake ..
+cmake --build .
+```
 
 ### Issue: Application crashes on startup
 **Solution**:
 - Verify asset files are in the correct location:
-  ```bash
-  ls src/assets/data/map01.csv
-  ls src/assets/player_south.png
-  ```
+```bash
+ls src/assets/data/map01.csv
+ls src/assets/player_south.png
+```
 - Rebuild so assets are copied into `build/assets`:
-  ```bash
-  cd build
-  cmake ..
-  cmake --build .
-  ```
+```bash
+cd build
+cmake ..
+cmake --build .
+```
 
 ### Issue: TGUI window (debug editor) fails to open
 **Solution**:
 - TGUI support is optional. If unavailable, a text overlay is used instead
 - To enable TGUI, ensure it's installed and rebuild:
-  ```bash
-  cmake .. -DCMAKE_PREFIX_PATH=/path/to/tgui
-  cmake --build .
-  ```
+```bash
+cmake .. -DCMAKE_PREFIX_PATH=/path/to/tgui
+cmake --build .
+```
 
 ### Issue: Tests fail to run
 **Solution**:
 - Ensure Google Test was downloaded during CMake configuration
 - Rebuild and try again:
-  ```bash
-  cd build
-  cmake --build .
-  ctest --output-on-failure
-  ```
+```bash
+cd build
+cmake --build .
+ctest --output-on-failure
+```
 
 ## Project Structure
 
 ```
 codemon/
-├── CMakeLists.txt              # Build configuration
-├── README.md                   # Project overview
-├── INSTALL.md                  # Installation and usage instructions
-├── challenges.txt              # Debug challenge data
-├── docs/                       # Developer and user guides
-├── external/                   # Vendored dependencies (e.g., TGUI)
+├── CMakeLists.txt # Build configuration
+├── README.md # Project overview
+├── INSTALL.md # Installation and usage instructions
+├── challenges.txt # Debug challenge data
+├── docs/ # Developer and user guides
+├── external/ # Vendored dependencies (e.g., TGUI)
 ├── src/
-│   ├── assets/                 # Source assets copied to build/assets
-│   ├── battle/                 # Battle system
-│   ├── debug/                  # Debug challenge system
-│   ├── game/                   # Core game/state stack
-│   ├── states/                 # World/menu/battle state logic
-│   └── world/                  # Tile map and overworld logic
-│   ├── main.cpp                # Entry point
-├── tests/                      # Unit tests (GoogleTest)
-└── build/                      # Generated build outputs (local)
+│ ├── assets/ # Source assets copied to build/assets
+│ ├── battle/ # Battle system
+│ ├── debug/ # Debug challenge system
+│ ├── game/ # Core game/state stack
+│ ├── states/ # World/menu/battle state logic
+│ └── world/ # Tile map and overworld logic
+│ ├── main.cpp # Entry point
+├── tests/ # Unit tests (GoogleTest)
+└── build/ # Generated build outputs (local)
 ```
 
 ## Getting Help

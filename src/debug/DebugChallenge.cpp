@@ -46,7 +46,7 @@ ValidationResult Challenge::validate(const std::string& submission) const {
     }
 
     if (Validators::exactMatch(submission, solution)) {
-        return { true, "Correct – the bug is fixed!" };
+        return { true, "Correct - the bug is fixed!" };
     }
 
     return { false, "That doesn't look right; try again." };
