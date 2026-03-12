@@ -1,6 +1,15 @@
 /**
  * @file BattleState.cpp
  * @brief Implementation of the BattleState class.
+ * 
+ * This file implements battle encounters integrated with the Debug::Engine system.
+ * The battle state presents coding challenges that players must solve by submitting
+ * correct code fixes. Key features:
+ * - Debug::Engine manages challenge lifecycle (start, submit, validation)
+ * - Step 3: TGUI popup editor (E/F1) captures user code and submits it
+ * - Fallback mode (no TGUI): Enter/Backspace test the validation paths
+ * - Visual feedback changes background color on success
+ * - Challenge prompt and feedback messages displayed via SFML text rendering
  */
 
 #include "BattleState.hpp"
@@ -22,6 +31,8 @@
 #define CODEMON_HAS_TGUI 0
 #endif
 
+// Static challenge loader shared across all battle instances
+// Attempts to load from "challenges.txt" in working directory, falls back to 8 defaults
 Debug::ChallengeLoader BattleState::sChallengeLoader("challenges.txt");
 
 namespace {
@@ -104,62 +115,103 @@ void applySubmission(Debug::Engine& engine,
 }
 
 #if CODEMON_HAS_TGUI
+// UI: modal editor popup used during battle.
+// Returns:
+// - std::string submission when player presses Submit
+// - std::nullopt when player closes/cancels popup
 std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
                                                const std::string& keywordHint) {
 #if SFML_VERSION_MAJOR >= 3
-    sf::RenderWindow popup(sf::VideoMode({960, 640}), "CodeMon Debug Editor", sf::Style::Titlebar | sf::Style::Close);
+    sf::RenderWindow popup(sf::VideoMode({1120, 820}), "CodeMon Debug Editor", sf::Style::Titlebar | sf::Style::Close);
 #else
-    sf::RenderWindow popup(sf::VideoMode(960, 640), "CodeMon Debug Editor", sf::Style::Titlebar | sf::Style::Close);
+    sf::RenderWindow popup(sf::VideoMode(1120, 820), "CodeMon Debug Editor", sf::Style::Titlebar | sf::Style::Close);
 #endif
 
     tgui::Gui gui{popup};
+    // Allow Tab to insert indentation inside TextArea instead of changing widget focus.
+    gui.setTabKeyUsageEnabled(false);
+
+    // Load monospace font for code-editor feel.
+    // Prefer bundled JetBrains Mono, fall back to Courier New (cross-platform).
+    tgui::Font monoFont;
+    bool monoLoaded = false;
+    const std::vector<std::string> monoFontCandidates = {
+        "assets/fonts/JetBrainsMono-Regular.ttf",
+        "../assets/fonts/JetBrainsMono-Regular.ttf",
+        "src/assets/fonts/JetBrainsMono-Regular.ttf",
+        "/System/Library/Fonts/Supplemental/Courier New.ttf",
+        "C:/Windows/Fonts/cour.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
+    };
+    for (const auto& path : monoFontCandidates) {
+        std::error_code ec;
+        if (!std::filesystem::exists(path, ec) || ec) continue;
+        monoFont = tgui::Font(path);
+        monoLoaded = true;
+        break;
+    }
 
     auto panel = tgui::Panel::create({"92%", "92%"});
     panel->setPosition({"4%", "4%"});
     panel->getRenderer()->setBackgroundColor(tgui::Color(45, 45, 55));
     gui.add(panel);
 
+    // Header + prompt context so the player knows what to fix.
     auto title = tgui::Label::create("BATTLE DEBUG CHALLENGE");
     title->setPosition({"3%", "3%"});
     title->setTextSize(26);
     title->getRenderer()->setTextColor(tgui::Color::White);
     panel->add(title);
 
-    auto promptLabel = tgui::Label::create("Something is wrong with this code!");
-    promptLabel->setPosition({"3%", "13%"});
-    promptLabel->setTextSize(18);
-    promptLabel->setAutoSize(false);
-    promptLabel->setSize({"94%", "10%"});
-    promptLabel->getRenderer()->setTextColor(tgui::Color(220, 220, 220));
+    auto promptLabel = tgui::Label::create("Broken code:");
+    promptLabel->setPosition({"3%", "12%"});
+    promptLabel->setTextSize(16);
+    promptLabel->getRenderer()->setTextColor(tgui::Color(210, 210, 210));
     panel->add(promptLabel);
 
-    auto instructionLabel = tgui::Label::create("Type the corrected code below:");
-    instructionLabel->setPosition({"3%", "24%"});
+    auto promptView = tgui::TextArea::create();
+    promptView->setPosition({"3%", "16%"});
+    promptView->setSize({"94%", "31%"});
+    promptView->setText(prompt);
+    promptView->setReadOnly(true);
+    promptView->setTextSize(18);
+    if (monoLoaded) promptView->getRenderer()->setFont(monoFont);
+    promptView->getRenderer()->setBackgroundColor(tgui::Color(30, 30, 40));
+    promptView->getRenderer()->setTextColor(tgui::Color(220, 220, 180));
+    promptView->getRenderer()->setBorderColor(tgui::Color(80, 80, 100));
+    panel->add(promptView);
+
+    // Instruction label explaining what to do
+    auto instructionLabel = tgui::Label::create("Type the corrected code below (Tab inserts indentation):");
+    instructionLabel->setPosition({"3%", "50%"});
     instructionLabel->setTextSize(14);
     instructionLabel->getRenderer()->setTextColor(tgui::Color(180, 180, 180));
     panel->add(instructionLabel);
 
     auto editor = tgui::TextArea::create();
-    editor->setPosition({"3%", "29%"});
-    editor->setSize({"94%", "49%"});
-    editor->setText(prompt);
+    editor->setPosition({"3%", "54%"});
+    editor->setSize({"94%", "28%"});
+    // Start with blank editor so player must type the correction
+    editor->setText("");
     editor->setTextSize(22);
-    editor->getRenderer()->setBackgroundColor(tgui::Color(55, 55, 65));
-    editor->getRenderer()->setTextColor(tgui::Color::White);
+    if (monoLoaded) editor->getRenderer()->setFont(monoFont);
+    editor->getRenderer()->setBackgroundColor(tgui::Color(20, 20, 30));
+    editor->getRenderer()->setTextColor(tgui::Color(200, 230, 200));
     editor->getRenderer()->setCaretColor(tgui::Color::White);
-    editor->getRenderer()->setSelectedTextBackgroundColor(tgui::Color(80, 80, 120));
-    editor->getRenderer()->setBorderColor(tgui::Color(70, 70, 80));
+    editor->getRenderer()->setSelectedTextBackgroundColor(tgui::Color(60, 80, 140));
+    editor->getRenderer()->setBorderColor(tgui::Color(80, 80, 100));
     panel->add(editor);
+    editor->setFocused(true);
 
     auto submitButton = tgui::Button::create("Submit");
-    submitButton->setPosition({"67%", "85%"});
+    submitButton->setPosition({"67%", "86%"});
     submitButton->setSize({"14%", "10%"});
     submitButton->getRenderer()->setBackgroundColor(tgui::Color(60, 120, 60));
     submitButton->getRenderer()->setTextColor(tgui::Color::White);
     panel->add(submitButton);
 
     auto cancelButton = tgui::Button::create("Cancel");
-    cancelButton->setPosition({"82%", "85%"});
+    cancelButton->setPosition({"82%", "86%"});
     cancelButton->setSize({"14%", "10%"});
     cancelButton->getRenderer()->setBackgroundColor(tgui::Color(120, 60, 60));
     cancelButton->getRenderer()->setTextColor(tgui::Color::White);
@@ -169,7 +221,7 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
         ? "No required keyword for this challenge."
         : ("Required keyword: " + keywordHint);
     auto hint = tgui::Label::create(hintText);
-    hint->setPosition({"25%", "85%"});
+    hint->setPosition({"3%", "87%"});
     hint->setTextSize(14);
     hint->getRenderer()->setTextColor(tgui::Color(200, 200, 150));
     panel->add(hint);
@@ -177,18 +229,21 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
     bool submitted = false;
     std::string submission;
 
+    // Submit captures textbox content and exits the modal loop.
     submitButton->onPress([&]() {
         submission = editor->getText().toStdString();
         submitted = true;
         popup.close();
     });
 
+    // Cancel just closes without changing challenge state.
     cancelButton->onPress([&]() {
         popup.close();
     });
 
     while (popup.isOpen()) {
 #if SFML_VERSION_MAJOR >= 3
+    // SFML 3 event model (std::optional from pollEvent).
         while (const std::optional event = popup.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
                 popup.close();
@@ -196,6 +251,7 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
             gui.handleEvent(*event);
         }
 #else
+    // SFML 2 event model.
         sf::Event event;
         while (popup.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
@@ -269,11 +325,16 @@ BattleState::BattleState(sf::RenderWindow& window, std::string preferredPlayerMo
         std::cerr << "WARNING: Failed to load battle font. Text will not display.\n";
     }
 
+    // ===== Debug::Engine Integration (Dynamic Loading) =====
+    // Load random challenge from ChallengeLoader.
+    // The loader reads from file if available, otherwise uses 8 hardcoded defaults.
+    // Challenge selection is random on each battle start for variety.
     auto maybeChallenge = sChallengeLoader.getRandomChallenge();
     if (maybeChallenge) {
         mCurrentKeywordHint = maybeChallenge->keywordHint;
         mDebugEngine.startChallenge(*maybeChallenge);
     } else {
+        // Fallback if loader completely fails (shouldn't happen with defaults)
         mCurrentKeywordHint = "return";
         mDebugEngine.startChallenge(Debug::Challenge{
             "Fix bug: change 'retun 0;' to valid C++",
@@ -283,8 +344,10 @@ BattleState::BattleState(sf::RenderWindow& window, std::string preferredPlayerMo
     }
 
 #if CODEMON_HAS_TGUI
+    // Default hint path: user opens editor and types their own fix.
     mBattleMessage = "Battle started. Press E or F1 to open Debug Editor. ESC = exit.";
 #else
+    // Fallback path used when TGUI is unavailable on the platform/build.
     mBattleMessage = "Battle started. Press Enter to submit fix. Backspace = wrong attempt. ESC = exit.";
 #endif
 
@@ -385,10 +448,10 @@ void BattleState::handleEvent(const sf::Event& e) {
 #if SFML_VERSION_MAJOR >= 3
     if (const auto* keyPressed = e.getIf<sf::Event::KeyPressed>()) {
         const auto code = keyPressed->code;
-        if (code == sf::Keyboard::Key::Escape) {
+        if (keyPressed->code == sf::Keyboard::Key::Escape) {
             mExitRequested = true;
-            requestPop();
-            return;
+            requestPop(); // Request to be removed from state stack
+            std::cout << "[BattleState] Exit requested\n";
         }
 
         if (mPhase == Phase::EncounterIntro) {
@@ -421,7 +484,8 @@ void BattleState::handleEvent(const sf::Event& e) {
         }
 
 #if CODEMON_HAS_TGUI
-        if ((code == sf::Keyboard::Key::E || code == sf::Keyboard::Key::F1) &&
+        // Open TGUI editor popup and submit the player's typed solution.
+        if ((keyPressed->code == sf::Keyboard::Key::E || keyPressed->code == sf::Keyboard::Key::F1) &&
             mDebugEngine.hasActiveChallenge()) {
             const auto submission = runDebugEditorPopup(mDebugEngine.currentPrompt(), mCurrentKeywordHint);
             if (submission.has_value()) {
@@ -429,24 +493,32 @@ void BattleState::handleEvent(const sf::Event& e) {
             }
         }
 #else
-        if (code == sf::Keyboard::Key::Enter && mDebugEngine.hasActiveChallenge()) {
+        // Enter key: Submit CORRECT answer to test success path
+        // Submits "return 0;" which matches the expected answer.
+        // On success: feedback = "Correct! ...", mChallengeSolved = true, background turns green
+        if (keyPressed->code == sf::Keyboard::Key::Enter && mDebugEngine.hasActiveChallenge()) {
             applySubmission(mDebugEngine, "return 0;", mBattleMessage, mChallengeSolved, mSubmissionFailed);
         }
-        if (code == sf::Keyboard::Key::Backspace && mDebugEngine.hasActiveChallenge()) {
+
+        // Backspace key: Submit WRONG answer to test failure path
+        // Submits "retun 0;" (typo) which doesn't match expected answer.
+        // On failure: feedback = "Incorrect. ...", mChallengeSolved = false, challenge stays active
+        if (keyPressed->code == sf::Keyboard::Key::Backspace && mDebugEngine.hasActiveChallenge()) {
             applySubmission(mDebugEngine, "retun 0;", mBattleMessage, mChallengeSolved, mSubmissionFailed);
         }
 #endif
     }
     if (const auto* resized = e.getIf<sf::Event::Resized>()) {
-        updateViewLayout(resized->size);
+        mBattleView.setSize({static_cast<float>(resized->size.x), static_cast<float>(resized->size.y)});
+        mBackground.setSize({static_cast<float>(resized->size.x), static_cast<float>(resized->size.y)});
     }
 #else
     if (e.type == sf::Event::KeyPressed) {
         const auto code = e.key.code;
-        if (code == sf::Keyboard::Escape) {
+        if (e.key.code == sf::Keyboard::Escape) {
             mExitRequested = true;
-            requestPop();
-            return;
+            requestPop(); // Request to be removed from state stack
+            std::cout << "[BattleState] Exit requested\n";
         }
 
         if (mPhase == Phase::EncounterIntro) {
@@ -479,7 +551,8 @@ void BattleState::handleEvent(const sf::Event& e) {
         }
 
 #if CODEMON_HAS_TGUI
-        if ((code == sf::Keyboard::E || code == sf::Keyboard::F1) &&
+        // Open TGUI editor popup and submit the player's typed solution.
+        if ((e.key.code == sf::Keyboard::E || e.key.code == sf::Keyboard::F1) &&
             mDebugEngine.hasActiveChallenge()) {
             const auto submission = runDebugEditorPopup(mDebugEngine.currentPrompt(), mCurrentKeywordHint);
             if (submission.has_value()) {
@@ -487,16 +560,22 @@ void BattleState::handleEvent(const sf::Event& e) {
             }
         }
 #else
-        if (code == sf::Keyboard::Return && mDebugEngine.hasActiveChallenge()) {
+        // Enter/Return key: Submit CORRECT answer ("return 0;")
+        // Tests success path for Debug::Engine validation
+        if (e.key.code == sf::Keyboard::Return && mDebugEngine.hasActiveChallenge()) {
             applySubmission(mDebugEngine, "return 0;", mBattleMessage, mChallengeSolved, mSubmissionFailed);
         }
-        if (code == sf::Keyboard::BackSpace && mDebugEngine.hasActiveChallenge()) {
+
+        // Backspace key: Submit WRONG answer ("retun 0;" with typo)
+        // Tests failure path for Debug::Engine validation
+        if (e.key.code == sf::Keyboard::BackSpace && mDebugEngine.hasActiveChallenge()) {
             applySubmission(mDebugEngine, "retun 0;", mBattleMessage, mChallengeSolved, mSubmissionFailed);
         }
 #endif
     }
     if (e.type == sf::Event::Resized) {
-        updateViewLayout(sf::Vector2u(static_cast<unsigned>(e.size.width), static_cast<unsigned>(e.size.height)));
+        mBattleView.setSize({static_cast<float>(e.size.width), static_cast<float>(e.size.height)});
+        mBackground.setSize({static_cast<float>(e.size.width), static_cast<float>(e.size.height)});
     }
 #endif
 }
@@ -516,7 +595,11 @@ void BattleState::render(sf::RenderTarget& target) {
 
     const float windowWidth = static_cast<float>(mWindow.getSize().x);
     const float windowHeight = static_cast<float>(mWindow.getSize().y);
-
+    
+    // Visual feedback: Change background color based on challenge state
+    // - Green (20, 120, 40): Challenge solved successfully
+    // - Red (150, 0, 0): Last submission was incorrect
+    // - Purple (64, 0, 128): Challenge active, no attempt yet (default battle color)
     if (mChallengeSolved) {
         mBackground.setFillColor(sf::Color(20, 120, 40));
     } else if (mSubmissionFailed) {
@@ -526,7 +609,8 @@ void BattleState::render(sf::RenderTarget& target) {
     }
 
     target.draw(mBackground);
-
+    
+    // ====== ENCOUNTER INTRO ======
     if (mPhase == Phase::EncounterIntro) {
         if (mEnemyTextureLoaded) {
 #if SFML_VERSION_MAJOR >= 3
