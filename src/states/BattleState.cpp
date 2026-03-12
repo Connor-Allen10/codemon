@@ -609,7 +609,7 @@ void BattleState::render(sf::RenderTarget& target) {
     }
 
     target.draw(mBackground);
-    
+
     // ====== ENCOUNTER INTRO ======
     if (mPhase == Phase::EncounterIntro) {
         if (mEnemyTextureLoaded) {
@@ -659,7 +659,7 @@ void BattleState::render(sf::RenderTarget& target) {
     }
 
     mEnemyPlatform.setPosition({windowWidth * 0.60f, windowHeight * 0.30f});
-    //target.draw(mEnemyPlatform);
+    target.draw(mEnemyPlatform);
 
     if (mEnemyTextureLoaded) {
 #if SFML_VERSION_MAJOR >= 3
@@ -733,7 +733,7 @@ void BattleState::render(sf::RenderTarget& target) {
     }
 
     mPlayerPlatform.setPosition({windowWidth * 0.10f, windowHeight * 0.70f});
-    //target.draw(mPlayerPlatform);
+    target.draw(mPlayerPlatform);
 
     if (mPlayerTextureLoaded) {
 #if SFML_VERSION_MAJOR >= 3
@@ -750,7 +750,7 @@ void BattleState::render(sf::RenderTarget& target) {
 
     if (mFontLoaded) {
 #if SFML_VERSION_MAJOR >= 3
-        sf::Text title(mFont, "BATTLE DEBUG", 40);
+        sf::Text title(mFont, "BATTLE!", 40);
         sf::Text subtitle(mFont, mBattleMessage, 22);
         sf::Text prompt(mFont,
                         mDebugEngine.hasActiveChallenge()
