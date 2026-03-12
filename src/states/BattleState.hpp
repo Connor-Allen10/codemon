@@ -12,10 +12,15 @@
 #include "../debug/DebugChallenge.hpp"
 #include "../debug/ChallengeLoader.hpp"
 
+class Party;
+
 class BattleState : public State {
 public:
     explicit BattleState(sf::RenderWindow& window,
                          std::string preferredPlayerMonFile = "");
+    BattleState(sf::RenderWindow& window,
+                Party& party,
+                std::string preferredPlayerMonFile = "");
 
     void handleEvent(const sf::Event& e) override;
     void update(sf::Time dt) override;
@@ -35,6 +40,11 @@ private:
     void confirmPlayerSelection();
     void refreshPlayerSprite();
     void moveSelection(int delta);
+    void finalizeSubmissionResult();
+
+    BattleState(sf::RenderWindow& window,
+                Party* party,
+                std::string preferredPlayerMonFile);
 
     sf::RenderWindow& mWindow;
     sf::View mBattleView;
@@ -49,6 +59,7 @@ private:
     sf::Texture mPlayerTexture;
     sf::Sprite mEnemySprite;
     sf::Sprite mPlayerSprite;
+    Party* mParty = nullptr;
     bool mEnemyTextureLoaded = false;
     bool mPlayerTextureLoaded = false;
     std::string mPreferredPlayerMonFile;
@@ -56,6 +67,7 @@ private:
     std::string mWildMonFile;
 
     std::vector<std::string> mSelectionMonFiles;
+    std::vector<std::string> mSelectionDisplayNames;
     std::vector<sf::Texture> mSelectionTextures;
     std::vector<sf::Sprite> mSelectionSprites;
     std::vector<bool> mSelectionLoaded;

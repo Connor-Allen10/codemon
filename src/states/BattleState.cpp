@@ -13,6 +13,7 @@
  */
 
 #include "BattleState.hpp"
+#include "../battle/Party.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -21,6 +22,7 @@
 #include <iostream>
 #include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 #if __has_include(<TGUI/TGUI.hpp>) && __has_include(<TGUI/Backend/SFML-Graphics.hpp>)
@@ -42,6 +44,9 @@ struct MonsterAsset {
 
 const std::vector<MonsterAsset>& monsterAssets() {
     static const std::vector<MonsterAsset> assets = {
+        {"void_mon.png"},
+        {"fire_mon.png"},
+        {"swamp_mon.png"},
         {"forest_mon.png"},
         {"rocky_mon.png"},
         {"Water_mon.png"},
@@ -275,9 +280,16 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
 }
 
 BattleState::BattleState(sf::RenderWindow& window, std::string preferredPlayerMonFile)
+: BattleState(window, nullptr, std::move(preferredPlayerMonFile)) {}
+
+BattleState::BattleState(sf::RenderWindow& window, Party& party, std::string preferredPlayerMonFile)
+: BattleState(window, &party, std::move(preferredPlayerMonFile)) {}
+
+BattleState::BattleState(sf::RenderWindow& window, Party* party, std::string preferredPlayerMonFile)
 : mWindow(window)
 , mEnemySprite(mEnemyTexture)
 , mPlayerSprite(mPlayerTexture)
+, mParty(party)
 , mPreferredPlayerMonFile(preferredPlayerMonFile)
 , mWildMonFile(pickRandomWildMon()) {
     updateViewLayout(mWindow.getSize());
@@ -356,23 +368,39 @@ BattleState::BattleState(sf::RenderWindow& window, std::string preferredPlayerMo
 
 void BattleState::beginPlayerSelection() {
     mSelectionMonFiles.clear();
+    mSelectionDisplayNames.clear();
     mSelectionTextures.clear();
     mSelectionSprites.clear();
     mSelectionLoaded.clear();
 
-    const auto& assets = monsterAssets();
-    mSelectionMonFiles.reserve(assets.size());
-    mSelectionTextures.reserve(assets.size());
-    mSelectionSprites.reserve(assets.size());
-    mSelectionLoaded.reserve(assets.size());
+    if (mParty && !mParty->empty()) {
+        const auto& members = mParty->members();
+        mSelectionMonFiles.reserve(members.size());
+        mSelectionDisplayNames.reserve(members.size());
+        for (const auto& member : members) {
+            mSelectionMonFiles.push_back(member.textureFile());
+            mSelectionDisplayNames.push_back(member.displayName());
+        }
+    } else {
+        const auto& assets = monsterAssets();
+        mSelectionMonFiles.reserve(assets.size());
+        mSelectionDisplayNames.reserve(assets.size());
+        for (const auto& asset : assets) {
+            mSelectionMonFiles.emplace_back(asset.fileName);
+            mSelectionDisplayNames.emplace_back(asset.fileName);
+        }
+    }
+
+    mSelectionTextures.reserve(mSelectionMonFiles.size());
+    mSelectionSprites.reserve(mSelectionMonFiles.size());
+    mSelectionLoaded.reserve(mSelectionMonFiles.size());
 
     std::size_t preferredIndex = 0;
     bool foundPreferred = false;
 
-    for (const auto& asset : assets) {
-        mSelectionMonFiles.emplace_back(asset.fileName);
+    for (const auto& monFile : mSelectionMonFiles) {
         mSelectionTextures.emplace_back();
-        const bool loaded = loadMonsterTexture(mSelectionTextures.back(), asset.fileName);
+        const bool loaded = loadMonsterTexture(mSelectionTextures.back(), monFile);
         mSelectionLoaded.push_back(loaded);
         if (loaded) {
             mSelectionSprites.emplace_back(mSelectionTextures.back());
@@ -380,10 +408,10 @@ void BattleState::beginPlayerSelection() {
         } else {
             mSelectionTextures.back() = mEnemyTexture;
             mSelectionSprites.emplace_back(mSelectionTextures.back());
-            std::cerr << "WARNING: Failed to load selectable battle sprite: " << asset.fileName << "\n";
+            std::cerr << "WARNING: Failed to load selectable battle sprite: " << monFile << "\n";
         }
 
-        if (!mPreferredPlayerMonFile.empty() && mPreferredPlayerMonFile == asset.fileName) {
+        if (!mPreferredPlayerMonFile.empty() && mPreferredPlayerMonFile == monFile) {
             preferredIndex = mSelectionMonFiles.size() - 1u;
             foundPreferred = true;
         }
@@ -435,6 +463,15 @@ void BattleState::moveSelection(int delta) {
     mSelectionIndex = static_cast<std::size_t>(next);
 }
 
+void BattleState::finalizeSubmissionResult() {
+    if (!mChallengeSolved || mParty == nullptr) {
+        return;
+    }
+
+    const Codemon& captured = mParty->addCodemon(mWildMonFile);
+    mBattleMessage += " Captured " + captured.displayName() + "!";
+}
+
 void BattleState::updateViewLayout(sf::Vector2u size) {
     mBattleView = sf::View(sf::FloatRect(
         {0.f, 0.f},
@@ -474,6 +511,9 @@ void BattleState::handleEvent(const sf::Event& e) {
                 case sf::Keyboard::Key::Num4: if (mSelectionMonFiles.size() > 3) mSelectionIndex = 3; return;
                 case sf::Keyboard::Key::Num5: if (mSelectionMonFiles.size() > 4) mSelectionIndex = 4; return;
                 case sf::Keyboard::Key::Num6: if (mSelectionMonFiles.size() > 5) mSelectionIndex = 5; return;
+                case sf::Keyboard::Key::Num7: if (mSelectionMonFiles.size() > 6) mSelectionIndex = 6; return;
+                case sf::Keyboard::Key::Num8: if (mSelectionMonFiles.size() > 7) mSelectionIndex = 7; return;
+                case sf::Keyboard::Key::Num9: if (mSelectionMonFiles.size() > 8) mSelectionIndex = 8; return;
                 case sf::Keyboard::Key::Enter:
                 case sf::Keyboard::Key::Space:
                     confirmPlayerSelection();
@@ -490,6 +530,7 @@ void BattleState::handleEvent(const sf::Event& e) {
             const auto submission = runDebugEditorPopup(mDebugEngine.currentPrompt(), mCurrentKeywordHint);
             if (submission.has_value()) {
                 applySubmission(mDebugEngine, submission.value(), mBattleMessage, mChallengeSolved, mSubmissionFailed);
+                finalizeSubmissionResult();
             }
         }
 #else
@@ -498,6 +539,7 @@ void BattleState::handleEvent(const sf::Event& e) {
         // On success: feedback = "Correct! ...", mChallengeSolved = true, background turns green
         if (keyPressed->code == sf::Keyboard::Key::Enter && mDebugEngine.hasActiveChallenge()) {
             applySubmission(mDebugEngine, "return 0;", mBattleMessage, mChallengeSolved, mSubmissionFailed);
+            finalizeSubmissionResult();
         }
 
         // Backspace key: Submit WRONG answer to test failure path
@@ -505,6 +547,7 @@ void BattleState::handleEvent(const sf::Event& e) {
         // On failure: feedback = "Incorrect. ...", mChallengeSolved = false, challenge stays active
         if (keyPressed->code == sf::Keyboard::Key::Backspace && mDebugEngine.hasActiveChallenge()) {
             applySubmission(mDebugEngine, "retun 0;", mBattleMessage, mChallengeSolved, mSubmissionFailed);
+            finalizeSubmissionResult();
         }
 #endif
     }
@@ -541,6 +584,9 @@ void BattleState::handleEvent(const sf::Event& e) {
                 case sf::Keyboard::Num4: if (mSelectionMonFiles.size() > 3) mSelectionIndex = 3; return;
                 case sf::Keyboard::Num5: if (mSelectionMonFiles.size() > 4) mSelectionIndex = 4; return;
                 case sf::Keyboard::Num6: if (mSelectionMonFiles.size() > 5) mSelectionIndex = 5; return;
+                case sf::Keyboard::Num7: if (mSelectionMonFiles.size() > 6) mSelectionIndex = 6; return;
+                case sf::Keyboard::Num8: if (mSelectionMonFiles.size() > 7) mSelectionIndex = 7; return;
+                case sf::Keyboard::Num9: if (mSelectionMonFiles.size() > 8) mSelectionIndex = 8; return;
                 case sf::Keyboard::Return:
                 case sf::Keyboard::Space:
                     confirmPlayerSelection();
@@ -557,6 +603,7 @@ void BattleState::handleEvent(const sf::Event& e) {
             const auto submission = runDebugEditorPopup(mDebugEngine.currentPrompt(), mCurrentKeywordHint);
             if (submission.has_value()) {
                 applySubmission(mDebugEngine, submission.value(), mBattleMessage, mChallengeSolved, mSubmissionFailed);
+                finalizeSubmissionResult();
             }
         }
 #else
@@ -564,12 +611,14 @@ void BattleState::handleEvent(const sf::Event& e) {
         // Tests success path for Debug::Engine validation
         if (e.key.code == sf::Keyboard::Return && mDebugEngine.hasActiveChallenge()) {
             applySubmission(mDebugEngine, "return 0;", mBattleMessage, mChallengeSolved, mSubmissionFailed);
+            finalizeSubmissionResult();
         }
 
         // Backspace key: Submit WRONG answer ("retun 0;" with typo)
         // Tests failure path for Debug::Engine validation
         if (e.key.code == sf::Keyboard::BackSpace && mDebugEngine.hasActiveChallenge()) {
             applySubmission(mDebugEngine, "retun 0;", mBattleMessage, mChallengeSolved, mSubmissionFailed);
+            finalizeSubmissionResult();
         }
 #endif
     }
@@ -678,10 +727,10 @@ void BattleState::render(sf::RenderTarget& target) {
         if (mFontLoaded) {
 #if SFML_VERSION_MAJOR >= 3
             sf::Text title(mFont, "Choose your Codemon", 34);
-            sf::Text hint(mFont, "Left/Right or 1-6 to choose, Enter to confirm", 22);
+            sf::Text hint(mFont, "Left/Right or number keys to choose, Enter to confirm", 22);
 #else
             sf::Text title("Choose your Codemon", mFont, 34);
-            sf::Text hint("Left/Right or 1-6 to choose, Enter to confirm", mFont, 22);
+            sf::Text hint("Left/Right or number keys to choose, Enter to confirm", mFont, 22);
 #endif
             title.setFillColor(sf::Color::White);
             hint.setFillColor(sf::Color(230, 230, 230));
@@ -721,12 +770,21 @@ void BattleState::render(sf::RenderTarget& target) {
             if (mFontLoaded) {
 #if SFML_VERSION_MAJOR >= 3
                 sf::Text num(mFont, std::to_string(i + 1), 20);
+                sf::Text label(mFont,
+                               i < mSelectionDisplayNames.size() ? mSelectionDisplayNames[i] : mSelectionMonFiles[i],
+                               16);
 #else
                 sf::Text num(std::to_string(i + 1), mFont, 20);
+                sf::Text label(i < mSelectionDisplayNames.size() ? mSelectionDisplayNames[i] : mSelectionMonFiles[i],
+                               mFont,
+                               16);
 #endif
                 num.setFillColor(sf::Color::White);
                 num.setPosition({slotBg.getPosition().x + 6.f, slotBg.getPosition().y + 4.f});
+                label.setFillColor(sf::Color(235, 235, 235));
+                label.setPosition({slotBg.getPosition().x, slotBg.getPosition().y + 100.f});
                 target.draw(num);
+                target.draw(label);
             }
         }
         return;
