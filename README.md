@@ -4,8 +4,13 @@ Codémon is a Pokémon-style RPG built in C++ using SFML. In this world, the cor
 
 ---
 
-## ⚡ Quick Start
 
+
+## ⚡ Quick Start
+### Download and Launch
+Download the latest release of codemon and find codemon.exe in the src/bin/ folder. 
+
+Codemon is open source! To build it yourself, follow the instructions below.
 ### Prerequisites
 - **CMake 3.20 or higher** (check version: `cmake --version`)
 - **C++ compiler** with C++17 support (GCC 7+, Clang 5+, MSVC 2017+)
