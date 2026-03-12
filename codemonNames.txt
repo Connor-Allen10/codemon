@@ -1,0 +1,12 @@
+# Format:
+# <texture_name>, "name1", "name2", "name3"
+
+fire_mon.png, "Blaze", "Ember", "Sparky"
+swamp_mon.png, "Murky", "Bogg", "Gloop"
+void_mon.png, "Nova", "Ether", "Starlord"
+fire_bird_mon.png, "Swooper", "Bennu", "Simorgh"
+candy_mon.png, "SweeTooth", "Candee", "Cookie"
+forest_mon.png, "Bambi", "Clover", "Douglass"
+rocky_mon.png, "Rocky", "Crystal", "Jeff",
+water_mon.png, "Poseidon", "Shelly", "Flow"
+zombie_mon.png, "Oozey", "Jumper", "Frank"
