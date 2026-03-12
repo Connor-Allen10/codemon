@@ -62,7 +62,7 @@ private:
 
     sf::Vector2f mPlayerTopLeft{100.f, 100.f};
     float mSpeed = 220.f;
-    bool mHelpMenuOpen = false;
+    bool mDebugOpen = false;
     bool mTrainerLocked = true;
 
     Facing mFacing = Facing::South;

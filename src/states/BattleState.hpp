@@ -1,19 +1,21 @@
 /**
  * @file BattleState.hpp
- * @brief Battle encounter state with simple placeholder UI.
+ * @brief Battle encounter state with encounter intro, mon selection, and debug battle.
  */
 
 #pragma once
 
 #include <SFML/Graphics.hpp>
 #include <string>
+#include <vector>
 #include "../game/State.hpp"
 #include "../debug/DebugChallenge.hpp"
 #include "../debug/ChallengeLoader.hpp"
 
 class BattleState : public State {
 public:
-    explicit BattleState(sf::RenderWindow& window);
+    explicit BattleState(sf::RenderWindow& window,
+                         std::string preferredPlayerMonFile = "");
 
     void handleEvent(const sf::Event& e) override;
     void update(sf::Time dt) override;
@@ -22,40 +24,49 @@ public:
     bool shouldExit() const { return mExitRequested; }
 
 private:
-    void updateLayout();
-    bool loadEncounterSprite();
-    bool loadPlayerSprite();
+    enum class Phase {
+        EncounterIntro,
+        PlayerSelect,
+        DebugBattle
+    };
 
-private:
+    void updateViewLayout(sf::Vector2u size);
+    void beginPlayerSelection();
+    void confirmPlayerSelection();
+    void refreshPlayerSprite();
+    void moveSelection(int delta);
+
     sf::RenderWindow& mWindow;
     sf::View mBattleView;
 
     sf::RectangleShape mBackground;
+    sf::RectangleShape mEnemyPlatform;
+    sf::RectangleShape mPlayerPlatform;
     sf::Font mFont;
     bool mFontLoaded = false;
 
-    bool mExitRequested = false;
-    float mTimer = 0.f;
-
-    // One-second encounter reveal before the full battle UI becomes interactive.
-    bool mEncounterIntroActive = true;
-    float mEncounterIntroTimer = 0.f;
-    static constexpr float kEncounterIntroDuration = 1.0f;
-
-    // Monster visuals.
-    sf::Texture mDummyTexture;
     sf::Texture mEnemyTexture;
     sf::Texture mPlayerTexture;
     sf::Sprite mEnemySprite;
     sf::Sprite mPlayerSprite;
-    bool mEnemySpriteLoaded = false;
-    bool mPlayerSpriteLoaded = false;
-    std::string mEnemySpritePath;
+    bool mEnemyTextureLoaded = false;
+    bool mPlayerTextureLoaded = false;
+    std::string mPreferredPlayerMonFile;
+    std::string mPlayerMonFile;
+    std::string mWildMonFile;
 
-    sf::RectangleShape mEnemyPlatform;
-    sf::RectangleShape mPlayerPlatform;
+    std::vector<std::string> mSelectionMonFiles;
+    std::vector<sf::Texture> mSelectionTextures;
+    std::vector<sf::Sprite> mSelectionSprites;
+    std::vector<bool> mSelectionLoaded;
+    std::size_t mSelectionIndex = 0;
 
-    // Debug-engine integration with dynamic challenge loading.
+    bool mExitRequested = false;
+    float mTimer = 0.f;
+    Phase mPhase = Phase::EncounterIntro;
+    float mEncounterIntroTimer = 0.f;
+    static constexpr float kEncounterIntroDuration = 2.0f;
+
     Debug::Engine mDebugEngine;
     std::string mBattleMessage;
     bool mChallengeSolved = false;
