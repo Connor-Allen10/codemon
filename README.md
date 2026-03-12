@@ -6,7 +6,7 @@ Codémon is a Pokémon-style RPG built in C++ using SFML. In this world, the cor
 
 ## ⚡ Quick Start
 ### Download and Launch
-Download the latest release of codemon and find codemon.exe in the src/bin/ folder. 
+Download the latest release of codemon and find the `codemon` executable in the `build/` folder (or `build/Debug/codemon.exe` on Windows). 
 
 Codemon is open source! To build it yourself, follow the instructions below.
 ### Prerequisites
@@ -47,8 +47,7 @@ Or with CTest:
 ```bash
 ctest --test-dir build --output-on-failure
 ```
-**Expected:** 43 tests passing (37 core logic + 6 ChallengeLoader tests).
-**Expected:** 53 tests passing.
+**Expected:** 53 tests passing (unit + integration).
 
 ### Run Instructions
 ```bash
@@ -80,7 +79,7 @@ ctest --test-dir build --output-on-failure
 
 ## 🎮 Operational Use Cases
 
-### ✅ World → Battle Transition (Beta Release)
+### ✅ World → Battle Transition
 **Status:** Fully implemented and tested
 1. Start the game - player spawns in tilemap world
 2. Walk on grass tiles (darker green areas)
@@ -102,20 +101,76 @@ ctest --test-dir build --output-on-failure
 For detailed information, see:
 
 * **[User Manual](./docs/USER_GUIDE.md)**: How to install, run, and play the game.
-* **[Install Guide](./INSTALL.md)**: End-user setup and launch instructions.
-* **[Setup Guide](./SETUP.md)**: System administrator/deployment instructions.
-* **[Developer Guidelines](./docs/DEVELOPER_GUIDE.md)**: Architecture, directory structure, and build system details.
-* **[Living Document](./docs/LIVING_DOCUMENT.md)**: Complete design overview, use cases, architecture, and technical decisions.
-* **[Test Plan & CI Infrastructure](./docs/TEST_PLAN.md)**: Testing strategy and GitHub Actions CI setup.
+* **[INSTALL.md](./INSTALL.md)**: End-user installation guide — platform prerequisites, step-by-step install, gameplay controls, and troubleshooting. Assumes no prior knowledge of the toolset.
+* **[SETUP.md](./SETUP.md)**: System administrator / developer deployment guide — all libraries required, build commands, asset packaging, and distribution instructions.
+* **[Developer Guidelines](./docs/DEVELOPER_GUIDE.md)**: Coding standards (Google C++ Style Guide), architecture, directory structure, and contribution workflow.
+* **[Test Plan & CI Infrastructure](./docs/TEST_PLAN.md)**: How to write, document, and run tests; unit and integration test coverage; GitHub Actions CI setup.
+* **[Living Document](./docs/LIVING_DOCUMENT.md)**: Full design overview, use cases, architecture decisions, and team Reflections.
 
 ---
 
-## 🛠 Project Status (Milestone 6: Beta Release)
-We are entering the beta testing phase with core components operational.
-* **Core Logic:** World rendering, player movement, random encounters, battle state transitions, and debug challenge system fully implemented.
-* **Testing:** 43 automated tests passing with GitHub Actions CI integration.
-* **Quality:** Comprehensive code documentation (Doxygen-style) and cross-platform compatibility (macOS/Linux, Windows CI disabled).
-* **Next Phase:** Battle UI enhancements, sprite asset integration, and additional challenge content.
+## � Release Notes — Version 1.0 (March 2026)
+
+> **Source repository:** https://github.com/Connor-Allen10/codemon  
+> **Change log:** `git log --oneline` in the repository root  
+> **Issue tracker:** [GitHub Issues](https://github.com/Connor-Allen10/codemon/issues)
+
+### ✅ Working Features
+| Feature | Status |
+|---------|--------|
+| Tile-based overworld with WASD / Arrow Key movement | ✅ |
+| Collision detection and camera follow | ✅ |
+| Random encounters on grass tiles (15% chance per tick) | ✅ |
+| Battle flow: encounter intro → party selection → debug battle | ✅ |
+| In-battle debug challenge editor (E or F1) | ✅ |
+| Multiline challenge prompts, keyword hints, Submit / Cancel | ✅ |
+| External challenge loading from `challenges.txt` with fallback | ✅ |
+| Monster sprites, updated main menu visuals | ✅ |
+| ESC exits battle and returns to world | ✅ |
+| Cross-platform build: macOS (SFML 3.x) + Linux CI (SFML 2.6) | ✅ |
+
+### 🐞 Known Issues
+| Issue | Platform | Severity | Issue # |
+|-------|----------|----------|---------|
+| Battle text may not render correctly (font path) | Windows | Minor | [#14](https://github.com/Connor-Allen10/codemon/issues/14) |
+| TGUI debug popup unavailable on Linux CI | Linux | Minor | — |
+| UI elements may shift on resolutions below 1920×1080 | All | Minor | — |
+
+All known bugs are tracked in [GitHub Issues](https://github.com/Connor-Allen10/codemon/issues) with `critical`/`minor` severity and `ui`/`logic`/`data` category labels. Issues are closed by a team member other than the author.
+
+### 🧪 Test Results
+**53 / 53 tests passing** — GoogleTest unit + integration suite
+
+| Test Suite | Tests | Coverage |
+|-----------|-------|----------|
+| `BattleStateTest` | 13 | Battle phases, input handling, rendering |
+| `ChallengeLoaderTest` | 5 | File parsing, fallback, malformed input |
+| `DebugIntegrationTest` | 3 | Challenge → battle integration |
+| `DebugChallengeTest` | 3 | Submission validation, hints, victory |
+| `DebugEngineTest` | 4 | Engine lifecycle, submit pass/fail |
+| `StateTransitionTest` | 6 | Push/pop state machine |
+| `StatsTest` | 2 | Health reduction, floor validation |
+| `TileMapTest` | 4 | CSV loading, passability, bounds |
+| `ValidatorsTest` + `ValidatorsEdgeTest` | 9 | Input sanitization, keyword matching |
+| `VerticalSliceTest` | 3 | End-to-end state stack smoke tests |
+
+**Run all tests (from project root):**
+```bash
+ctest --test-dir build --output-on-failure
+```
+**Run unit tests directly:**
+```bash
+./build/run_tests
+```
+See [docs/TEST_PLAN.md](./docs/TEST_PLAN.md) for instructions on adding new tests and CI details.
+
+### 📦 Source Distribution
+- **Coding guidelines:** [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html) — see [docs/DEVELOPER_GUIDE.md](./docs/DEVELOPER_GUIDE.md)
+- **All features** developed on feature branches with PR review before merging to `main`
+- **Change log:** `git log --oneline` or `git log --follow -p <file>` to trace evolution of any file
+- **Issue tracking:** [GitHub Issues](https://github.com/Connor-Allen10/codemon/issues) — used for bugs, tasks, and cross-developer handoff
+- **Inline documentation:** Doxygen-style comments throughout `src/`
+- **Build from source:** See [SETUP.md](./SETUP.md) for complete administrator / developer build steps
 
 ## 👥 The Team
 * **Connor Allen:** Project Manager
