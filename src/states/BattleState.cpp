@@ -1,24 +1,16 @@
 /**
  * @file BattleState.cpp
  * @brief Implementation of the BattleState class.
- * 
- * This file implements battle encounters integrated with the Debug::Engine system.
- * The battle state presents coding challenges that players must solve by submitting
- * correct code fixes. Key features:
- * - Debug::Engine manages challenge lifecycle (start, submit, validation)
- * - Step 3: TGUI popup editor (E/F1) captures user code and submits it
- * - Fallback mode (no TGUI): Enter/Backspace test the validation paths
- * - Visual feedback changes background color on success
- * - Challenge prompt and feedback messages displayed via SFML text rendering
  */
 
 #include "BattleState.hpp"
 
 #include <cmath>
+#include <cstdlib>
 #include <filesystem>
-#include <vector>
 #include <iostream>
 #include <optional>
+#include <vector>
 
 #if __has_include(<TGUI/TGUI.hpp>) && __has_include(<TGUI/Backend/SFML-Graphics.hpp>)
 #define CODEMON_HAS_TGUI 1
@@ -28,29 +20,48 @@
 #define CODEMON_HAS_TGUI 0
 #endif
 
-// Static challenge loader shared across all battle instances
-// Attempts to load from "challenges.txt" in working directory, falls back to 8 defaults
 Debug::ChallengeLoader BattleState::sChallengeLoader("challenges.txt");
 
 namespace {
-// Centralized helper so all submission paths (TGUI and fallback hotkeys)
-// update BattleState UI fields in one place.
-void applySubmission(Debug::Engine& engine,
-                     const std::string& submission,
-                     std::string& message,
-                     bool& solved,
-                     bool& failed) {
-    const ValidationResult result = engine.submit(submission);
-    message = result.feedback;
-    solved = result.success;
-    failed = !result.success;
+sf::Texture makeDummyTexture() {
+    sf::Texture tex;
+#if SFML_VERSION_MAJOR >= 3
+    tex = sf::Texture(sf::Vector2u{1u, 1u});
+#else
+    tex.create(1u, 1u);
+#endif
+    return tex;
+}
+
+bool loadTextureFromAny(sf::Texture& tex, std::initializer_list<const char*> paths) {
+    for (const char* path : paths) {
+        if (tex.loadFromFile(path)) {
+            tex.setSmooth(false);
+            return true;
+        }
+    }
+    return false;
+}
+
+std::string chooseRandomMonsterAsset() {
+    static const std::vector<std::string> monsters = {
+        "forest_mon.png",
+        "fire_bird_mon.png",
+        "rocky_mon.png",
+        "Water_mon.png",
+        "candy_mon.png",
+        "zombie_mon.png"
+    };
+
+    if (monsters.empty()) {
+        return {};
+    }
+
+    const std::size_t index = static_cast<std::size_t>(std::rand()) % monsters.size();
+    return monsters[index];
 }
 
 #if CODEMON_HAS_TGUI
-// UI: modal editor popup used during battle.
-// Returns:
-// - std::string submission when player presses Submit
-// - std::nullopt when player closes/cancels popup
 std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
                                                const std::string& keywordHint) {
 #if SFML_VERSION_MAJOR >= 3
@@ -66,14 +77,13 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
     panel->getRenderer()->setBackgroundColor(tgui::Color(45, 45, 55));
     gui.add(panel);
 
-    // Header + prompt context so the player knows what to fix.
     auto title = tgui::Label::create("BATTLE DEBUG CHALLENGE");
     title->setPosition({"3%", "3%"});
     title->setTextSize(26);
     title->getRenderer()->setTextColor(tgui::Color::White);
     panel->add(title);
 
-    auto promptLabel = tgui::Label::create("Something is wrong with this code! ");
+    auto promptLabel = tgui::Label::create("Something is wrong with this code!");
     promptLabel->setPosition({"3%", "13%"});
     promptLabel->setTextSize(18);
     promptLabel->setAutoSize(false);
@@ -81,7 +91,6 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
     promptLabel->getRenderer()->setTextColor(tgui::Color(220, 220, 220));
     panel->add(promptLabel);
 
-    // Instruction label explaining what to do
     auto instructionLabel = tgui::Label::create("Type the corrected code below:");
     instructionLabel->setPosition({"3%", "24%"});
     instructionLabel->setTextSize(14);
@@ -91,7 +100,6 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
     auto editor = tgui::TextArea::create();
     editor->setPosition({"3%", "29%"});
     editor->setSize({"94%", "49%"});
-    // Start with blank editor so player must type the correction
     editor->setText(prompt);
     editor->setTextSize(22);
     editor->getRenderer()->setBackgroundColor(tgui::Color(55, 55, 65));
@@ -127,21 +135,16 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
     bool submitted = false;
     std::string submission;
 
-    // Submit captures textbox content and exits the modal loop.
     submitButton->onPress([&]() {
         submission = editor->getText().toStdString();
         submitted = true;
         popup.close();
     });
 
-    // Cancel just closes without changing challenge state.
-    cancelButton->onPress([&]() {
-        popup.close();
-    });
+    cancelButton->onPress([&]() { popup.close(); });
 
     while (popup.isOpen()) {
 #if SFML_VERSION_MAJOR >= 3
-    // SFML 3 event model (std::optional from pollEvent).
         while (const std::optional event = popup.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
                 popup.close();
@@ -149,7 +152,6 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
             gui.handleEvent(*event);
         }
 #else
-    // SFML 2 event model.
         sf::Event event;
         while (popup.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
@@ -170,23 +172,34 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
     return std::nullopt;
 }
 #endif
+
+void applySubmission(Debug::Engine& engine,
+                     const std::string& submission,
+                     std::string& message,
+                     bool& solved,
+                     bool& failed) {
+    const ValidationResult result = engine.submit(submission);
+    message = result.feedback;
+    solved = result.success;
+    failed = !result.success;
+}
 }
 
 BattleState::BattleState(sf::RenderWindow& window)
-: mWindow(window) {
-    // Initialize view to match window size
+: mWindow(window)
+, mDummyTexture(makeDummyTexture())
+, mEnemySprite(mDummyTexture)
+, mPlayerSprite(mDummyTexture) {
     const auto ws = mWindow.getSize();
     mBattleView = sf::View(sf::FloatRect(
         {0.f, 0.f},
         {static_cast<float>(ws.x), static_cast<float>(ws.y)}
     ));
 
-    // Setup battle background (dark purple)
     mBackground.setPosition({0.f, 0.f});
     mBackground.setSize({static_cast<float>(ws.x), static_cast<float>(ws.y)});
     mBackground.setFillColor(sf::Color(64, 0, 128));
 
-    // Try to load font without spamming failed open attempts.
     const std::vector<std::string> fontCandidates = {
         "assets/fonts/arial.ttf",
         "../assets/fonts/arial.ttf",
@@ -203,7 +216,6 @@ BattleState::BattleState(sf::RenderWindow& window)
         if (!std::filesystem::exists(path, ec) || ec) {
             continue;
         }
-
 #if SFML_VERSION_MAJOR >= 3
         if (mFont.openFromFile(path)) {
 #else
@@ -218,16 +230,11 @@ BattleState::BattleState(sf::RenderWindow& window)
         std::cerr << "WARNING: Failed to load battle font. Text will not display.\n";
     }
 
-    // ===== Debug::Engine Integration (Dynamic Loading) =====
-    // Load random challenge from ChallengeLoader.
-    // The loader reads from file if available, otherwise uses 8 hardcoded defaults.
-    // Challenge selection is random on each battle start for variety.
     auto maybeChallenge = sChallengeLoader.getRandomChallenge();
     if (maybeChallenge) {
         mCurrentKeywordHint = maybeChallenge->keywordHint;
         mDebugEngine.startChallenge(*maybeChallenge);
     } else {
-        // Fallback if loader completely fails (shouldn't happen with defaults)
         mCurrentKeywordHint = "return";
         mDebugEngine.startChallenge(Debug::Challenge{
             "Fix bug: change 'retun 0;' to valid C++",
@@ -235,28 +242,140 @@ BattleState::BattleState(sf::RenderWindow& window)
             "return"
         });
     }
+
 #if CODEMON_HAS_TGUI
-    // Default hint path: user opens editor and types their own fix.
-    mBattleMessage = "Battle started. Press E or F1 to open Debug Editor. ESC = exit.";
+    mBattleMessage = "Press E or F1 to open Debug Editor. ESC = exit.";
 #else
-    // Fallback path used when TGUI is unavailable on the platform/build.
-    mBattleMessage = "Battle started. Press Enter to submit fix. Backspace = wrong attempt. ESC = exit.";
+    mBattleMessage = "Press Enter to submit fix. Backspace = wrong attempt. ESC = exit.";
 #endif
 
-    std::cout << "[BattleState] Initialized\n";
+    mEnemyPlatform.setFillColor(sf::Color(110, 90, 150, 180));
+    mPlayerPlatform.setFillColor(sf::Color(110, 90, 150, 180));
+
+    mEnemySpriteLoaded = loadEncounterSprite();
+    mPlayerSpriteLoaded = loadPlayerSprite();
+    updateLayout();
+
+    std::cout << "[BattleState] Initialized with encounter sprite: " << mEnemySpritePath << "\n";
+}
+
+bool BattleState::loadEncounterSprite() {
+    mEnemySpritePath = chooseRandomMonsterAsset();
+    if (mEnemySpritePath.empty()) {
+        return false;
+    }
+
+    const std::string srcPath = "src/assets/" + mEnemySpritePath;
+    const std::string assetsPath = "assets/" + mEnemySpritePath;
+    const std::string parentSrcPath = "../src/assets/" + mEnemySpritePath;
+    const std::string parentAssetsPath = "../assets/" + mEnemySpritePath;
+
+    if (!loadTextureFromAny(mEnemyTexture, {
+        srcPath.c_str(), assetsPath.c_str(), parentSrcPath.c_str(), parentAssetsPath.c_str()
+    })) {
+        std::cerr << "WARNING: Failed to load encounter sprite: " << mEnemySpritePath << "\n";
+        return false;
+    }
+
+    mEnemySprite.setTexture(mEnemyTexture, true);
+    return true;
+}
+
+bool BattleState::loadPlayerSprite() {
+    if (!loadTextureFromAny(mPlayerTexture, {
+        "src/assets/forest_mon.png",
+        "assets/forest_mon.png",
+        "../src/assets/forest_mon.png",
+        "../assets/forest_mon.png"
+    })) {
+        std::cerr << "WARNING: Failed to load player battle sprite.\n";
+        return false;
+    }
+
+    mPlayerSprite.setTexture(mPlayerTexture, true);
+    return true;
+}
+
+void BattleState::updateLayout() {
+    const float width = static_cast<float>(mWindow.getSize().x);
+    const float height = static_cast<float>(mWindow.getSize().y);
+
+    mBackground.setSize({width, height});
+
+    mEnemyPlatform.setSize({width * 0.27f, height * 0.08f});
+    mEnemyPlatform.setPosition({width * 0.60f, height * 0.24f});
+
+    mPlayerPlatform.setSize({width * 0.31f, height * 0.10f});
+    mPlayerPlatform.setPosition({width * 0.10f, height * 0.70f});
+
+    if (mEnemySpriteLoaded) {
+#if SFML_VERSION_MAJOR >= 3
+        const auto bounds = mEnemySprite.getLocalBounds();
+        if (bounds.size.x > 0.f && bounds.size.y > 0.f) {
+            const float targetHeight = height * (mEncounterIntroActive ? 0.46f : 0.30f);
+            const float scale = targetHeight / bounds.size.y;
+            mEnemySprite.setScale({scale, scale});
+            const auto scaled = mEnemySprite.getGlobalBounds();
+            const float x = mEncounterIntroActive ? (width - scaled.size.x) * 0.5f : width * 0.68f - scaled.size.x * 0.5f;
+            const float y = mEncounterIntroActive ? height * 0.20f : height * 0.09f;
+            mEnemySprite.setPosition({x, y});
+        }
+#else
+        const auto bounds = mEnemySprite.getLocalBounds();
+        if (bounds.width > 0.f && bounds.height > 0.f) {
+            const float targetHeight = height * (mEncounterIntroActive ? 0.46f : 0.30f);
+            const float scale = targetHeight / bounds.height;
+            mEnemySprite.setScale(scale, scale);
+            const auto scaled = mEnemySprite.getGlobalBounds();
+            const float x = mEncounterIntroActive ? (width - scaled.width) * 0.5f : width * 0.68f - scaled.width * 0.5f;
+            const float y = mEncounterIntroActive ? height * 0.20f : height * 0.09f;
+            mEnemySprite.setPosition(x, y);
+        }
+#endif
+    }
+
+    if (mPlayerSpriteLoaded) {
+#if SFML_VERSION_MAJOR >= 3
+        const auto bounds = mPlayerSprite.getLocalBounds();
+        if (bounds.size.x > 0.f && bounds.size.y > 0.f) {
+            const float targetHeight = height * 0.34f;
+            const float scale = targetHeight / bounds.size.y;
+            mPlayerSprite.setScale({scale, scale});
+            const auto scaled = mPlayerSprite.getGlobalBounds();
+            mPlayerSprite.setPosition({width * 0.22f - scaled.size.x * 0.5f, height * 0.42f});
+        }
+#else
+        const auto bounds = mPlayerSprite.getLocalBounds();
+        if (bounds.width > 0.f && bounds.height > 0.f) {
+            const float targetHeight = height * 0.34f;
+            const float scale = targetHeight / bounds.height;
+            mPlayerSprite.setScale(scale, scale);
+            const auto scaled = mPlayerSprite.getGlobalBounds();
+            mPlayerSprite.setPosition(width * 0.22f - scaled.width * 0.5f, height * 0.42f);
+        }
+#endif
+    }
 }
 
 void BattleState::handleEvent(const sf::Event& e) {
 #if SFML_VERSION_MAJOR >= 3
+    if (const auto* resized = e.getIf<sf::Event::Resized>()) {
+        mBattleView.setSize({static_cast<float>(resized->size.x), static_cast<float>(resized->size.y)});
+        updateLayout();
+    }
+
     if (const auto* keyPressed = e.getIf<sf::Event::KeyPressed>()) {
         if (keyPressed->code == sf::Keyboard::Key::Escape) {
             mExitRequested = true;
-            requestPop(); // Request to be removed from state stack
-            std::cout << "[BattleState] Exit requested\n";
+            requestPop();
+            return;
+        }
+
+        if (mEncounterIntroActive) {
+            return;
         }
 
 #if CODEMON_HAS_TGUI
-        // Open TGUI editor popup and submit the player's typed solution.
         if ((keyPressed->code == sf::Keyboard::Key::E || keyPressed->code == sf::Keyboard::Key::F1) &&
             mDebugEngine.hasActiveChallenge()) {
             const auto submission = runDebugEditorPopup(mDebugEngine.currentPrompt(), mCurrentKeywordHint);
@@ -265,35 +384,32 @@ void BattleState::handleEvent(const sf::Event& e) {
             }
         }
 #else
-        // Enter key: Submit CORRECT answer to test success path
-        // Submits "return 0;" which matches the expected answer.
-        // On success: feedback = "Correct! ...", mChallengeSolved = true, background turns green
         if (keyPressed->code == sf::Keyboard::Key::Enter && mDebugEngine.hasActiveChallenge()) {
             applySubmission(mDebugEngine, "return 0;", mBattleMessage, mChallengeSolved, mSubmissionFailed);
         }
-
-        // Backspace key: Submit WRONG answer to test failure path
-        // Submits "retun 0;" (typo) which doesn't match expected answer.
-        // On failure: feedback = "Incorrect. ...", mChallengeSolved = false, challenge stays active
         if (keyPressed->code == sf::Keyboard::Key::Backspace && mDebugEngine.hasActiveChallenge()) {
             applySubmission(mDebugEngine, "retun 0;", mBattleMessage, mChallengeSolved, mSubmissionFailed);
         }
 #endif
     }
-    if (const auto* resized = e.getIf<sf::Event::Resized>()) {
-        mBattleView.setSize({static_cast<float>(resized->size.x), static_cast<float>(resized->size.y)});
-        mBackground.setSize({static_cast<float>(resized->size.x), static_cast<float>(resized->size.y)});
-    }
 #else
+    if (e.type == sf::Event::Resized) {
+        mBattleView.setSize({static_cast<float>(e.size.width), static_cast<float>(e.size.height)});
+        updateLayout();
+    }
+
     if (e.type == sf::Event::KeyPressed) {
         if (e.key.code == sf::Keyboard::Escape) {
             mExitRequested = true;
-            requestPop(); // Request to be removed from state stack
-            std::cout << "[BattleState] Exit requested\n";
+            requestPop();
+            return;
+        }
+
+        if (mEncounterIntroActive) {
+            return;
         }
 
 #if CODEMON_HAS_TGUI
-        // Open TGUI editor popup and submit the player's typed solution.
         if ((e.key.code == sf::Keyboard::E || e.key.code == sf::Keyboard::F1) &&
             mDebugEngine.hasActiveChallenge()) {
             const auto submission = runDebugEditorPopup(mDebugEngine.currentPrompt(), mCurrentKeywordHint);
@@ -302,37 +418,32 @@ void BattleState::handleEvent(const sf::Event& e) {
             }
         }
 #else
-        // Enter/Return key: Submit CORRECT answer ("return 0;")
-        // Tests success path for Debug::Engine validation
         if (e.key.code == sf::Keyboard::Return && mDebugEngine.hasActiveChallenge()) {
             applySubmission(mDebugEngine, "return 0;", mBattleMessage, mChallengeSolved, mSubmissionFailed);
         }
-
-        // Backspace key: Submit WRONG answer ("retun 0;" with typo)
-        // Tests failure path for Debug::Engine validation
         if (e.key.code == sf::Keyboard::BackSpace && mDebugEngine.hasActiveChallenge()) {
             applySubmission(mDebugEngine, "retun 0;", mBattleMessage, mChallengeSolved, mSubmissionFailed);
         }
 #endif
-    }
-    if (e.type == sf::Event::Resized) {
-        mBattleView.setSize({static_cast<float>(e.size.width), static_cast<float>(e.size.height)});
-        mBackground.setSize({static_cast<float>(e.size.width), static_cast<float>(e.size.height)});
     }
 #endif
 }
 
 void BattleState::update(sf::Time dt) {
     mTimer += dt.asSeconds();
+
+    if (mEncounterIntroActive) {
+        mEncounterIntroTimer += dt.asSeconds();
+        if (mEncounterIntroTimer >= kEncounterIntroDuration) {
+            mEncounterIntroActive = false;
+            updateLayout();
+        }
+    }
 }
 
 void BattleState::render(sf::RenderTarget& target) {
     target.setView(mBattleView);
 
-    // Visual feedback: Change background color based on challenge state
-    // - Green (20, 120, 40): Challenge solved successfully
-    // - Red (150, 0, 0): Last submission was incorrect
-    // - Purple (64, 0, 128): Challenge active, no attempt yet (default battle color)
     if (mChallengeSolved) {
         mBackground.setFillColor(sf::Color(20, 120, 40));
     } else if (mSubmissionFailed) {
@@ -342,14 +453,47 @@ void BattleState::render(sf::RenderTarget& target) {
     }
 
     target.draw(mBackground);
-    
-    // ===== Debug UI Text Rendering =====
-    // Three-line layout for battle debug interface:
-    // 1. Title: "BATTLE DEBUG" with pulsing alpha animation
-    // 2. Subtitle: Feedback message (mBattleMessage) showing validation result
-    // 3. Prompt: Current challenge prompt or completion message
-    if (mFontLoaded) {
-        // SFML 3.0 vs 2.x have different Text constructor parameter order
+
+    if (mEncounterIntroActive) {
+        if (mEnemySpriteLoaded) {
+            target.draw(mEnemySprite);
+        }
+
+        if (mFontLoaded) {
+#if SFML_VERSION_MAJOR >= 3
+            sf::Text intro(mFont, "A wild Codemon appeared!", 34);
+#else
+            sf::Text intro("A wild Codemon appeared!", mFont, 34);
+#endif
+            intro.setFillColor(sf::Color::White);
+#if SFML_VERSION_MAJOR >= 3
+            const auto bounds = intro.getLocalBounds();
+            intro.setOrigin({bounds.size.x * 0.5f, bounds.size.y * 0.5f});
+#else
+            const auto bounds = intro.getLocalBounds();
+            intro.setOrigin(bounds.width * 0.5f, bounds.height * 0.5f);
+#endif
+            intro.setPosition({static_cast<float>(mWindow.getSize().x) * 0.5f,
+                               static_cast<float>(mWindow.getSize().y) * 0.10f});
+            target.draw(intro);
+        }
+        return;
+    }
+
+    target.draw(mEnemyPlatform);
+    target.draw(mPlayerPlatform);
+
+    if (mEnemySpriteLoaded) {
+        target.draw(mEnemySprite);
+    }
+    if (mPlayerSpriteLoaded) {
+        target.draw(mPlayerSprite);
+    }
+
+    if (!mFontLoaded) {
+        return;
+    }
+
 #if SFML_VERSION_MAJOR >= 3
     sf::Text title(mFont, "BATTLE DEBUG", 40);
     sf::Text subtitle(mFont, mBattleMessage, 22);
@@ -360,13 +504,11 @@ void BattleState::render(sf::RenderTarget& target) {
     title.setFillColor(sf::Color::White);
     subtitle.setFillColor(sf::Color(230, 230, 230));
 
-    // Prompt line shows active challenge or completion message
-    std::string promptLine = mDebugEngine.hasActiveChallenge()
-        ? ("Can you find what's wrong with the following code?")
+    const std::string promptLine = mDebugEngine.hasActiveChallenge()
+        ? "Can you find what's wrong with the following code?"
         : std::string("Challenge solved. Press ESC to return.");
 
 #if CODEMON_HAS_TGUI
-    // Control text switches based on whether full editor mode is compiled in.
     const std::string controlsLine = "Controls: E/F1 open editor, ESC exits battle";
 #else
     const std::string controlsLine = "Controls: Enter=correct test, Backspace=wrong test, ESC exits";
@@ -379,32 +521,30 @@ void BattleState::render(sf::RenderTarget& target) {
     sf::Text prompt(promptLine, mFont, 20);
     sf::Text controls(controlsLine, mFont, 18);
 #endif
+
     prompt.setFillColor(sf::Color(220, 220, 140));
     controls.setFillColor(sf::Color(200, 200, 200));
-        
-        // Center text on screen
+
 #if SFML_VERSION_MAJOR >= 3
-        const auto bounds = title.getLocalBounds();
-        title.setOrigin({bounds.size.x * 0.5f, bounds.size.y * 0.5f});
+    const auto bounds = title.getLocalBounds();
+    title.setOrigin({bounds.size.x * 0.5f, bounds.size.y * 0.5f});
 #else
-        const auto bounds = title.getLocalBounds();
-        title.setOrigin({bounds.width * 0.5f, bounds.height * 0.5f});
+    const auto bounds = title.getLocalBounds();
+    title.setOrigin({bounds.width * 0.5f, bounds.height * 0.5f});
 #endif
-        title.setPosition({static_cast<float>(mWindow.getSize().x) * 0.5f,
-                   static_cast<float>(mWindow.getSize().y) * 0.35f});
+    title.setPosition({static_cast<float>(mWindow.getSize().x) * 0.5f,
+                       static_cast<float>(mWindow.getSize().y) * 0.08f});
 
-        subtitle.setPosition({40.f, static_cast<float>(mWindow.getSize().y) * 0.55f});
-        prompt.setPosition({40.f, static_cast<float>(mWindow.getSize().y) * 0.65f});
-        controls.setPosition({40.f, static_cast<float>(mWindow.getSize().y) * 0.73f});
-        
-        // Apply pulse effect to alpha channel (fade in/out)
-        const float pulse = 0.5f + 0.5f * std::sin(mTimer * 3.f);
-        const auto alpha = static_cast<std::uint8_t>(128 + 127 * pulse);
-        title.setFillColor(sf::Color(255, 255, 255, alpha));
+    subtitle.setPosition({40.f, static_cast<float>(mWindow.getSize().y) * 0.84f});
+    prompt.setPosition({40.f, static_cast<float>(mWindow.getSize().y) * 0.90f});
+    controls.setPosition({40.f, static_cast<float>(mWindow.getSize().y) * 0.95f});
 
-        target.draw(title);
-        target.draw(subtitle);
-        target.draw(prompt);
-        target.draw(controls);
-    }
+    const float pulse = 0.5f + 0.5f * std::sin(mTimer * 3.f);
+    const auto alpha = static_cast<std::uint8_t>(128 + 127 * pulse);
+    title.setFillColor(sf::Color(255, 255, 255, alpha));
+
+    target.draw(title);
+    target.draw(subtitle);
+    target.draw(prompt);
+    target.draw(controls);
 }
