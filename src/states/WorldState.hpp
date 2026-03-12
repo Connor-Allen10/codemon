@@ -7,6 +7,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "../game/State.hpp"
+#include "../battle/Party.hpp"
 #include "../world/TileMap.hpp"
 
 class WorldState : public State {
@@ -74,4 +75,5 @@ private:
     static constexpr float kEncounterChance = 0.15f;
 
     sf::RectangleShape mOverlay;
+    Party mParty;
 };

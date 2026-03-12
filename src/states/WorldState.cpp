@@ -419,7 +419,7 @@ void WorldState::checkEncounter() {
 #ifndef NDEBUG
             std::cout << "[WorldState] Wild encounter! Transitioning to battle...\n";
 #endif
-            requestPush(std::make_unique<BattleState>(mWindow));
+            requestPush(std::make_unique<BattleState>(mWindow, mParty));
             mEncounterCooldown = 5.0f;
         }
     }
