@@ -125,6 +125,23 @@ g++ -std=c++17 `
   -lsfml-graphics -lsfml-window -lsfml-system `
   -o src/bin/codemon.exe
 
+    ===============================
+    Run before TGUI compile Command
+    ===============================
+
+    1. cd external/TGUI
+        mkdir build -Force
+        cd build
+        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DTGUI_BACKEND=SFML_GRAPHICS -DSFML_DIR="C:\personal_projects\codemon\src\lib\cmake\SFML"
+        mingw32-make
+
+        **note: C:\personal_projects\codemon\src\lib\cmake\SFML    *personal_projects* will need to be adjusted to the folder where you keep your project directory**
+
+    2. go back to project root.
+
+    3. Run compile command below
+  
+
   ============================================
   COMPILE COMMAND (FOR CHUMPS) (INCLUDES TGUI)
   ============================================
@@ -134,13 +151,15 @@ g++ -std=c++17 `
   src/states/BattleState.cpp src/states/DebugState.cpp src/states/MainMenuState.cpp src/states/WorldState.cpp `
   src/world/TileMap.cpp `
   src/game/Game.cpp src/game/StateStack.cpp `
+  src/debug/ChallengeLoader.cpp src/debug/DebugChallenge.cpp `
   -Isrc -Isrc/include `
   -Iexternal/TGUI/include `
   -Lsrc/lib `
-  -Lexternal/TGUI/lib `
+  -Lexternal/TGUI/build/lib `
   -ltgui `
   -lsfml-graphics -lsfml-window -lsfml-system `
   -o src/bin/codemon.exe
 */
+
 
 /*test comment*/
