@@ -115,6 +115,7 @@ target_sources(run_tests PRIVATE
     src/debug/ChallengeLoader.cpp
     src/states/WorldState.cpp
     src/states/BattleState.cpp
+    src/states/MainMenuState.cpp
     src/game/StateStack.cpp
     src/game/Game.cpp
 )

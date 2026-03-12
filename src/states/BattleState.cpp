@@ -65,12 +65,34 @@ std::string chooseRandomMonsterAsset() {
 std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
                                                const std::string& keywordHint) {
 #if SFML_VERSION_MAJOR >= 3
-    sf::RenderWindow popup(sf::VideoMode({960, 640}), "CodeMon Debug Editor", sf::Style::Titlebar | sf::Style::Close);
+    sf::RenderWindow popup(sf::VideoMode({1120, 820}), "CodeMon Debug Editor", sf::Style::Titlebar | sf::Style::Close);
 #else
-    sf::RenderWindow popup(sf::VideoMode(960, 640), "CodeMon Debug Editor", sf::Style::Titlebar | sf::Style::Close);
+    sf::RenderWindow popup(sf::VideoMode(1120, 820), "CodeMon Debug Editor", sf::Style::Titlebar | sf::Style::Close);
 #endif
 
     tgui::Gui gui{popup};
+    // Allow Tab to insert indentation inside TextArea instead of changing widget focus.
+    gui.setTabKeyUsageEnabled(false);
+
+    // Load monospace font for code-editor feel.
+    // Prefer bundled JetBrains Mono, fall back to Courier New (cross-platform).
+    tgui::Font monoFont;
+    bool monoLoaded = false;
+    const std::vector<std::string> monoFontCandidates = {
+        "assets/fonts/JetBrainsMono-Regular.ttf",
+        "../assets/fonts/JetBrainsMono-Regular.ttf",
+        "src/assets/fonts/JetBrainsMono-Regular.ttf",
+        "/System/Library/Fonts/Supplemental/Courier New.ttf",
+        "C:/Windows/Fonts/cour.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
+    };
+    for (const auto& path : monoFontCandidates) {
+        std::error_code ec;
+        if (!std::filesystem::exists(path, ec) || ec) continue;
+        monoFont = tgui::Font(path);
+        monoLoaded = true;
+        break;
+    }
 
     auto panel = tgui::Panel::create({"92%", "92%"});
     panel->setPosition({"4%", "4%"});
@@ -83,41 +105,55 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
     title->getRenderer()->setTextColor(tgui::Color::White);
     panel->add(title);
 
-    auto promptLabel = tgui::Label::create("Something is wrong with this code!");
-    promptLabel->setPosition({"3%", "13%"});
-    promptLabel->setTextSize(18);
-    promptLabel->setAutoSize(false);
-    promptLabel->setSize({"94%", "10%"});
-    promptLabel->getRenderer()->setTextColor(tgui::Color(220, 220, 220));
+    auto promptLabel = tgui::Label::create("Broken code:");
+    promptLabel->setPosition({"3%", "12%"});
+    promptLabel->setTextSize(16);
+    promptLabel->getRenderer()->setTextColor(tgui::Color(210, 210, 210));
     panel->add(promptLabel);
 
-    auto instructionLabel = tgui::Label::create("Type the corrected code below:");
-    instructionLabel->setPosition({"3%", "24%"});
+    auto promptView = tgui::TextArea::create();
+    promptView->setPosition({"3%", "16%"});
+    promptView->setSize({"94%", "31%"});
+    promptView->setText(prompt);
+    promptView->setReadOnly(true);
+    promptView->setTextSize(18);
+    if (monoLoaded) promptView->getRenderer()->setFont(monoFont);
+    promptView->getRenderer()->setBackgroundColor(tgui::Color(30, 30, 40));
+    promptView->getRenderer()->setTextColor(tgui::Color(220, 220, 180));
+    promptView->getRenderer()->setBorderColor(tgui::Color(80, 80, 100));
+    panel->add(promptView);
+
+    // Instruction label explaining what to do
+    auto instructionLabel = tgui::Label::create("Type the corrected code below (Tab inserts indentation):");
+    instructionLabel->setPosition({"3%", "50%"});
     instructionLabel->setTextSize(14);
     instructionLabel->getRenderer()->setTextColor(tgui::Color(180, 180, 180));
     panel->add(instructionLabel);
 
     auto editor = tgui::TextArea::create();
-    editor->setPosition({"3%", "29%"});
-    editor->setSize({"94%", "49%"});
+    editor->setPosition({"3%", "54%"});
+    editor->setSize({"94%", "28%"});
+    // Start with blank editor so player must type the correction
     editor->setText(prompt);
     editor->setTextSize(22);
-    editor->getRenderer()->setBackgroundColor(tgui::Color(55, 55, 65));
-    editor->getRenderer()->setTextColor(tgui::Color::White);
+    if (monoLoaded) editor->getRenderer()->setFont(monoFont);
+    editor->getRenderer()->setBackgroundColor(tgui::Color(20, 20, 30));
+    editor->getRenderer()->setTextColor(tgui::Color(200, 230, 200));
     editor->getRenderer()->setCaretColor(tgui::Color::White);
-    editor->getRenderer()->setSelectedTextBackgroundColor(tgui::Color(80, 80, 120));
-    editor->getRenderer()->setBorderColor(tgui::Color(70, 70, 80));
+    editor->getRenderer()->setSelectedTextBackgroundColor(tgui::Color(60, 80, 140));
+    editor->getRenderer()->setBorderColor(tgui::Color(80, 80, 100));
     panel->add(editor);
+    editor->setFocused(true);
 
     auto submitButton = tgui::Button::create("Submit");
-    submitButton->setPosition({"67%", "85%"});
+    submitButton->setPosition({"67%", "86%"});
     submitButton->setSize({"14%", "10%"});
     submitButton->getRenderer()->setBackgroundColor(tgui::Color(60, 120, 60));
     submitButton->getRenderer()->setTextColor(tgui::Color::White);
     panel->add(submitButton);
 
     auto cancelButton = tgui::Button::create("Cancel");
-    cancelButton->setPosition({"82%", "85%"});
+    cancelButton->setPosition({"82%", "86%"});
     cancelButton->setSize({"14%", "10%"});
     cancelButton->getRenderer()->setBackgroundColor(tgui::Color(120, 60, 60));
     cancelButton->getRenderer()->setTextColor(tgui::Color::White);
@@ -127,7 +163,7 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
         ? "No required keyword for this challenge."
         : ("Required keyword: " + keywordHint);
     auto hint = tgui::Label::create(hintText);
-    hint->setPosition({"25%", "85%"});
+    hint->setPosition({"3%", "87%"});
     hint->setTextSize(14);
     hint->getRenderer()->setTextColor(tgui::Color(200, 200, 150));
     panel->add(hint);

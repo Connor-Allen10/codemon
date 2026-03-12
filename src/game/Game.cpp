@@ -24,21 +24,23 @@ void Game::run()
     while (mWindow.isOpen()) {
         sf::Time dt = clock.restart();
 
+        #if SFML_VERSION_MAJOR >= 3
         while (auto eventOpt = mWindow.pollEvent()) {
             const sf::Event& event = *eventOpt;
-
-#if SFML_VERSION_MAJOR >= 3
             if (event.is<sf::Event::Closed>()) {
                 mWindow.close();
             }
-#else
+            mStates.handleEvent(event);
+        }
+        #else
+        sf::Event event;
+        while (mWindow.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 mWindow.close();
             }
-#endif
-
             mStates.handleEvent(event);
         }
+        #endif
 
         mStates.update(dt);
 
