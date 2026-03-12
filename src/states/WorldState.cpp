@@ -118,9 +118,8 @@ WorldState::WorldState(sf::RenderWindow& window)
         }
 #endif
     }
-
-    // mTrainer.setPosition({300.f, 200.f});
     mTrainer.setColor(sf::Color(0,0,0,0));
+    mTrainer.setPosition({300.f, 200.f});
 
     mPlayerFallback.setSize({static_cast<float>(kTileSize), static_cast<float>(kTileSize)});
     mPlayerFallback.setFillColor(sf::Color::Blue);
@@ -342,7 +341,7 @@ void WorldState::handleEvent(const sf::Event& e) {
 #if SFML_VERSION_MAJOR >= 3
     if (const auto* keyPressed = e.getIf<sf::Event::KeyPressed>()) {
         if (keyPressed->code == sf::Keyboard::Key::F1 || keyPressed->code == sf::Keyboard::Key::E) {
-            // mDebugOpen = !mDebugOpen;
+            mHelpMenuOpen = !mHelpMenuOpen;
         }
     }
     if (const auto* resized = e.getIf<sf::Event::Resized>()) {
@@ -353,7 +352,7 @@ void WorldState::handleEvent(const sf::Event& e) {
 #else
     if (e.type == sf::Event::KeyPressed) {
         if (e.key.code == sf::Keyboard::F1 || e.key.code == sf::Keyboard::E) {
-            mDebugOpen = !mDebugOpen;
+            mHelpMenuOpen = !mHelpMenuOpen;
         }
     }
     if (e.type == sf::Event::Resized) {
@@ -441,32 +440,77 @@ void WorldState::render(sf::RenderTarget& target) {
         target.draw(mPlayerFallback);
     }
 
-    if (mDebugOpen) {
+    if (mHelpMenuOpen) {
         target.setView(target.getDefaultView());
     #if CODEMON_HAS_TGUI
+        // CREATE HELP MENU
         sf::RenderWindow window(sf::VideoMode({800, 600}), "TGUI Test");
         tgui::Gui gui{window};
 
-        auto textArea = tgui::TextArea::create();
-        textArea->setSize({"80%", "70%"});
-        textArea->setPosition({"10%", "15%"});
-        textArea->setText("int main() {\n    return 0;\n}");
+        // Main background panel
+        auto helpPanel = tgui::Panel::create({"70%", "70%"});
+        helpPanel->setPosition({"15%", "15%"});
+        helpPanel->getRenderer()->setBackgroundColor(tgui::Color(180, 180, 180));
+        helpPanel->getRenderer()->setBorderColor(tgui::Color::Black);
+        helpPanel->getRenderer()->setBorders(2);
+        gui.add(helpPanel);
 
-        gui.add(textArea);
+        // Title
+        auto title = tgui::Label::create("Help Menu");
+        title->setTextSize(28);
+        title->setPosition({"(&.width - width) / 2", "4%"});
+        helpPanel->add(title);
+
+        // ===== CONTROLS SECTION =====
+        auto controlsTitle = tgui::Label::create("Controls");
+        controlsTitle->setTextSize(22);
+        controlsTitle->setPosition({"5%", "15%"});
+        helpPanel->add(controlsTitle);
+
+        auto controlsLine = tgui::SeparatorLine::create({"90%", 2});
+        controlsLine->setPosition({"5%", "20%"});
+        helpPanel->add(controlsLine);
+
+        auto controlsText = tgui::Label::create(
+            "W / A / S / D  - Move character\n"
+            "E  - Open GUI\n"
+            "ESC/Enter  - Close GUI\n"
+        );
+        controlsText->setTextSize(18);
+        controlsText->setPosition({"5%", "23%"});
+        helpPanel->add(controlsText);
+
+        // Game Description
+        auto descTitle = tgui::Label::create("Game Description");
+        descTitle->setTextSize(22);
+        descTitle->setPosition({"5%", "50%"});
+        helpPanel->add(descTitle);
+
+        auto descLine = tgui::SeparatorLine::create({"90%", 2});
+        descLine->setPosition({"5%", "55%"});
+        helpPanel->add(descLine);
+
+        auto descText = tgui::Label::create(
+            "Try moving around the world until you encounter\n"
+            "A Codemon, and use your debugging skills to defeat it!\n"
+        );
+        descText->setTextSize(18);
+        descText->setPosition({"5%", "58%"});
+        helpPanel->add(descText);
 
         while (window.isOpen())
         {
             while (const std::optional event = window.pollEvent())
             {
                 if (event->is<sf::Event::Closed>()) {
-                    mDebugOpen = !mDebugOpen;
+                    mHelpMenuOpen = !mHelpMenuOpen;
                     window.close();
                 }
                 
                 gui.handleEvent(*event);
 
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter)) {
-                    mDebugOpen = !mDebugOpen;
+                    mHelpMenuOpen = !mHelpMenuOpen;
                     window.close();
                 }
                     
