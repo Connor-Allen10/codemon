@@ -226,12 +226,23 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
     panel->add(cancelButton);
 
     const std::string hintText = keywordHint.empty()
-        ? "No required keyword for this challenge."
-        : ("Required keyword: " + keywordHint);
+        ? "No hint for this challenge."
+        : (keywordHint);
+
+    bool hintVisible = false;
+
+    auto hintToggleButton = tgui::Button::create("Show Hint");
+    hintToggleButton->setPosition({"3%", "86%"});
+    hintToggleButton->setSize({"14%", "10%"});
+    hintToggleButton->getRenderer()->setBackgroundColor(tgui::Color(80, 90, 140));
+    hintToggleButton->getRenderer()->setTextColor(tgui::Color::White);
+    panel->add(hintToggleButton);
+
     auto hint = tgui::Label::create(hintText);
-    hint->setPosition({"3%", "87%"});
+    hint->setPosition({"19%", "87%"});
     hint->setTextSize(14);
     hint->getRenderer()->setTextColor(tgui::Color(200, 200, 150));
+    hint->setVisible(false);
     panel->add(hint);
 
     bool submitted = false;
@@ -247,6 +258,12 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
     // Cancel just closes without changing challenge state.
     cancelButton->onPress([&]() {
         popup.close();
+    });
+
+    hintToggleButton->onPress([&]() {
+        hintVisible = !hintVisible;
+        hint->setVisible(hintVisible);
+        hintToggleButton->setText(hintVisible ? "Hide Hint" : "Show Hint");
     });
 
     while (popup.isOpen()) {
