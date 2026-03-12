@@ -65,7 +65,6 @@ PROMPT:
 You see:
 int total = 10
 std::cout << total << "\n";
-}
 
 Type the fix:
 SOLUTION:
@@ -79,7 +78,6 @@ PROMPT:
 You see:
 std::string name = "Coder";
 std::cout << name << "\n"
-}
 
 Type the fix:
 SOLUTION:
@@ -107,17 +105,28 @@ BEGIN_CHALLENGE
 PROMPT:
 You see:
 for (int i = 10; i >= 0; i++) {
-	if (i % 2 = 0) {
-		std::cout << i << " ";
-	}
+	std::cout << i << " ";
 }
 
 Type the fix:
 SOLUTION:
 for (int i = 10; i >= 0; i--) {
-	if (i % 2 == 0) {
-		std::cout << i << " ";
-	}
+	std::cout << i << " ";
+}
+KEYWORD: --
+END_CHALLENGE
+
+BEGIN_CHALLENGE
+PROMPT:
+You see:
+if (i % 2 = 0) {
+	std::cout << i << " ";
+}
+
+Type the fix:
+SOLUTION:
+if (i % 2 == 0) {
+	std::cout << i << " ";
 }
 KEYWORD: ==
 END_CHALLENGE
