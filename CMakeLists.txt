@@ -111,6 +111,7 @@ add_executable(run_tests ${TEST_SOURCES})
 # so that the test binary links correctly.
 target_sources(run_tests PRIVATE
     src/world/TileMap.cpp
+    src/battle/Party.cpp
     src/debug/DebugChallenge.cpp
     src/debug/ChallengeLoader.cpp
     src/states/WorldState.cpp

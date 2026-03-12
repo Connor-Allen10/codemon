@@ -6,6 +6,19 @@
 
 **Codémon** is a Pokémon-style role-playing game designed to teach one of the most critical yet under-practiced programming skills: **debugging**. Instead of writing code from scratch, players progress through the game by identifying and fixing bugs embedded directly into the world, battles, and creatures. By reframing debugging as the core mechanic rather than a punishment, Codémon offers an engaging, low-pressure way for students to build confidence, pattern recognition, and problem-solving skills essential to real-world software development.
 
+### Release 1.0 Implementation Update (March 2026)
+
+Since the previous revision of this living document, the team has completed and integrated the following:
+
+- **Battle flow overhaul** with explicit phases: encounter intro → player monster selection → debug battle.
+- **Codemon party system integration** for player monster choice and battle presentation.
+- **Expanded visual content** including additional monster sprites and updated main menu visuals.
+- **Debug challenge UX improvements** including multiline challenge prompts/solutions and improved popup editor behavior.
+- **Challenge content externalization** via `challenges.txt` with robust parsing and fallback behavior.
+- **Cross-version SFML compatibility fixes** for both SFML 2.6 (Linux CI) and SFML 3.x (macOS dev environment).
+- **Expanded automated test suite** (unit + integration/smoke tests), with CI execution on macOS and Ubuntu.
+- **Deployment/user documentation updates** (`INSTALL.md`, `SETUP.md`, and supporting guides).
+
 ---
 
 ## Team & Communication
@@ -143,7 +156,7 @@
 **Technology Stack:**
 - **Language:** C++17
 - **Graphics:** SFML 3.0 (macOS) / SFML 2.6 (Linux)
-- **Build System:** CMake 3.10+
+- **Build System:** CMake 3.20+
 - **Testing:** GoogleTest
 
 ---
@@ -158,22 +171,28 @@ Keeps game visuals (UI) separate from game rules (logic) and save data. This all
 
 | Component | Responsibility |
 |-----------|-----------------|
-| **RenderEngine** | Draws UI and sprites to screen using SFML |
-| **Logic Layer** | Decides game state (collisions, battle triggers, scoring) |
-| **Debugger** | Text box where players type fixes; validates correctness |
-| **Data Manager** | Loads Codémon and level data from JSON files |
-| **StateStack** | Manages game states (World, Battle, Menu) |
-| **AssetCache** | Manages texture and font memory |
+| **StateStack** | Manages active game states (World, Battle, Main Menu) |
+| **WorldState** | Handles world rendering, movement, collision, and encounter triggers |
+| **BattleState** | Manages encounter phases, codemon selection, and debug battle loop |
+| **Debug::Engine / Challenge / Validators** | Presents challenge prompts and validates player submissions |
+| **ChallengeLoader** | Loads challenges from external file, with default fallback |
+| **Party / Codemon** | Represents player codemon roster and selected monster metadata |
+| **TileMap** | Loads map CSV data and provides passability/collision checks |
 
-### Data Storage
+## Data Storage
 
-**Format:** JSON files for easy manual editing  
-**Location:** `/assets/data/species.json` and `/assets/data/map_events.json`  
-**Schema:**
-- `id`: Unique integer
-- `name`: String
-- `buggy_code`: String containing the error
-- `solution_key`: Expected fix substring or logic
+**Format:**
+- CSV for world map layout
+- Plain-text challenge file for debugging prompts/solutions
+
+**Location:**
+- `src/assets/data/map01.csv`
+- `challenges.txt` (repository root)
+
+**Challenge File Notes:**
+- Supports preferred multiline block format (`BEGIN_CHALLENGE` / `PROMPT` / `SOLUTION` / `KEYWORD` / `END_CHALLENGE`)
+- Maintains backward compatibility with legacy pipe-delimited entries
+- Falls back to built-in default challenges when file content is missing or invalid
 
 ### Interfaces (Component Communication)
 
@@ -197,18 +216,18 @@ Keeps game visuals (UI) separate from game rules (logic) and save data. This all
 **How to Add Tests:**
 1. Create new `.cpp` file in `/tests` directory
 2. Use `TEST(ComponentName, TestName)` macro
-3. Register in `tests/CMakeLists.txt`
-4. Run with `ctest` command
+3. Build test target (files are auto-collected by top-level CMake)
+4. Run tests via `./build/run_tests` or `ctest --test-dir build --output-on-failure`
 
 **Test Coverage:**
-- Battle system
-- Move validation
-- Party management
+- Battle flow phases and input handling (including selection and transitions)
+- Debug challenge validation and keyword hint behavior
+- ChallengeLoader parsing (multiline + legacy format + fallback/default logic)
+- Party/Codemon integration and battle-facing behaviors
 - Stats calculations
-- Player collision detection
-- TileMap loading and pathfinding
-- State transitions
-- Validator functions
+- TileMap loading and passability validation
+- State transition behaviors
+- Validator functions and edge cases
 
 ### Integration Testing
 
@@ -247,7 +266,7 @@ Ensures communication between Core Logic, Debugging Engine, and Visual Layer:
 - Every push to any branch
 - Every pull request to main branch
 
-**Execution:** Full suite of unit and integration tests across Windows, macOS, and Linux
+**Execution:** Automated build and test runs on macOS and Ubuntu via GitHub Actions (Windows pipeline currently disabled pending dependency stabilization)
 
 ---
 
@@ -305,17 +324,44 @@ Ensures communication between Core Logic, Debugging Engine, and Visual Layer:
 
 ## Architectural Decisions
 
-### Decision 1: JSON vs. SQLite
+### Decision 1: Flat Files vs. Database Backend
 
-**Chosen:** JSON files
+**Chosen:** Flat files (`map01.csv` + `challenges.txt`)
 
-**Rationale:** More readable; easier to manually add new challenges; simpler dependency management.
+**Rationale:**
+- Fast iteration for a student-scale desktop game
+- Easy to review and edit in pull requests
+- No runtime database dependency for users, TAs, or new developers
 
 ### Decision 2: Centralized vs. Decentralized State Management
 
 **Chosen:** Centralized StateStack
 
 **Rationale:** Prevents spaghetti code; ensures only one state is active; easier to debug.
+
+---
+
+## Final Release Packaging & Documentation
+
+To satisfy the 1.0 release and handoff requirements, the project includes:
+
+- **Installed/User distribution guidance:** [INSTALL.md](../INSTALL.md)
+   - Player-facing install/run instructions
+   - Platform prerequisites and gameplay controls
+- **Admin/Deployment guidance:** [SETUP.md](../SETUP.md)
+   - System administrator setup and deployment details
+   - Build, run, and troubleshooting steps
+- **Developer/source distribution docs:**
+   - [README.md](../README.md)
+   - [docs/DEVELOPER_GUIDE.md](./DEVELOPER_GUIDE.md)
+   - [docs/TEST_PLAN.md](./TEST_PLAN.md)
+
+**Testing commands for handoff (from repository root):**
+- Build: `cmake --build build`
+- Unit/integration tests: `./build/run_tests`
+- CTest runner: `ctest --test-dir build --output-on-failure`
+
+**Issue tracking:** GitHub Issues in the project repository.
 
 ---
 
@@ -326,3 +372,20 @@ Ensures communication between Core Logic, Debugging Engine, and Visual Layer:
 - Custom challenge creator
 - Leaderboard system
 - Mobile platform support
+
+---
+
+## Reflections
+
+### Connor Allen
+
+
+### Isaac Hutchison
+
+
+### Lon Danna
+1. **Automated tests protect velocity.** Expanding unit/integration tests made refactors and feature merges significantly safer near release.
+2. **CI catches environment-specific bugs quickly.** Running macOS + Linux CI exposed compatibility issues (SFML 2.x vs 3.x) that local testing alone missed.
+3. **Milestone planning reduced risk.** Breaking work into milestone-sized deliverables made integration and testing more predictable.
+4. **Documentation is part of engineering quality.** Keeping INSTALL/SETUP/developer docs aligned with code reduced onboarding friction and improved release readiness.
+5. **Issue tracking improved team organization.** Using GitHub Issues with labels, ownership, and closure criteria made priorities clearer, reduced duplicate work, and improved handoff between teammates.

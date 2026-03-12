@@ -5,7 +5,10 @@ Codémon is a Pokémon-style RPG built in C++ using SFML. In this world, the cor
 ---
 
 ## ⚡ Quick Start
+### Download and Launch
+Download the latest release of codemon and find codemon.exe in the src/bin/ folder. 
 
+Codemon is open source! To build it yourself, follow the instructions below.
 ### Prerequisites
 - **CMake 3.20 or higher** (check version: `cmake --version`)
 - **C++ compiler** with C++17 support (GCC 7+, Clang 5+, MSVC 2017+)
@@ -45,6 +48,7 @@ Or with CTest:
 ctest --test-dir build --output-on-failure
 ```
 **Expected:** 43 tests passing (37 core logic + 6 ChallengeLoader tests).
+**Expected:** 53 tests passing.
 
 ### Run Instructions
 ```bash
@@ -66,7 +70,8 @@ ctest --test-dir build --output-on-failure
   - Required keyword hint displayed at bottom
   - Cancel button exits without submitting
 - **Challenge Customization:** Edit `challenges.txt` to add your own debug puzzles
-  - Format: `prompt|solution|keyword` (one per line)
+  - Preferred format: multiline challenge blocks (`BEGIN_CHALLENGE` / `PROMPT` / `SOLUTION` / `KEYWORD` / `END_CHALLENGE`)
+  - Legacy format still supported: `prompt|solution|keyword` (one per line)
   - Falls back to built-in challenges if file missing
 - **Exit Battle:** ESC
 - **Controls:** See [User Manual](./docs/USER_GUIDE.md) for extended controls
@@ -97,6 +102,8 @@ ctest --test-dir build --output-on-failure
 For detailed information, see:
 
 * **[User Manual](./docs/USER_GUIDE.md)**: How to install, run, and play the game.
+* **[Install Guide](./INSTALL.md)**: End-user setup and launch instructions.
+* **[Setup Guide](./SETUP.md)**: System administrator/deployment instructions.
 * **[Developer Guidelines](./docs/DEVELOPER_GUIDE.md)**: Architecture, directory structure, and build system details.
 * **[Living Document](./docs/LIVING_DOCUMENT.md)**: Complete design overview, use cases, architecture, and technical decisions.
 * **[Test Plan & CI Infrastructure](./docs/TEST_PLAN.md)**: Testing strategy and GitHub Actions CI setup.

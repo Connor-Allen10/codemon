@@ -7,6 +7,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "../game/State.hpp"
+#include "../battle/Party.hpp"
 #include "../world/TileMap.hpp"
 
 class WorldState : public State {
@@ -62,7 +63,7 @@ private:
 
     sf::Vector2f mPlayerTopLeft{100.f, 100.f};
     float mSpeed = 220.f;
-    bool mHelpMenuOpen = false;
+    bool helpMenuOpen = false;
     bool mTrainerLocked = true;
 
     Facing mFacing = Facing::South;
@@ -74,4 +75,5 @@ private:
     static constexpr float kEncounterChance = 0.15f;
 
     sf::RectangleShape mOverlay;
+    Party mParty;
 };

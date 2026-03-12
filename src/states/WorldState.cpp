@@ -118,8 +118,9 @@ WorldState::WorldState(sf::RenderWindow& window)
         }
 #endif
     }
+
+    // mTrainer.setPosition({300.f, 200.f});
     mTrainer.setColor(sf::Color(0,0,0,0));
-    mTrainer.setPosition({300.f, 200.f});
 
     mPlayerFallback.setSize({static_cast<float>(kTileSize), static_cast<float>(kTileSize)});
     mPlayerFallback.setFillColor(sf::Color::Blue);
@@ -341,7 +342,7 @@ void WorldState::handleEvent(const sf::Event& e) {
 #if SFML_VERSION_MAJOR >= 3
     if (const auto* keyPressed = e.getIf<sf::Event::KeyPressed>()) {
         if (keyPressed->code == sf::Keyboard::Key::F1 || keyPressed->code == sf::Keyboard::Key::E) {
-            mHelpMenuOpen = !mHelpMenuOpen;
+            helpMenuOpen = !helpMenuOpen;
         }
     }
     if (const auto* resized = e.getIf<sf::Event::Resized>()) {
@@ -352,7 +353,7 @@ void WorldState::handleEvent(const sf::Event& e) {
 #else
     if (e.type == sf::Event::KeyPressed) {
         if (e.key.code == sf::Keyboard::F1 || e.key.code == sf::Keyboard::E) {
-            mHelpMenuOpen = !mHelpMenuOpen;
+            helpMenuOpen = !helpMenuOpen;
         }
     }
     if (e.type == sf::Event::Resized) {
@@ -418,7 +419,7 @@ void WorldState::checkEncounter() {
 #ifndef NDEBUG
             std::cout << "[WorldState] Wild encounter! Transitioning to battle...\n";
 #endif
-            requestPush(std::make_unique<BattleState>(mWindow));
+            requestPush(std::make_unique<BattleState>(mWindow, mParty));
             mEncounterCooldown = 5.0f;
         }
     }
@@ -440,18 +441,19 @@ void WorldState::render(sf::RenderTarget& target) {
         target.draw(mPlayerFallback);
     }
 
-    if (mHelpMenuOpen) {
+    if (helpMenuOpen) {
         target.setView(target.getDefaultView());
     #if CODEMON_HAS_TGUI
+
         // CREATE HELP MENU
-        sf::RenderWindow window(sf::VideoMode({800, 600}), "TGUI Test");
+        sf::RenderWindow window(sf::VideoMode({800, 600}), "Help Menu");
         tgui::Gui gui{window};
 
         // Main background panel
         auto helpPanel = tgui::Panel::create({"70%", "70%"});
         helpPanel->setPosition({"15%", "15%"});
         helpPanel->getRenderer()->setBackgroundColor(tgui::Color(180, 180, 180));
-        helpPanel->getRenderer()->setBorderColor(tgui::Color::Black);
+        helpPanel->getRenderer()->setBorderColor(tgui::Color(180, 180, 180));
         helpPanel->getRenderer()->setBorders(2);
         gui.add(helpPanel);
 
@@ -503,14 +505,14 @@ void WorldState::render(sf::RenderTarget& target) {
             while (const std::optional event = window.pollEvent())
             {
                 if (event->is<sf::Event::Closed>()) {
-                    mHelpMenuOpen = !mHelpMenuOpen;
+                    helpMenuOpen = !helpMenuOpen;
                     window.close();
                 }
                 
                 gui.handleEvent(*event);
 
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter)) {
-                    mHelpMenuOpen = !mHelpMenuOpen;
+                    helpMenuOpen = !helpMenuOpen;
                     window.close();
                 }
                     

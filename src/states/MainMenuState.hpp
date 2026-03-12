@@ -15,6 +15,9 @@ private:
     sf::RenderWindow& mWindow;
     sf::View mMenuView;
     sf::RectangleShape mBackground;
+    sf::Texture mBackgroundTexture;
+    sf::Sprite mBackgroundSprite;
+    bool mBackgroundTextureLoaded = false;
 
     sf::Font mFont;
     bool mFontLoaded = false;

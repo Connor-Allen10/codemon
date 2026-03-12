@@ -1,104 +1,89 @@
 /**
  * @file BattleState.hpp
- * @brief Battle encounter state with simple placeholder UI.
- * 
- * This state is pushed onto the stack when a wild encounter occurs.
- * Currently displays a purple background with text. Press ESC to exit
- * and return to the world.
+ * @brief Battle encounter state with encounter intro, mon selection, and debug battle.
  */
 
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <string>
+#include <vector>
 #include "../game/State.hpp"
 #include "../debug/DebugChallenge.hpp"
 #include "../debug/ChallengeLoader.hpp"
 
-/**
- * @class BattleState
- * @brief State for handling battle encounters.
- * 
- * BattleState is pushed onto the StateStack when:
- * - Player walks on grass tiles (random 15% encounter chance)
- * - Player interacts with trainer NPCs (not yet implemented)
- * 
- * Current implementation:
- * - Displays purple background (64, 0, 128)
- * - Shows "BATTLE! Press ESC to exit" text
- * - ESC key pops state and returns to world
- * 
- * Future enhancements:
- * - Turn-based combat system
- * - Move selection UI
- * - Enemy/player monster display
- * - Battle result handling (win/lose/flee)
- */
+class Party;
+
 class BattleState : public State {
 public:
-    /**
-     * @brief Construct a new battle state.
-     * @param window Reference to the main game window
-     * 
-     * Initializes battle view, background, and attempts to load a font
-     * for text display. Falls back gracefully if font loading fails.
-     */
-    explicit BattleState(sf::RenderWindow& window);
+    explicit BattleState(sf::RenderWindow& window,
+                         std::string preferredPlayerMonFile = "");
+    BattleState(sf::RenderWindow& window,
+                Party& party,
+                std::string preferredPlayerMonFile = "");
 
-    /**
-     * @brief Handle input events during battle.
-     * @param e The SFML event to process
-     * 
-     * Currently handles:
-     * - ESC key: request pop to return to world
-     * - Window resize: adjust view and background size
-     */
     void handleEvent(const sf::Event& e) override;
-    
-    /**
-     * @brief Update battle logic.
-     * @param dt Delta time since last update
-     * 
-     * Currently just increments timer for text pulse animation.
-     * Future: handle turn-based battle logic.
-     */
     void update(sf::Time dt) override;
-    
-    /**
-     * @brief Render battle visuals.
-     * @param target The render target to draw to
-     * 
-     * Draws purple background and animated "BATTLE!" text.
-     */
     void render(sf::RenderTarget& target) override;
 
-    /**
-     * @brief Check if battle has requested exit.
-     * @return true if ESC was pressed
-     * 
-     * @deprecated Not currently used. State pops itself via requestPop().
-     */
     bool shouldExit() const { return mExitRequested; }
 
 private:
-    sf::RenderWindow& mWindow;           ///< Reference to main game window
-    sf::View mBattleView;                ///< View for battle rendering
+    enum class Phase {
+        EncounterIntro,
+        PlayerSelect,
+        DebugBattle
+    };
 
-    // Battle UI elements
-    sf::RectangleShape mBackground;      ///< Purple background (64, 0, 128)
-    sf::Font mFont;                      ///< Font for text display
-    bool mFontLoaded = false;            ///< Whether font loaded successfully
+    void updateViewLayout(sf::Vector2u size);
+    void beginPlayerSelection();
+    void confirmPlayerSelection();
+    void refreshPlayerSprite();
+    void moveSelection(int delta);
+    void finalizeSubmissionResult();
 
-    // Battle state
-    bool mExitRequested = false;         ///< Whether ESC was pressed
-    float mTimer = 0.f;                  ///< Timer for animations (pulse effect)
+    BattleState(sf::RenderWindow& window,
+                Party* party,
+                std::string preferredPlayerMonFile);
 
-    // Debug-engine integration with dynamic challenge loading
+    sf::RenderWindow& mWindow;
+    sf::View mBattleView;
+
+    sf::RectangleShape mBackground;
+    sf::RectangleShape mEnemyPlatform;
+    sf::RectangleShape mPlayerPlatform;
+    sf::Font mFont;
+    bool mFontLoaded = false;
+
+    sf::Texture mEnemyTexture;
+    sf::Texture mPlayerTexture;
+    sf::Sprite mEnemySprite;
+    sf::Sprite mPlayerSprite;
+    Party* mParty = nullptr;
+    bool mEnemyTextureLoaded = false;
+    bool mPlayerTextureLoaded = false;
+    std::string mPreferredPlayerMonFile;
+    std::string mPlayerMonFile;
+    std::string mWildMonFile;
+
+    std::vector<std::string> mSelectionMonFiles;
+    std::vector<std::string> mSelectionDisplayNames;
+    std::vector<sf::Texture> mSelectionTextures;
+    std::vector<sf::Sprite> mSelectionSprites;
+    std::vector<bool> mSelectionLoaded;
+    std::size_t mSelectionIndex = 0;
+
+    bool mExitRequested = false;
+    float mTimer = 0.f;
+    Phase mPhase = Phase::EncounterIntro;
+    float mEncounterIntroTimer = 0.f;
+    static constexpr float kEncounterIntroDuration = 2.0f;
+
     Debug::Engine mDebugEngine;
     std::string mBattleMessage;
     bool mChallengeSolved = false;
-    bool mSubmissionFailed = false;  ///< True if last submission was incorrect
+    bool mSubmissionFailed = false;
     std::string mCurrentKeywordHint;
-    
-    // Static challenge pool shared across all battle instances
+
     static Debug::ChallengeLoader sChallengeLoader;
 };
