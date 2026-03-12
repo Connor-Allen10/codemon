@@ -21,6 +21,7 @@
 #include <initializer_list>
 #include <iostream>
 #include <optional>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
@@ -86,7 +87,9 @@ std::string pickRandomWildMon() {
     if (assets.empty()) {
         return "forest_mon.png";
     }
-    const std::size_t index = static_cast<std::size_t>(std::rand()) % assets.size();
+    static std::mt19937 rng(std::random_device{}());
+    std::uniform_int_distribution<std::size_t> dist(0, assets.size() - 1);
+    const std::size_t index = dist(rng);
     return assets[index].fileName;
 }
 
