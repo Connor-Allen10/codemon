@@ -5,6 +5,42 @@
 #include <cctype>
 #include <cmath>
 #include <algorithm>
+#include <array>
+#include <filesystem>
+#include <iostream>
+
+namespace {
+
+// Loads a tile texture using multiple candidate roots.
+// This avoids test/runtime failures when the process working directory is
+// different (for example running from project root vs. from build/).
+bool loadTileTexture(sf::Texture& texture, const std::string& filename) {
+    // Keep this ordered from most common repo-local path to build-relative
+    // fallbacks used by local and CI test execution.
+    const std::array<std::string, 4> candidates = {
+        "src/assets/" + filename,
+        "assets/" + filename,
+        "../src/assets/" + filename,
+        "../../src/assets/" + filename,
+    };
+
+    for (const auto& candidate : candidates) {
+        if (!std::filesystem::exists(candidate)) {
+            continue;
+        }
+        if (texture.loadFromFile(candidate)) {
+            return true;
+        }
+        std::cerr << "Failed to load tile texture at " << candidate << "\n";
+        return false;
+    }
+
+    std::cerr << "Tile texture not found: " << filename
+              << " (cwd: " << std::filesystem::current_path().string() << ")\n";
+    return false;
+}
+
+} // namespace
 
 TileMap::TileMap() : TileMap(48) {}
 
@@ -12,17 +48,11 @@ TileMap::TileMap(unsigned tileSizePx)
 : mTileSize(tileSizePx) {
     mVerts.setPrimitiveType(sf::PrimitiveType::Triangles);
 
-    if (!mGrassTexture.loadFromFile("assets/grass_tile.png")) {
-        printf("Failed to load grass_tile.png\n");
-    }
-
-    if (!mPathTexture.loadFromFile("assets/path_tile.png")) {
-        printf("Failed to load path_tile.png\n");
-    }
-
-    if (!mTreeTexture.loadFromFile("assets/tree_tile.png")) {
-        printf("Failed to load tree_tile.png\n");
-    }
+    // Use resilient loading so tile textures are found regardless of the
+    // current working directory used to launch the executable/tests.
+    loadTileTexture(mGrassTexture, "grass_tile.png");
+    loadTileTexture(mPathTexture, "path_tile.png");
+    loadTileTexture(mTreeTexture, "tree_tile.png");
 }
 
 bool TileMap::inBounds(int tx, int ty) const {
