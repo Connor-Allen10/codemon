@@ -33,6 +33,13 @@ TEST(DebugChallengeTest, ValidateKeywordHint) {
     EXPECT_TRUE(r2.success);
 }
 
+// Sentence-style KEYWORD hints should be informational, not strict tokens.
+TEST(DebugChallengeTest, HumanReadableHintDoesNotBlockCorrectSolution) {
+    Challenge c("Fix type", "int total = 10;", "what type should total be? Something else is missing...");
+    ValidationResult r = c.validate("int total = 10;");
+    EXPECT_TRUE(r.success);
+}
+
 // Test that the forceVictory flag allows developers to bypass validation.
 // Useful for testing game flow without actually implementing challenge content.
 TEST(DebugChallengeTest, ForceVictory) {

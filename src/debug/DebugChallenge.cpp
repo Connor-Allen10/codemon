@@ -38,8 +38,13 @@ ValidationResult Challenge::validate(const std::string& submission) const {
     if (victoryForced) {
         return { true, "Debug: victory forced by developer." };
     }
-    if (!keywordHint.empty() &&
-        !Validators::containsKeyword(submission, keywordHint)) {
+    // Enforce keyword only when it is an actual token in the canonical (authorized)
+    // solution. Some challenge files use KEYWORD as a human-readable hint
+    // sentence, which should not be required verbatim in submissions.
+    const bool enforceKeyword = !keywordHint.empty() &&
+                                Validators::containsKeyword(solution, keywordHint);
+
+    if (enforceKeyword && !Validators::containsKeyword(submission, keywordHint)) {
         return { false,
                  "Your fix must include '" + keywordHint + "'." };
     }
