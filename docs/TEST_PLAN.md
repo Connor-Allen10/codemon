@@ -20,6 +20,7 @@ minutes for open‑source projects, and its YAML workflows are easy to extend.
 The workflow file (`.github/workflows/cmake-build.yml`) checks out the code, installs
 SFML and necessary tools, runs CMake to configure and build the
 project, and finally invokes `ctest` to execute all discovered tests.
+Current CI matrix runs on **macOS** and **Ubuntu Linux**.
 
 ### CI Options Considered
 
@@ -32,13 +33,13 @@ project, and finally invokes `ctest` to execute all discovered tests.
 
 ### CI Triggers & Test Execution
 
-* Tests are executed on every push to `main` and on every PR targeting
-  `main`.
+* Tests are executed on pushes to `main`, `feature-lon`, `develop`, and `feature/**`,
+   and on PRs targeting `main`.
 * The workflow builds both the game executable and the `run_tests` binary,
   then executes the full test suite via `ctest --output-on-failure`.
   Any failing test causes the workflow to fail, preventing merges.
-* Developers are expected to run `cmake --build build && cd build && ctest`
-  locally before pushing to ensure their changes don't break CI.
+* Developers are expected to run the local test flow before pushing:
+   `cmake --build build --target run_tests && ./build/run_tests` (or CTest).
 
 ## How to Add a New Test
 
@@ -61,7 +62,7 @@ project, and finally invokes `ctest` to execute all discovered tests.
 4. If your test needs to link additional implementation files, update
    `CMakeLists.txt` under the "# Some GoogleTest cases rely on..." section
    and add your source via `target_sources(run_tests PRIVATE src/path.cpp)`.
-5. Run `cmake --build build && cd build && ctest --output-on-failure` to
+5. Run `cmake --build build --target run_tests && ./build/run_tests` to
    verify the test compiles and passes.
 6. Commit your test file to the repository; the CI workflow will automatically
    run it on the next push.
@@ -80,3 +81,29 @@ project, and finally invokes `ctest` to execute all discovered tests.
 By maintaining this infrastructure and following the above process, any new
 team member can add tests and automatically have them run in CI, meeting the
 requirements of Milestone 5.
+
+## Current Local Test Commands
+
+From repository root:
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build -j
+cmake --build build --target run_tests
+./build/run_tests
+```
+
+Alternative via CTest:
+
+```bash
+ctest --test-dir build --output-on-failure
+```
+
+Windows multi-config note:
+
+```powershell
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake
+cmake --build build --config Debug --target run_tests
+.\build\Debug\run_tests.exe
+ctest --test-dir build -C Debug --output-on-failure
+```
