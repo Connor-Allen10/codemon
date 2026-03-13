@@ -38,13 +38,11 @@ ValidationResult Challenge::validate(const std::string& submission) const {
     if (victoryForced) {
         return { true, "Debug: victory forced by developer." };
     }
-
     if (!keywordHint.empty() &&
         !Validators::containsKeyword(submission, keywordHint)) {
         return { false,
                  "Your fix must include '" + keywordHint + "'." };
     }
-
     if (Validators::exactMatch(submission, solution)) {
         return { true, "Correct - the bug is fixed!" };
     }

@@ -200,7 +200,7 @@ std::optional<std::string> runDebugEditorPopup(const std::string& prompt,
     editor->setPosition({"3%", "54%"});
     editor->setSize({"94%", "28%"});
     // Start with blank editor so player must type the correction
-    editor->setText(prompt);
+    editor->setText("");
     editor->setTextSize(22);
     if (monoLoaded) editor->getRenderer()->setFont(monoFont);
     editor->getRenderer()->setBackgroundColor(tgui::Color(20, 20, 30));
