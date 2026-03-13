@@ -35,7 +35,8 @@
 #endif
 
 // Static challenge loader shared across all battle instances
-// Attempts to load from "challenges.txt" in working directory, falls back to 8 defaults
+// Attempts to load from "challenges.txt" in working directory, 
+// falls back to 8 defaults
 Debug::ChallengeLoader BattleState::sChallengeLoader("challenges.txt");
 
 namespace {
@@ -60,6 +61,12 @@ const std::vector<MonsterAsset>& monsterAssets() {
 
 bool loadTextureFromAny(sf::Texture& texture, std::initializer_list<const char*> paths) {
     for (const char* path : paths) {
+        // Only attempt real files to avoid repeated SFML load errors while
+        // probing multiple relative asset locations.
+        std::error_code ec;
+        if (!std::filesystem::exists(path, ec) || ec) {
+            continue;
+        }
         if (texture.loadFromFile(path)) {
             texture.setSmooth(true);
             return true;

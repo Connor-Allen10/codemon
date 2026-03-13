@@ -47,6 +47,12 @@ sf::Vector2f normalizeOrZero(sf::Vector2f v) {
 
 bool loadTextureFromAny(sf::Texture& tex, std::initializer_list<const char*> paths) {
     for (const char* path : paths) {
+        // Skip non-existent candidates so SFML doesn't emit noisy
+        // "Failed to load image" logs for every fallback path.
+        std::error_code ec;
+        if (!std::filesystem::exists(path, ec) || ec) {
+            continue;
+        }
         if (tex.loadFromFile(path)) {
             tex.setSmooth(false);
             return true;

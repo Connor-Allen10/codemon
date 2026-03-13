@@ -19,6 +19,12 @@ MainMenuState::MainMenuState(sf::RenderWindow& window)
     };
 
     for (const auto& path : backgroundCandidates) {
+        // Probe candidate paths quietly; this prevents noisy load failures
+        // when running from a different working directory.
+        std::error_code ec;
+        if (!std::filesystem::exists(path, ec) || ec) {
+            continue;
+        }
         if (mBackgroundTexture.loadFromFile(path)) {
             mBackgroundTexture.setSmooth(true);
             mBackgroundSprite.setTexture(mBackgroundTexture, true);
