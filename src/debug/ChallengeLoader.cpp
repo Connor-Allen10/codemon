@@ -5,6 +5,7 @@
 
 #include "ChallengeLoader.hpp"
 
+#include <cstdlib>
 #include <cctype>
 #include <fstream>
 #include <iostream>
@@ -57,16 +58,50 @@ void appendLine(std::string& dst, const std::string& line) {
 	dst += line;
 }
 
+bool isVerboseLoggingEnabled() {
+	// Opt-in logging for parser diagnostics.
+	// Default is quiet to keep gameplay/test output clean.
+	// Enable with: CODEMON_VERBOSE_CHALLENGE_LOADER=1
+	static const bool enabled = [] {
+		const char* env = std::getenv("CODEMON_VERBOSE_CHALLENGE_LOADER");
+		if (env == nullptr) {
+			return false;
+		}
+		const std::string value = trim(env);
+		return value == "1" || value == "true" || value == "TRUE" || value == "on" || value == "ON";
+	}();
+	return enabled;
+}
+
+void logInfo(const std::string& message) {
+	// Info logs are intentionally gated behind the verbose flag so
+	// normal runs don't print loader chatter on successful paths.
+	if (isVerboseLoggingEnabled()) {
+		std::cout << "[ChallengeLoader] " << message << "\n";
+	}
+}
+
+void logWarn(const std::string& message) {
+	// Warnings are also gated for the same reason: malformed test fixtures
+	// or fallback-to-default paths are expected in some test cases.
+	if (isVerboseLoggingEnabled()) {
+		std::cerr << "[ChallengeLoader] " << message << "\n";
+	}
+}
+
 } // namespace
 
 ChallengeLoader::ChallengeLoader(const std::string& filePath) {
 	if (!filePath.empty() && loadFromFile(filePath)) {
-		std::cout << "[ChallengeLoader] Loaded " << mChallenges.size()
-				  << " challenges from " << filePath << "\n";
+		// Print load summary only in verbose mode.
+		logInfo("Loaded " + std::to_string(mChallenges.size()) +
+				" challenges from " + filePath);
 		return;
 	}
 
-	std::cerr << "[ChallengeLoader] Could not load from file, using defaults\n";
+	// Missing/invalid files still fall back to defaults; this message is
+	// available when verbose logging is explicitly requested.
+	logWarn("Could not load from file, using defaults");
 	initializeDefaults();
 }
 
@@ -135,14 +170,16 @@ bool ChallengeLoader::loadFromFile(const std::string& filePath) {
 			}
 
 			if (!foundEnd) {
-				std::cerr << "[ChallengeLoader] Unterminated BEGIN_CHALLENGE near line " << lineNum << "\n";
+				logWarn("Unterminated BEGIN_CHALLENGE near line " + std::to_string(lineNum));
 				continue;
 			}
 
 			prompt = trim(prompt);
 			solution = trim(solution);
 			if (prompt.empty() || solution.empty()) {
-				std::cerr << "[ChallengeLoader] Skipping malformed multiline challenge near line " << lineNum << "\n";
+				// Keep parsing the rest of the file if this block is incomplete.
+				// In verbose mode, include the source line to simplify file cleanup.
+				logWarn("Skipping malformed multiline challenge near line " + std::to_string(lineNum));
 				continue;
 			}
 
@@ -169,7 +206,9 @@ bool ChallengeLoader::loadFromFile(const std::string& filePath) {
 		keyword = decodeEscapes(trim(keyword));
 
 		if (prompt.empty() || solution.empty()) {
-			std::cerr << "[ChallengeLoader] Skipping malformed line " << lineNum << "\n";
+			// Legacy pipe entries can be malformed; skip instead of failing the
+			// entire load so valid entries later in the file still work.
+			logWarn("Skipping malformed line " + std::to_string(lineNum));
 			continue;
 		}
 
@@ -186,8 +225,10 @@ void ChallengeLoader::initializeDefaults() {
 		Challenge{"Fix include typo: #inclde <iostream>", "#include <iostream>", "#include"}
 	};
 
-	std::cout << "[ChallengeLoader] Initialized " << mChallenges.size()
-			  << " default challenges\n";
+	// Diagnostic summary for fallback mode (visible only when verbose logging
+	// is enabled via CODEMON_VERBOSE_CHALLENGE_LOADER).
+	logInfo("Initialized " + std::to_string(mChallenges.size()) +
+			" default challenges");
 }
 
 std::optional<Challenge> ChallengeLoader::getRandomChallenge() const {
