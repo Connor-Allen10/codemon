@@ -10,34 +10,61 @@ Instead of just using brute force, you progress by identifying
 and fixing logic errors in the game’s code snippets.
 
 ## 2. Prerequisites & Installation
-Currently, Codémon is supported on **Windows 10/11**.
+Codémon supports **macOS**, **Linux**, **Windows**.
 
 ### Prerequisites:
-* **SFML Libraries:** Included in the release folder.
-* **C++ Redistributables:** Ensure your system is up to date.
+* **CMake 3.20+**
+* **C++17 compiler** (Clang, GCC, or MSVC)
+* **SFML** (3.0 on macOS, 2.6+ on Linux/Windows)
+
+Platform package setup:
+- **macOS**: `brew install sfml`
+- **Linux (Ubuntu/Debian)**: `sudo apt install libsfml-dev`
+- **Windows (vcpkg)**: `vcpkg install sfml:x64-windows`
 
 ### Installation:
-1. Download the latest `Codemon_v0.x.zip` from our GitHub Releases page.
-2. Extract the folder to your desired location.
-3. **Note:** Do not move the `Codemon.exe` out of the folder,
-4. as it needs the `assets/` and `bin/` folders to run.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Connor-Allen10/codemon.git
+   cd codemon
+   ```
+2. Configure and build:
+
+   **macOS/Linux**
+   ```bash
+   cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+   cmake --build build -j
+   ```
+
+   **Windows (with vcpkg toolchain)**
+   ```powershell
+   cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake
+   cmake --build build --config Debug
+   ```
+3. Keep `challenges.txt` with the executable if you want custom runtime challenges.
 
 ## 3. How to Run
-1. Navigate to the extracted folder.
-2. Double-click **Codemon.exe**.
-3. If prompted by Windows Defender, select "More Info" -> "Run Anyway."
+From project root:
+
+**macOS/Linux**
+```bash
+./build/codemon
+```
+
+**Windows**
+```powershell
+.\build\Debug\codemon.exe
+# or (single-config generators)
+.\build\codemon.exe
+```
 
 ## 4. How to Play
 * **Movement:** Use the **Arrow Keys** or **WASD** to walk.
-* **Interaction:** Press **E** or **Space** to interact with obstacles
-* (like broken bridges).
-* **Battles:** When a battle begins, use the **Terminal Overlay**
-* to inspect the Codémon's code. 
+* **Battles:** Battles trigger when you move through grass tiles.
+* **Debug Editor:** In battle, press **E** or **F1** to open the debug challenge editor.
 * **Debugging:** Type your fix into the editor and press **Submit**.
-* A correct fix allows your Codémon to execute its move!
-
-> **Work in Progress:** The "Evolution" system and "Branching Evolution"
-> are currently under development and will be included in the final version.
+* A correct fix allows your Codémon to execute its move.
+* **Exit Battle:** Press **ESC**.
 
 ## 5. How to Report a Bug
 If you encounter a crash or a non-gameplay error:
@@ -68,7 +95,7 @@ cmake -B build -DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/scripts/buildsystems/vcpk
 ```
 
 **Q: "cmake: command not found"**  
-A: Install CMake 3.10+ from [cmake.org](https://cmake.org/download/) or via your package manager.
+A: Install CMake 3.20+ from [cmake.org](https://cmake.org/download/) or via your package manager.
 
 ### Runtime Issues
 
@@ -76,10 +103,14 @@ A: Install CMake 3.10+ from [cmake.org](https://cmake.org/download/) or via your
 A: This is a known font loading issue (#14). The battle still works—press ESC to exit. Fix in progress.
 
 **Q: Game crashes immediately on startup**  
-A: Verify you're running from the correct directory with `assets/` folder present:
+A: Verify assets were copied by CMake and run from project root:
 ```bash
-cd build
-./codemon  # macOS/Linux
+cmake --build build
+./build/codemon  # macOS/Linux
+```
+```powershell
+cmake --build build --config Debug
+.\build\Debug\codemon.exe  # Windows
 ```
 
 **Q: Player movement feels laggy or stutters**  
@@ -90,10 +121,18 @@ cmake --build build
 ```
 
 **Q: Tests fail with "Cannot open map file"**  
-A: Ensure you're running tests from the build directory:
+A: Build tests, then run from project root or with CTest:
 ```bash
-cd build
-ctest --output-on-failure
+cmake --build build --target run_tests
+./build/run_tests
+# or
+ctest --test-dir build --output-on-failure
+```
+```powershell
+cmake --build build --config Debug --target run_tests
+.\build\Debug\run_tests.exe
+# or
+ctest --test-dir build -C Debug --output-on-failure
 ```
 
 ### Gameplay Issues
@@ -110,7 +149,7 @@ A: Walk on grass tiles (green areas). Battles trigger randomly with 15% chance e
 **Q: What are the controls?**  
 A: 
 - Movement: WASD or Arrow Keys
-- Debug overlay: F1
+- Debug editor: E or F1 (during battle)
 - Exit battle: ESC
 
 **Q: Can I play in fullscreen?**  
