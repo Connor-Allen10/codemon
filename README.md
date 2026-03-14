@@ -5,7 +5,6 @@ Codémon is a Pokémon-style RPG built in C++ using SFML. In this world, the cor
 ---
 
 
-
 ## ⚡ Quick Start
 ### Download and Launch
 Download the latest release of codemon and find the `codemon` executable in the `build/` folder (or `build/Debug/codemon.exe` on Windows). 
@@ -49,7 +48,9 @@ Or with CTest:
 ```bash
 ctest --test-dir build --output-on-failure
 ```
-**Expected:** 53 tests passing (unit + integration).
+**Expected:** 56 tests passing (unit + integration).
+
+Optional verbose runtime/test logging (cross-platform shell examples) is documented in [Developer Guidelines](./docs/DEVELOPER_GUIDE.md).
 
 ### Run Instructions
 ```bash
@@ -141,14 +142,14 @@ For detailed information, see:
 All known bugs are tracked in [GitHub Issues](https://github.com/Connor-Allen10/codemon/issues) with `critical`/`minor` severity and `ui`/`logic`/`data` category labels. Issues are closed by a team member other than the author.
 
 ### 🧪 Test Results
-**53 / 53 tests passing** — GoogleTest unit + integration suite
+**56 / 56 tests passing** — GoogleTest unit + integration suite
 
 | Test Suite | Tests | Coverage |
 |-----------|-------|----------|
 | `BattleStateTest` | 13 | Battle phases, input handling, rendering |
-| `ChallengeLoaderTest` | 5 | File parsing, fallback, malformed input |
+| `ChallengeLoaderTest` | 7 | File parsing, fallback, malformed input, verbose-toggle behavior |
 | `DebugIntegrationTest` | 3 | Challenge → battle integration |
-| `DebugChallengeTest` | 3 | Submission validation, hints, victory |
+| `DebugChallengeTest` | 4 | Submission validation, hints, victory |
 | `DebugEngineTest` | 4 | Engine lifecycle, submit pass/fail |
 | `StateTransitionTest` | 6 | Push/pop state machine |
 | `StatsTest` | 2 | Health reduction, floor validation |
