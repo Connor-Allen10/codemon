@@ -15,6 +15,7 @@
 #include "BattleState.hpp"
 #include "../battle/Party.hpp"
 
+#include <cstdlib>
 #include <algorithm>
 #include <cmath>
 #include <filesystem>
@@ -40,6 +41,18 @@
 Debug::ChallengeLoader BattleState::sChallengeLoader("challenges.txt");
 
 namespace {
+// Shared runtime toggle for state-level debug prints.
+// Default: quiet. Enable with CODEMON_VERBOSE_STATE_LOGS=1.
+bool isStateLoggingEnabled() {
+    const char* env = std::getenv("CODEMON_VERBOSE_STATE_LOGS");
+    if (env == nullptr) {
+        return false;
+    }
+
+    const std::string value = env;
+    return value == "1" || value == "true" || value == "TRUE" || value == "on" || value == "ON";
+}
+
 struct MonsterAsset {
     const char* fileName;
 };
@@ -515,7 +528,11 @@ void BattleState::handleEvent(const sf::Event& e) {
         if (keyPressed->code == sf::Keyboard::Key::Escape) {
             mExitRequested = true;
             requestPop(); // Request to be removed from state stack
-            std::cout << "[BattleState] Exit requested\n";
+            // Keep this trace available for debugging input/state flow,
+            // but suppress it in normal runs to reduce console noise.
+            if (isStateLoggingEnabled()) {
+                std::cout << "[BattleState] Exit requested\n";
+            }
         }
 
         if (mPhase == Phase::EncounterIntro) {
@@ -588,7 +605,9 @@ void BattleState::handleEvent(const sf::Event& e) {
         if (e.key.code == sf::Keyboard::Escape) {
             mExitRequested = true;
             requestPop(); // Request to be removed from state stack
-            std::cout << "[BattleState] Exit requested\n";
+            if (isStateLoggingEnabled()) {
+                std::cout << "[BattleState] Exit requested\n";
+            }
         }
 
         if (mPhase == Phase::EncounterIntro) {

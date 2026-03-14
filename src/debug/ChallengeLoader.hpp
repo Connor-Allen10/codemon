@@ -1,9 +1,17 @@
 /**
  * @file ChallengeLoader.hpp
- * @brief Dynamic loading of debug challenges from JSON files.
+ * @brief Dynamic loading of debug challenges from text files.
  * 
- * Provides utilities to load multiple challenges from external data files
- * and select challenges randomly or by ID for battle encounters.
+ * Provides utilities to load challenges from external data files and
+ * select challenges randomly or by index for battle encounters.
+ *
+ * Supported file formats:
+ * - Multiline block format (BEGIN_CHALLENGE / PROMPT / SOLUTION / KEYWORD)
+ * - Legacy single-line format (prompt|solution|keyword)
+ *
+ * Logging note:
+ * - Loader diagnostics are quiet by default.
+ * - Set CODEMON_VERBOSE_CHALLENGE_LOADER=1 to enable loader logs.
  */
 
 #pragma once
@@ -21,7 +29,7 @@ namespace Debug {
  * @brief Loads and manages a pool of debug challenges.
  * 
  * Supports:
- * - Loading challenges from JSON files
+ * - Loading challenges from multiline block and legacy pipe formats
  * - Random challenge selection
  * - Fallback to hardcoded challenges if file loading fails
  */
@@ -29,7 +37,7 @@ class ChallengeLoader {
 public:
     /**
      * @brief Construct a loader and attempt to load challenges from file.
-     * @param filePath Path to JSON challenge file (optional)
+     * @param filePath Path to challenge file (optional)
      * 
      * If file loading fails, initializes with hardcoded default challenges.
      */
@@ -60,7 +68,7 @@ public:
 
 private:
     /**
-     * @brief Load challenges from JSON file.
+    * @brief Load challenges from challenge text file.
      * @return true if successful, false otherwise
      */
     bool loadFromFile(const std::string& filePath);

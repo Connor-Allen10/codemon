@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
+#include <string>
 #if __has_include(<TGUI/TGUI.hpp>) && __has_include(<TGUI/Backend/SFML-Graphics.hpp>)
 #define CODEMON_HAS_TGUI 1
 #include <TGUI/TGUI.hpp>
@@ -36,6 +37,18 @@ namespace {
 constexpr unsigned kTileSize = 48;
 constexpr int kFrameSize = 48;
 constexpr float kAnimFrameTime = 0.14f;
+
+// Shared runtime toggle for state transition logs.
+// Default: quiet. Enable with CODEMON_VERBOSE_STATE_LOGS=1.
+bool isStateLoggingEnabled() {
+    const char* env = std::getenv("CODEMON_VERBOSE_STATE_LOGS");
+    if (env == nullptr) {
+        return false;
+    }
+
+    const std::string value = env;
+    return value == "1" || value == "true" || value == "TRUE" || value == "on" || value == "ON";
+}
 
 sf::Vector2f normalizeOrZero(sf::Vector2f v) {
     const float mag = std::sqrt(v.x * v.x + v.y * v.y);
@@ -422,9 +435,11 @@ void WorldState::checkEncounter() {
     if (mMap.isEncounterAt(playerCenter)) {
         const float roll = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
         if (roll < kEncounterChance) {
-#ifndef NDEBUG
-            std::cout << "[WorldState] Wild encounter! Transitioning to battle...\n";
-#endif
+            // This is useful when debugging encounter/state flow; keep it
+            // opt-in so normal play and tests remain quiet.
+            if (isStateLoggingEnabled()) {
+                std::cout << "[WorldState] Wild encounter! Transitioning to battle...\n";
+            }
             requestPush(std::make_unique<BattleState>(mWindow, mParty));
             mEncounterCooldown = 5.0f;
         }

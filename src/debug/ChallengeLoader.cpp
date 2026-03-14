@@ -62,15 +62,12 @@ bool isVerboseLoggingEnabled() {
 	// Opt-in logging for parser diagnostics.
 	// Default is quiet to keep gameplay/test output clean.
 	// Enable with: CODEMON_VERBOSE_CHALLENGE_LOADER=1
-	static const bool enabled = [] {
-		const char* env = std::getenv("CODEMON_VERBOSE_CHALLENGE_LOADER");
-		if (env == nullptr) {
-			return false;
-		}
-		const std::string value = trim(env);
-		return value == "1" || value == "true" || value == "TRUE" || value == "on" || value == "ON";
-	}();
-	return enabled;
+	const char* env = std::getenv("CODEMON_VERBOSE_CHALLENGE_LOADER");
+	if (env == nullptr) {
+		return false;
+	}
+	const std::string value = trim(env);
+	return value == "1" || value == "true" || value == "TRUE" || value == "on" || value == "ON";
 }
 
 void logInfo(const std::string& message) {

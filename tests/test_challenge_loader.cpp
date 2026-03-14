@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <cstdlib>		// Needed for std::getenv functions.
 
 #include "debug/ChallengeLoader.hpp"
 
@@ -19,6 +20,49 @@ std::filesystem::path writeTempFile(const std::string& fileName,
 	out.close();
 	return path;
 }
+
+class EnvVarGuard {
+public:
+	// Saves and restores an environment variable so tests don't leak
+	// process-wide env changes into other tests.
+	explicit EnvVarGuard(const std::string& key)
+	: mKey(key)
+	, mHadOriginal(false) {
+		if (const char* existing = std::getenv(mKey.c_str()); existing != nullptr) {
+			mHadOriginal = true;
+			mOriginal = existing;
+		}
+	}
+
+	~EnvVarGuard() {
+		if (mHadOriginal) {
+			set(mOriginal);
+		} else {
+			unset();
+		}
+	}
+
+	void set(const std::string& value) {
+#ifdef _WIN32
+		_putenv_s(mKey.c_str(), value.c_str());
+#else
+		setenv(mKey.c_str(), value.c_str(), 1);
+#endif
+	}
+
+	void unset() {
+#ifdef _WIN32
+		_putenv_s(mKey.c_str(), "");
+#else
+		unsetenv(mKey.c_str());
+#endif
+	}
+
+private:
+	std::string mKey;
+	std::string mOriginal;
+	bool mHadOriginal;
+};
 
 } // namespace
 
@@ -126,4 +170,41 @@ TEST(ChallengeLoaderTest, UsesDefaultsWhenFileHasNoValidChallenges) {
 
 	std::error_code ec;
 	std::filesystem::remove(filePath, ec);
+}
+
+TEST(ChallengeLoaderTest, VerboseToggleOffSuppressesLoaderLogs) {
+	// With toggle unset, ChallengeLoader should remain quiet even when
+	// it falls back to defaults.
+	EnvVarGuard guard("CODEMON_VERBOSE_CHALLENGE_LOADER");
+	guard.unset();
+
+	testing::internal::CaptureStdout();
+	testing::internal::CaptureStderr();
+
+	Debug::ChallengeLoader loader("/tmp/this_file_does_not_exist_verbose_off.txt");
+	(void)loader;
+
+	const std::string out = testing::internal::GetCapturedStdout();
+	const std::string err = testing::internal::GetCapturedStderr();
+
+	EXPECT_EQ(out.find("[ChallengeLoader]"), std::string::npos);
+	EXPECT_EQ(err.find("[ChallengeLoader]"), std::string::npos);
+}
+
+TEST(ChallengeLoaderTest, VerboseToggleOnEmitsLoaderLogs) {
+	// With toggle enabled, loader diagnostics should be emitted.
+	EnvVarGuard guard("CODEMON_VERBOSE_CHALLENGE_LOADER");
+	guard.set("1");
+
+	testing::internal::CaptureStdout();
+	testing::internal::CaptureStderr();
+
+	Debug::ChallengeLoader loader("/tmp/this_file_does_not_exist_verbose_on.txt");
+	(void)loader;
+
+	const std::string out = testing::internal::GetCapturedStdout();
+	const std::string err = testing::internal::GetCapturedStderr();
+
+	EXPECT_NE(out.find("Initialized 3 default challenges"), std::string::npos);
+	EXPECT_NE(err.find("Could not load from file, using defaults"), std::string::npos);
 }

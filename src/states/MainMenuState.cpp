@@ -1,9 +1,27 @@
 #include "MainMenuState.hpp"
 
+#include <cstdlib>
 #include <cmath>
 #include <filesystem>
-#include <vector>
 #include <iostream>
+#include <string>
+#include <vector>
+
+namespace {
+
+// Shared runtime toggle for noisy state-transition logs.
+// Default: quiet. Enable with CODEMON_VERBOSE_STATE_LOGS=1.
+bool isStateLoggingEnabled() {
+    const char* env = std::getenv("CODEMON_VERBOSE_STATE_LOGS");
+    if (env == nullptr) {
+        return false;
+    }
+
+    const std::string value = env;
+    return value == "1" || value == "true" || value == "TRUE" || value == "on" || value == "ON";
+}
+
+} // namespace
 
 MainMenuState::MainMenuState(sf::RenderWindow& window)
 : mWindow(window)
@@ -68,7 +86,11 @@ MainMenuState::MainMenuState(sf::RenderWindow& window)
         std::cerr << "WARNING: Failed to load menu font. Text will not display.\n";
     }
 
-    std::cout << "[MainMenuState] Initialized\n";
+    // Startup trace is useful for debugging state flow, but too noisy for
+    // normal gameplay/test output, so it's behind the runtime toggle.
+    if (isStateLoggingEnabled()) {
+        std::cout << "[MainMenuState] Initialized\n";
+    }
 }
 
 void MainMenuState::handleEvent(const sf::Event& e)
@@ -78,7 +100,9 @@ void MainMenuState::handleEvent(const sf::Event& e)
         if (keyPressed->code == sf::Keyboard::Key::Enter ||
             keyPressed->code == sf::Keyboard::Key::Space) {
             requestPop();
-            std::cout << "[MainMenuState] Start requested\n";
+            if (isStateLoggingEnabled()) {
+                std::cout << "[MainMenuState] Start requested\n";
+            }
         }
 
         if (keyPressed->code == sf::Keyboard::Key::Escape) {
@@ -90,7 +114,9 @@ void MainMenuState::handleEvent(const sf::Event& e)
         if (e.key.code == sf::Keyboard::Enter ||
             e.key.code == sf::Keyboard::Space) {
             requestPop();
-            std::cout << "[MainMenuState] Start requested\n";
+            if (isStateLoggingEnabled()) {
+                std::cout << "[MainMenuState] Start requested\n";
+            }
         }
 
         if (e.key.code == sf::Keyboard::Escape) {
