@@ -58,6 +58,32 @@ From project root:
 .\build\codemon.exe
 ```
 
+### Optional: Enable Runtime Debug Logs
+By default, most state/debug loader logs are quiet to reduce terminal noise.
+
+Enable logs for one run:
+
+**macOS/Linux (bash/zsh)**
+```bash
+CODEMON_VERBOSE_STATE_LOGS=1 CODEMON_VERBOSE_CHALLENGE_LOADER=1 ./build/codemon
+```
+
+**Windows (PowerShell)**
+```powershell
+$env:CODEMON_VERBOSE_STATE_LOGS='1'; $env:CODEMON_VERBOSE_CHALLENGE_LOADER='1'; .\build\Debug\codemon.exe
+```
+
+**Windows (CMD)**
+```bat
+set CODEMON_VERBOSE_STATE_LOGS=1 && set CODEMON_VERBOSE_CHALLENGE_LOADER=1 && .\build\Debug\codemon.exe
+```
+
+Available toggles:
+- `CODEMON_VERBOSE_STATE_LOGS` → prints state-flow logs (menu start, encounter transitions, battle exit)
+- `CODEMON_VERBOSE_CHALLENGE_LOADER` → prints challenge loader parsing/fallback logs
+
+Truthy values: `1`, `true`, `TRUE`, `on`, `ON`
+
 ## 4. How to Play
 * **Movement:** Use the **Arrow Keys** or **WASD** to walk.
 * **Battles:** Battles trigger when you move through grass tiles.
@@ -133,6 +159,24 @@ cmake --build build --config Debug --target run_tests
 .\build\Debug\run_tests.exe
 # or
 ctest --test-dir build -C Debug --output-on-failure
+```
+
+**Q: How do I turn debug logs back on?**  
+A: Run with one or both env vars enabled:
+**macOS/Linux**
+```bash
+CODEMON_VERBOSE_STATE_LOGS=1 ./build/codemon
+CODEMON_VERBOSE_CHALLENGE_LOADER=1 ./build/codemon
+```
+**Windows PowerShell**
+```powershell
+$env:CODEMON_VERBOSE_STATE_LOGS='1'; .\build\Debug\codemon.exe
+$env:CODEMON_VERBOSE_CHALLENGE_LOADER='1'; .\build\Debug\codemon.exe
+```
+**Windows CMD**
+```bat
+set CODEMON_VERBOSE_STATE_LOGS=1 && .\build\Debug\codemon.exe
+set CODEMON_VERBOSE_CHALLENGE_LOADER=1 && .\build\Debug\codemon.exe
 ```
 
 ### Gameplay Issues

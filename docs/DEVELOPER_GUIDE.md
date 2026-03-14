@@ -53,6 +53,33 @@ ctest --test-dir build --output-on-failure
 
 For detailed information on testing infrastructure and continuous integration, see [TEST_PLAN.md](TEST_PLAN.md).
 
+### Debug Environment Variables
+To keep normal output clean, several diagnostics are runtime-gated.
+
+- `CODEMON_VERBOSE_STATE_LOGS`
+	- Enables state transition/action logs from world/menu/battle flow.
+- `CODEMON_VERBOSE_CHALLENGE_LOADER`
+	- Enables challenge parser/fallback diagnostics.
+
+Truthy values accepted by both: `1`, `true`, `TRUE`, `on`, `ON`
+
+Examples (single run):
+
+**macOS/Linux (bash/zsh)**
+```bash
+CODEMON_VERBOSE_STATE_LOGS=1 CODEMON_VERBOSE_CHALLENGE_LOADER=1 ./build/codemon
+```
+
+**Windows (PowerShell)**
+```powershell
+$env:CODEMON_VERBOSE_STATE_LOGS='1'; $env:CODEMON_VERBOSE_CHALLENGE_LOADER='1'; .\build\Debug\codemon.exe
+```
+
+**Windows (CMD)**
+```bat
+set CODEMON_VERBOSE_STATE_LOGS=1 && set CODEMON_VERBOSE_CHALLENGE_LOADER=1 && .\build\Debug\codemon.exe
+```
+
 ## 5. Building a Release
 To package a release for end-users:
 1. Configure in Release mode: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release`

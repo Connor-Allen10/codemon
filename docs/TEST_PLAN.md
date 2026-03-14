@@ -99,6 +99,28 @@ Alternative via CTest:
 ctest --test-dir build --output-on-failure
 ```
 
+Verbose diagnostic mode (optional):
+
+**macOS/Linux (bash/zsh)**
+```bash
+CODEMON_VERBOSE_CHALLENGE_LOADER=1 ./build/run_tests
+CODEMON_VERBOSE_STATE_LOGS=1 ./build/run_tests
+```
+
+**Windows (PowerShell)**
+```powershell
+$env:CODEMON_VERBOSE_CHALLENGE_LOADER='1'; .\build\Debug\run_tests.exe
+$env:CODEMON_VERBOSE_STATE_LOGS='1'; .\build\Debug\run_tests.exe
+```
+
+**Windows (CMD)**
+```bat
+set CODEMON_VERBOSE_CHALLENGE_LOADER=1 && .\build\Debug\run_tests.exe
+set CODEMON_VERBOSE_STATE_LOGS=1 && .\build\Debug\run_tests.exe
+```
+
+Use this mode only when investigating parser/state-flow behavior. Default runs should remain quiet for readable CI/local output.
+
 Windows multi-config note:
 
 ```powershell
