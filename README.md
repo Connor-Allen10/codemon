@@ -104,8 +104,8 @@ Optional verbose runtime/test logging (cross-platform shell examples) is documen
 For detailed information, see:
 
 * **[User Manual](./docs/USER_GUIDE.md)**: How to install, run, and play the game.
-* **[INSTALL.md](./INSTALL.md)**: End-user installation guide — platform prerequisites, step-by-step install, gameplay controls, and troubleshooting. Assumes no prior knowledge of the toolset.
-* **[SETUP.md](./SETUP.md)**: System administrator / developer deployment guide — all libraries required, build commands, asset packaging, and distribution instructions.
+* **[INSTALL.md](./docs/INSTALL.md)**: End-user installation guide — platform prerequisites, step-by-step install, gameplay controls, and troubleshooting. Assumes no prior knowledge of the toolset.
+* **[SETUP.md](./docs/SETUP.md)**: System administrator / developer deployment guide — all libraries required, build commands, asset packaging, and distribution instructions.
 * **[Developer Guidelines](./docs/DEVELOPER_GUIDE.md)**: Coding standards (Google C++ Style Guide), architecture, directory structure, and contribution workflow.
 * **[Test Plan & CI Infrastructure](./docs/TEST_PLAN.md)**: How to write, document, and run tests; unit and integration test coverage; GitHub Actions CI setup.
 * **[Living Document](./docs/LIVING_DOCUMENT.md)**: Full design overview, use cases, architecture decisions, and team Reflections.
@@ -173,7 +173,7 @@ See [docs/TEST_PLAN.md](./docs/TEST_PLAN.md) for instructions on adding new test
 - **Change log:** `git log --oneline` or `git log --follow -p <file>` to trace evolution of any file
 - **Issue tracking:** [GitHub Issues](https://github.com/Connor-Allen10/codemon/issues) — used for bugs, tasks, and cross-developer handoff
 - **Inline documentation:** Doxygen-style comments throughout `src/`
-- **Build from source:** See [SETUP.md](./SETUP.md) for complete administrator / developer build steps
+- **Build from source:** See [SETUP.md](./docs/SETUP.md) for complete administrator / developer build steps
 
 ## 👥 The Team
 * **Connor Allen:** Project Manager
