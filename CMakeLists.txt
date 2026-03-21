@@ -90,6 +90,30 @@ if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src/assets")
 endif()
 
 # =========================================================
+# 6b. Local release packaging (dist/)
+# =========================================================
+# Creates a runnable distribution folder containing:
+# - codemon executable
+# - assets
+# - runtime data files (challenge/name lists)
+#
+# Usage:
+#   cmake --build build --target package_dist
+set(CODEMON_DIST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dist/codemon")
+
+add_custom_target(package_dist
+    COMMAND ${CMAKE_COMMAND} -E rm -rf "${CODEMON_DIST_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CODEMON_DIST_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:codemon>" "${CODEMON_DIST_DIR}/"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_BINARY_DIR}/assets" "${CODEMON_DIST_DIR}/assets"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/challenges.txt" "${CODEMON_DIST_DIR}/challenges.txt"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/codemonNames.txt" "${CODEMON_DIST_DIR}/codemonNames.txt"
+    COMMAND ${CMAKE_COMMAND} -E echo "Packaged Codemon to ${CODEMON_DIST_DIR}"
+    DEPENDS codemon
+    COMMENT "Creating local distribution folder in dist/codemon"
+)
+
+# =========================================================
 # 7. Automated Testing (GoogleTest)
 # =========================================================
 
