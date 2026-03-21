@@ -62,6 +62,8 @@ Output is generated at `dist/codemon` and includes:
 - `challenges.txt`
 - `codemonNames.txt`
 
+In CI (GitHub Actions), successful matrix jobs also publish this package as a downloadable artifact named `codemon-dist-${{ matrix.os }}`.
+
 Optional verbose runtime/test logging (cross-platform shell examples) is documented in [Developer Guidelines](./docs/DEVELOPER_GUIDE.md).
 
 ### Run Instructions

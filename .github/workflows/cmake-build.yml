@@ -106,6 +106,14 @@ jobs:
         ctest -C Release -E PackageDistSmoke --output-on-failure --verbose
         echo "::endgroup::"
 
+    - name: Upload packaged build artifact
+      if: success()
+      uses: actions/upload-artifact@v4
+      with:
+        name: codemon-dist-${{ matrix.os }}
+        path: dist/codemon
+        if-no-files-found: error
+
     - name: Test Summary (Unix)
       if: always() && matrix.os != 'windows-latest'
       working-directory: ./build

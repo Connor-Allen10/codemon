@@ -38,6 +38,8 @@ Current CI matrix runs on **macOS** and **Ubuntu Linux**.
 * The workflow builds both the game executable and the `run_tests` binary,
   then executes the full test suite via `ctest --output-on-failure`.
   Any failing test causes the workflow to fail, preventing merges.
+* On successful CI runs, the workflow also uploads a downloadable packaged
+   build artifact named `codemon-dist-${{ matrix.os }}` containing `dist/codemon`.
 * Developers are expected to run the local test flow before pushing:
    `cmake --build build --target run_tests && ./build/run_tests` (or CTest).
 
