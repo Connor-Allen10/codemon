@@ -70,6 +70,8 @@ This is included as a CMake dependency and downloads automatically during build.
 
 ## Installation Steps
 
+This section describes **source installation** (developers/builders). If you only want to play a prebuilt package, see "Using a Packaged Build" below.
+
 ### Step 1: Clone the Repository
 
 ```bash
@@ -176,11 +178,27 @@ ctest --output-on-failure
 ```
 
 ### Expected Output
-All tests should pass (43 tests total):
+All tests should pass (56 tests total):
 ```
-[==========] 43 tests from X test suites ran.
-[ PASSED ] 43 tests.
+[==========] 56 tests from X test suites ran.
+[ PASSED ] 56 tests.
 ```
+
+## Using a Packaged Build (No CMake Required)
+
+If you download a prebuilt package, you do **not** need to install CMake or compile from source.
+
+Expected package contents:
+- executable (`codemon` or `codemon.exe`)
+- `assets/`
+- `challenges.txt`
+- `codemonNames.txt`
+
+For project maintainers creating a local package from source:
+```bash
+cmake --build build --target package_dist
+```
+This creates `dist/codemon` with the required runtime files.
 
 ## Troubleshooting
 

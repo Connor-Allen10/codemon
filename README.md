@@ -49,6 +49,19 @@ ctest --test-dir build --output-on-failure
 ```
 **Expected:** 56 tests passing (unit + integration).
 
+### Local Release Package (dist)
+Create a runnable folder for testers/users without source-tree dependencies:
+
+```bash
+cmake --build build --target package_dist
+```
+
+Output is generated at `dist/codemon` and includes:
+- `codemon` executable
+- `assets/`
+- `challenges.txt`
+- `codemonNames.txt`
+
 Optional verbose runtime/test logging (cross-platform shell examples) is documented in [Developer Guidelines](./docs/DEVELOPER_GUIDE.md).
 
 ### Run Instructions

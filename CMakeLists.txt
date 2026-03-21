@@ -159,3 +159,16 @@ target_link_libraries(run_tests PRIVATE
 # Modern test discovery (Works perfectly on Mac and Linux)
 include(GoogleTest)
 gtest_discover_tests(run_tests)
+
+# =========================================================
+# 8. Packaging smoke test (CTest integration)
+# =========================================================
+# Runs package_dist and verifies required distribution artifacts exist.
+add_test(
+    NAME PackageDistSmoke
+    COMMAND ${CMAKE_COMMAND}
+        -DCMAKE_COMMAND_PATH=${CMAKE_COMMAND}
+        -DBUILD_DIR=${CMAKE_CURRENT_BINARY_DIR}
+        -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/VerifyPackageDist.cmake
+)

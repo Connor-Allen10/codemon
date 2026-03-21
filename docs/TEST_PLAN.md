@@ -129,3 +129,19 @@ cmake --build build --config Debug --target run_tests
 .\build\Debug\run_tests.exe
 ctest --test-dir build -C Debug --output-on-failure
 ```
+
+## Packaging Smoke Test
+
+We include a lightweight integration check to validate local release packaging output.
+
+Run only the packaging smoke test:
+
+```bash
+ctest --test-dir build -R PackageDistSmoke --output-on-failure
+```
+
+This verifies that `dist/codemon` is produced and contains required runtime files:
+- executable
+- `assets/`
+- `challenges.txt`
+- `codemonNames.txt`

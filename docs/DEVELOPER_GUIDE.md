@@ -84,9 +84,13 @@ set CODEMON_VERBOSE_STATE_LOGS=1 && set CODEMON_VERBOSE_CHALLENGE_LOADER=1 && .\
 To package a release for end-users:
 1. Configure in Release mode: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release`
 2. Build the project: `cmake --build build -j`
-3. Ensure game assets are distributed with the build (typically from `/src/assets`, or your packaged `assets` folder).
-4. Include `challenges.txt` with the release if you want custom challenge content at runtime.
-5. Ensure all necessary SFML binaries (.dll or .so files) are included.
+3. Create local distribution folder: `cmake --build build --target package_dist`
+4. Distribution output is generated at `/dist/codemon` with:
+	- executable (`codemon` or `codemon.exe`)
+	- `assets/`
+	- `challenges.txt`
+	- `codemonNames.txt`
+5. Ensure all necessary SFML runtime binaries (.dll/.dylib/.so) are included for external distribution.
 
 ## 6. Coding Guidelines
 * Style: We follow the Google C++ Style Guide for consistency.
