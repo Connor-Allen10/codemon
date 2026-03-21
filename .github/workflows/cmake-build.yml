@@ -70,15 +70,31 @@ jobs:
     - name: Build Project
       run: cmake --build build --config Release
 
+    - name: Run Packaging Smoke Test (Unix)
+      if: matrix.os != 'windows-latest'
+      working-directory: ./build
+      run: |
+        echo "::group::Running PackageDistSmoke"
+        ctest -C Release -R PackageDistSmoke --output-on-failure --verbose
+        echo "::endgroup::"
+
+    - name: Run Packaging Smoke Test (Windows)
+      if: matrix.os == 'windows-latest'
+      working-directory: ./build
+      run: |
+        echo "::group::Running PackageDistSmoke"
+        ctest -C Release -R PackageDistSmoke --output-on-failure --verbose
+        echo "::endgroup::"
+
     - name: Run Tests (Unix)
       if: matrix.os != 'windows-latest'
       working-directory: ./build
       run: |
         echo "::group::Running CTest"
         if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-          xvfb-run -a ctest -C Release --output-on-failure --verbose
+          xvfb-run -a ctest -C Release -E PackageDistSmoke --output-on-failure --verbose
         else
-          ctest -C Release --output-on-failure --verbose
+          ctest -C Release -E PackageDistSmoke --output-on-failure --verbose
         fi
         echo "::endgroup::"
 
@@ -87,7 +103,7 @@ jobs:
       working-directory: ./build
       run: |
         echo "::group::Running CTest"
-        ctest -C Release --output-on-failure --verbose
+        ctest -C Release -E PackageDistSmoke --output-on-failure --verbose
         echo "::endgroup::"
 
     - name: Test Summary (Unix)
