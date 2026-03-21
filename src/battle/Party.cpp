@@ -84,9 +84,12 @@ const std::unordered_map<std::string, std::vector<std::string>>& codemonNamesByT
 	static const std::unordered_map<std::string, std::vector<std::string>> names = [] {
 		std::unordered_map<std::string, std::vector<std::string>> loaded;
 		const bool loadedFromFile = readNamesFile(loaded, {
+			"assets/data/codemonNames.txt",
+			"src/assets/data/codemonNames.txt",
+			"../assets/data/codemonNames.txt",
+			"../src/assets/data/codemonNames.txt",
 			"codemonNames.txt",
-			"../codemonNames.txt",
-			"../../codemonNames.txt"
+			"../codemonNames.txt"
 		});
 
 		if (!loadedFromFile || loaded.empty()) {

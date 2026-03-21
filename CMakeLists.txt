@@ -106,8 +106,8 @@ add_custom_target(package_dist
     COMMAND ${CMAKE_COMMAND} -E make_directory "${CODEMON_DIST_DIR}"
     COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:codemon>" "${CODEMON_DIST_DIR}/"
     COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_BINARY_DIR}/assets" "${CODEMON_DIST_DIR}/assets"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/challenges.txt" "${CODEMON_DIST_DIR}/challenges.txt"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/codemonNames.txt" "${CODEMON_DIST_DIR}/codemonNames.txt"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/src/assets/data/challenges.txt" "${CODEMON_DIST_DIR}/challenges.txt"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/src/assets/data/codemonNames.txt" "${CODEMON_DIST_DIR}/codemonNames.txt"
     COMMAND ${CMAKE_COMMAND} -E echo "Packaged Codemon to ${CODEMON_DIST_DIR}"
     DEPENDS codemon
     COMMENT "Creating local distribution folder in dist/codemon"

@@ -35,10 +35,35 @@
 #define CODEMON_HAS_TGUI 0
 #endif
 
-// Static challenge loader shared across all battle instances
-// Attempts to load from "challenges.txt" in working directory, 
-// falls back to 8 defaults
-Debug::ChallengeLoader BattleState::sChallengeLoader("challenges.txt");
+namespace {
+
+std::string resolveChallengeFilePath() {
+    const std::initializer_list<const char*> candidates = {
+        "assets/data/challenges.txt",
+        "src/assets/data/challenges.txt",
+        "../assets/data/challenges.txt",
+        "../src/assets/data/challenges.txt",
+        "challenges.txt",
+        "../challenges.txt"
+    };
+
+    for (const char* path : candidates) {
+        std::error_code ec;
+        if (std::filesystem::exists(path, ec) && !ec) {
+            return path;
+        }
+    }
+
+    // If no file exists, keep canonical location as the preferred default.
+    // ChallengeLoader will still fall back to built-in defaults when missing.
+    return "assets/data/challenges.txt";
+}
+
+} // namespace
+
+// Static challenge loader shared across all battle instances.
+// Prefers canonical assets/data path, with compatibility fallback candidates.
+Debug::ChallengeLoader BattleState::sChallengeLoader(resolveChallengeFilePath());
 
 namespace {
 // Shared runtime toggle for state-level debug prints.

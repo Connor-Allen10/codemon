@@ -5,6 +5,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <initializer_list>
 #include <string>
 #include <cstdlib>		// Needed for std::getenv functions.
 
@@ -170,6 +171,29 @@ TEST(ChallengeLoaderTest, UsesDefaultsWhenFileHasNoValidChallenges) {
 
 	std::error_code ec;
 	std::filesystem::remove(filePath, ec);
+}
+
+TEST(ChallengeLoaderTest, LoadsBundledChallengesFromCanonicalDataPath) {
+	const std::initializer_list<const char*> candidates = {
+		"assets/data/challenges.txt",
+		"src/assets/data/challenges.txt",
+		"../assets/data/challenges.txt",
+		"../src/assets/data/challenges.txt"
+	};
+
+	std::string resolvedPath;
+	for (const char* path : candidates) {
+		if (std::filesystem::exists(path)) {
+			resolvedPath = path;
+			break;
+		}
+	}
+
+	ASSERT_FALSE(resolvedPath.empty()) << "Expected bundled challenges file in canonical data locations";
+
+	Debug::ChallengeLoader loader(resolvedPath);
+	EXPECT_TRUE(loader.hasAnyChallenges());
+	EXPECT_GT(loader.getChallengeCount(), 3u);
 }
 
 TEST(ChallengeLoaderTest, VerboseToggleOffSuppressesLoaderLogs) {

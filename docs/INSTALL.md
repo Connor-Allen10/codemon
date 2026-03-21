@@ -178,13 +178,13 @@ ctest --output-on-failure
 ```
 
 ### Expected Output
-GoogleTest suite should pass (56 tests):
+GoogleTest suite should pass (57 tests):
 ```
-[==========] 56 tests from X test suites ran.
-[ PASSED ] 56 tests.
+[==========] 57 tests from X test suites ran.
+[ PASSED ] 57 tests.
 ```
 
-If running all CTest checks, expect 57 total checks (56 GoogleTest + 1 `PackageDistSmoke`).
+If running all CTest checks, expect 58 total checks (57 GoogleTest + 1 `PackageDistSmoke`).
 
 ## Using a Packaged Build (No CMake Required)
 
@@ -263,11 +263,11 @@ codemon/
 ├── CMakeLists.txt # Build configuration
 ├── README.md # Project overview
 ├── INSTALL.md # Installation and usage instructions
-├── challenges.txt # Debug challenge data
 ├── docs/ # Developer and user guides
 ├── external/ # Vendored dependencies (e.g., TGUI)
 ├── src/
 │ ├── assets/ # Source assets copied to build/assets
+│ │ └── data/ # Runtime map/challenge/name data files
 │ ├── battle/ # Battle system
 │ ├── debug/ # Debug challenge system
 │ ├── game/ # Core game/state stack
@@ -350,7 +350,7 @@ Release\codemon.exe
 
 - The game is optimized for 60 FPS on modern hardware
 - Minimum CPU: Intel Core i5 or equivalent
-- The debug challenge system supports loading challenges from external files (see `challenges.txt`)
+- The debug challenge system supports loading challenges from external files (see `src/assets/data/challenges.txt`)
 
 ## License
 

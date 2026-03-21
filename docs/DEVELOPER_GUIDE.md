@@ -13,7 +13,8 @@ git clone https://github.com/Connor-Allen10/codemon.git
 ## 2. Directory Structure
 * `/src`: Contains all .cpp and .hpp source files (Game logic, UI, Engine).
 * `/src/assets`: Textures, fonts, and map data used by the game.
-* `/challenges.txt`: External debug challenge definitions loaded at runtime (with fallback defaults if missing/invalid).
+* `/src/assets/data/challenges.txt`: External debug challenge definitions loaded at runtime (with fallback defaults if missing/invalid).
+* `/src/assets/data/codemonNames.txt`: Runtime display-name pool for monster texture variants.
 * `/docs`: Project documentation, user manuals, and milestone reports.
 * `/external`: Vendored third-party dependencies (for example, TGUI source and GoogleTest via CMake FetchContent cache/build outputs).
 * `/status_reports`: Weekly progress updates and sprint planning.

@@ -47,7 +47,7 @@ Or with CTest:
 ```bash
 ctest --test-dir build --output-on-failure
 ```
-**Expected:** 57 checks passing in CTest total (56 GoogleTest + 1 packaging smoke test).
+**Expected:** 58 checks passing in CTest total (57 GoogleTest + 1 packaging smoke test).
 
 ### Local Release Package (dist)
 Create a runnable folder for testers/users without source-tree dependencies:
@@ -85,7 +85,7 @@ Optional verbose runtime/test logging (cross-platform shell examples) is documen
   - Click Submit to validate your fix
   - Required keyword hint displayed at bottom
   - Cancel button exits without submitting
-- **Challenge Customization:** Edit `challenges.txt` to add your own debug puzzles
+- **Challenge Customization:** Edit `src/assets/data/challenges.txt` to add your own debug puzzles
   - Preferred format: multiline challenge blocks (`BEGIN_CHALLENGE` / `PROMPT` / `SOLUTION` / `KEYWORD` / `END_CHALLENGE`)
   - Legacy format still supported: `prompt|solution|keyword` (one per line)
   - Falls back to built-in challenges if file missing
@@ -141,7 +141,7 @@ For detailed information, see:
 | Battle flow: encounter intro → party selection → debug battle | ✅ |
 | In-battle debug challenge editor (E or F1) | ✅ |
 | Multiline challenge prompts, keyword hints, Submit / Cancel | ✅ |
-| External challenge loading from `challenges.txt` with fallback | ✅ |
+| External challenge loading from `src/assets/data/challenges.txt` with fallback | ✅ |
 | Monster sprites, updated main menu visuals | ✅ |
 | ESC exits battle and returns to world | ✅ |
 | Cross-platform build: macOS (SFML 3.x) + Linux CI (SFML 2.6) | ✅ |
@@ -156,12 +156,12 @@ For detailed information, see:
 All known bugs are tracked in [GitHub Issues](https://github.com/Connor-Allen10/codemon/issues) with `critical`/`minor` severity and `ui`/`logic`/`data` category labels. Issues are closed by a team member other than the author.
 
 ### 🧪 Test Results
-**56 / 56 GoogleTest tests passing** + **1 packaging smoke test** = **57 / 57 total CTest checks**
+**57 / 57 GoogleTest tests passing** + **1 packaging smoke test** = **58 / 58 total CTest checks**
 
 | Test Suite | Tests | Coverage |
 |-----------|-------|----------|
 | `BattleStateTest` | 13 | Battle phases, input handling, rendering |
-| `ChallengeLoaderTest` | 7 | File parsing, fallback, malformed input, verbose-toggle behavior |
+| `ChallengeLoaderTest` | 8 | File parsing, fallback, malformed input, canonical data path, verbose-toggle behavior |
 | `DebugIntegrationTest` | 3 | Challenge → battle integration |
 | `DebugChallengeTest` | 4 | Submission validation, hints, victory |
 | `DebugEngineTest` | 4 | Engine lifecycle, submit pass/fail |
