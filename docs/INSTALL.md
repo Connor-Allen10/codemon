@@ -178,11 +178,13 @@ ctest --output-on-failure
 ```
 
 ### Expected Output
-All tests should pass (56 tests total):
+GoogleTest suite should pass (56 tests):
 ```
 [==========] 56 tests from X test suites ran.
 [ PASSED ] 56 tests.
 ```
+
+If running all CTest checks, expect 57 total checks (56 GoogleTest + 1 `PackageDistSmoke`).
 
 ## Using a Packaged Build (No CMake Required)
 

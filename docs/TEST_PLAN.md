@@ -145,3 +145,7 @@ This verifies that `dist/codemon` is produced and contains required runtime file
 - `assets/`
 - `challenges.txt`
 - `codemonNames.txt`
+
+Current total local CTest checks: **57**
+- **56** GoogleTest checks from `run_tests`
+- **1** packaging integration check (`PackageDistSmoke`)

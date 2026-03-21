@@ -47,7 +47,7 @@ Or with CTest:
 ```bash
 ctest --test-dir build --output-on-failure
 ```
-**Expected:** 56 tests passing (unit + integration).
+**Expected:** 57 checks passing in CTest total (56 GoogleTest + 1 packaging smoke test).
 
 ### Local Release Package (dist)
 Create a runnable folder for testers/users without source-tree dependencies:
@@ -154,7 +154,7 @@ For detailed information, see:
 All known bugs are tracked in [GitHub Issues](https://github.com/Connor-Allen10/codemon/issues) with `critical`/`minor` severity and `ui`/`logic`/`data` category labels. Issues are closed by a team member other than the author.
 
 ### 🧪 Test Results
-**56 / 56 tests passing** — GoogleTest unit + integration suite
+**56 / 56 GoogleTest tests passing** + **1 packaging smoke test** = **57 / 57 total CTest checks**
 
 | Test Suite | Tests | Coverage |
 |-----------|-------|----------|
